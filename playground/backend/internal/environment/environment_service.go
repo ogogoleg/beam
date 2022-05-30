@@ -17,6 +17,7 @@ package environment
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/logger"
 	"encoding/json"
 	"errors"
@@ -62,6 +63,10 @@ const (
 	defaultNumOfParallelJobs      = 20
 	bucketNameKey                 = "BUCKET_NAME"
 	defaultBucketName             = "playground-precompiled-objects"
+	snippetDBTypeKey              = "SNIPPET_DB_TYPE"
+	defaultSnippetDBType          = db.LOCAL
+	playgroundSaltKey             = "PLAYGROUND_SALT"
+	defaultPlaygroundSalt         = "Beam playground salt\n"
 )
 
 // Environment operates with environment structures: NetworkEnvs, BeamEnvs, ApplicationEnvs
@@ -104,6 +109,8 @@ func GetApplicationEnvsFromOsEnvs() (*ApplicationEnvs, error) {
 	projectId := os.Getenv(projectIdKey)
 	pipelinesFolder := getEnv(pipelinesFolderKey, defaultPipelinesFolder)
 	bucketName := getEnv(bucketNameKey, defaultBucketName)
+	snippetDBType := db.Database(getEnv(snippetDBTypeKey, defaultSnippetDBType.String()))
+	playgroundSalt := getEnv(playgroundSaltKey, defaultPlaygroundSalt)
 
 	if value, present := os.LookupEnv(cacheKeyExpirationTimeKey); present {
 		if converted, err := time.ParseDuration(value); err == nil {
@@ -121,7 +128,7 @@ func GetApplicationEnvsFromOsEnvs() (*ApplicationEnvs, error) {
 	}
 
 	if value, present := os.LookupEnv(workingDirKey); present {
-		return NewApplicationEnvs(value, launchSite, projectId, pipelinesFolder, NewCacheEnvs(cacheType, cacheAddress, cacheExpirationTime), pipelineExecuteTimeout, bucketName), nil
+		return NewApplicationEnvs(value, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, NewCacheEnvs(cacheType, cacheAddress, cacheExpirationTime), pipelineExecuteTimeout, snippetDBType), nil
 	}
 	return nil, errors.New("APP_WORK_DIR env should be provided with os.env")
 }

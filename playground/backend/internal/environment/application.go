@@ -16,6 +16,7 @@
 package environment
 
 import (
+	"beam.apache.org/playground/backend/internal/db"
 	"fmt"
 	"time"
 )
@@ -42,7 +43,7 @@ func (serverEnvs *NetworkEnvs) Protocol() string {
 	return serverEnvs.protocol
 }
 
-//CacheEnvs contains all environment variables that needed to use cache
+// CacheEnvs contains all environment variables that needed to use cache
 type CacheEnvs struct {
 	// cacheType is type of cache (local/redis)
 	cacheType string
@@ -78,7 +79,7 @@ func NewCacheEnvs(cacheType, cacheAddress string, cacheExpirationTime time.Durat
 	}
 }
 
-//ApplicationEnvs contains all environment variables that needed to run backend processes
+// ApplicationEnvs contains all environment variables that needed to run backend processes
 type ApplicationEnvs struct {
 	// workingDir is a root working directory of application.
 	// This directory is different from the `pwd` of the application. It is a working directory passed as
@@ -102,10 +103,21 @@ type ApplicationEnvs struct {
 
 	// bucketName is a name of the GCS's bucket with examples
 	bucketName string
+
+	// snippetDB is a database type to store code snippets
+	snippetDB db.Database
+
+	// playgroundSalt is a salt to generate hash
+	playgroundSalt string
 }
 
 // NewApplicationEnvs constructor for ApplicationEnvs
-func NewApplicationEnvs(workingDir, launchSite, projectId, pipelinesFolder string, cacheEnvs *CacheEnvs, pipelineExecuteTimeout time.Duration, bucketName string) *ApplicationEnvs {
+func NewApplicationEnvs(
+	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt string,
+	cacheEnvs *CacheEnvs,
+	pipelineExecuteTimeout time.Duration,
+	snippetDBType db.Database,
+) *ApplicationEnvs {
 	return &ApplicationEnvs{
 		workingDir:             workingDir,
 		cacheEnvs:              cacheEnvs,
@@ -114,6 +126,8 @@ func NewApplicationEnvs(workingDir, launchSite, projectId, pipelinesFolder strin
 		projectId:              projectId,
 		pipelinesFolder:        pipelinesFolder,
 		bucketName:             bucketName,
+		snippetDB:              snippetDBType,
+		playgroundSalt:         playgroundSalt,
 	}
 }
 
@@ -150,4 +164,14 @@ func (ae *ApplicationEnvs) PipelinesFolder() string {
 // BucketName returns name of the GCS's bucket with examples
 func (ae *ApplicationEnvs) BucketName() string {
 	return ae.bucketName
+}
+
+// SnippetDB returns database type for code snippets
+func (ae *ApplicationEnvs) SnippetDB() db.Database {
+	return ae.snippetDB
+}
+
+// PlaygroundSalt returns playground salt for hash generation
+func (ae *ApplicationEnvs) PlaygroundSalt() string {
+	return ae.playgroundSalt
 }

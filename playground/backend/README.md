@@ -91,6 +91,8 @@ default value and there is no need to set them up to launch locally:
   incoming requests to other instances while the instance will not ready.
 - `LAUNCH_SITE` - is the value to configure log (default value = local). If developers want to use log service on the
   App Engine then need to change this value to `app_engine`.
+- `SNIPPET_DB_TYPE` - is a type of the code snippet database is used for the backend server. If it is set as a `firestore`,
+  then backend server will use Firestore to keep all code snippets (default value = `local`)
 
 ### Running the server app via Docker
 

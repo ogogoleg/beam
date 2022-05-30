@@ -158,6 +158,10 @@ variable "cache_type" {
   description = "remote or local. Set remote to use Redis and local to use in-memory application level cache"
   default     = "remote"
 }
+variable "snippet_db_type" {
+  description = "firestore or local. Set firestore to use Firestore and local to use in-memory application level storage"
+  default = "firestore"
+}
 variable "backend_service_name" {
   default = "backend"
 }

@@ -21,6 +21,9 @@ import (
 	"beam.apache.org/playground/backend/internal/cache/local"
 	"beam.apache.org/playground/backend/internal/cache/redis"
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
+	"beam.apache.org/playground/backend/internal/db"
+	"beam.apache.org/playground/backend/internal/db/firestore"
+	local_db "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
 	"beam.apache.org/playground/backend/internal/utils"
@@ -47,9 +50,16 @@ func runServer() error {
 	if err != nil {
 		return err
 	}
+
+	snippetDb, err := setupSnippetDB(ctx, envService.ApplicationEnvs)
+	if err != nil {
+		return err
+	}
+
 	pb.RegisterPlaygroundServiceServer(grpcServer, &playgroundController{
 		env:          envService,
 		cacheService: cacheService,
+		snippetDB:    snippetDb,
 	})
 
 	// Examples catalog should be retrieved and saved to cache only if the server doesn't suppose to run code, i.e. SDK is unspecified
@@ -141,6 +151,16 @@ func setupExamplesCatalog(ctx context.Context, cacheService cache.Cache, bucketN
 		}
 	}
 	return nil
+}
+
+// setupSnippetDB constructs required database by application environment
+func setupSnippetDB(ctx context.Context, appEnv environment.ApplicationEnvs) (db.SnippetDB, error) {
+	switch appEnv.SnippetDB() {
+	case db.FIRESTORE:
+		return firestore.New(ctx, appEnv.GoogleProjectId())
+	default:
+		return local_db.New()
+	}
 }
 
 func main() {

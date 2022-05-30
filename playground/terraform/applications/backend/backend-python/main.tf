@@ -59,6 +59,7 @@ resource "google_app_engine_flexible_app_version" "backend_app_python" {
 
   env_variables = {
     CACHE_TYPE        = var.cache_type
+    SNIPPET_DB_TYPE   = var.snippet_db_type
     CACHE_ADDRESS     = "${var.cache_address}:6379"
     NUM_PARALLEL_JOBS = 70
     LAUNCH_SITE       = "app_engine"

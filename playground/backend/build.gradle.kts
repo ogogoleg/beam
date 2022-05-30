@@ -40,14 +40,30 @@ task("tidy") {
   }
 }
 
+task("startMockFirestore") {
+  doLast {
+    exec {
+      executable("sh")
+      args("start-firestore-emulator.sh")
+    }
+  }
+}
+
 task("test") {
   group = "verification"
+  dependsOn(":playground:backend:startMockFirestore")
   description = "Test the backend"
-  doLast {
+  doFirst {
     exec {
       executable("go")
       args("test", "./...")
     }
+  }
+  doLast {
+      exec {
+        executable("sh")
+        args("stop-firestore-emulator.sh")
+      }
   }
 }
 

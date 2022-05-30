@@ -55,6 +55,11 @@ variable "cache_type" {
   default     = "remote"
 }
 
+variable "snippet_db_type" {
+  description = "firestore or local. Set firestore to use Firestore and local to use in-memory application level storage"
+  default = "firestore"
+}
+
 variable "location" {
   description = "Location of App"
   default     = "us-central"

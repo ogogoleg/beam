@@ -13,21 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module beam.apache.org/playground/backend
+package db
 
-go 1.16
-
-require (
-	cloud.google.com/go/firestore v1.6.1
-	cloud.google.com/go/logging v1.4.2
-	cloud.google.com/go/storage v1.18.2
-	github.com/go-redis/redis/v8 v8.11.4
-	github.com/go-redis/redismock/v8 v8.0.6
-	github.com/google/uuid v1.3.0
-	github.com/improbable-eng/grpc-web v0.14.1
-	github.com/rs/cors v1.8.0
-	go.uber.org/goleak v1.1.12
-	google.golang.org/api v0.59.0
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
+import (
+	"beam.apache.org/playground/backend/internal/share"
+	"context"
 )
+
+// Database represents data type that needed to use specific database
+type Database string
+
+// FIRESTORE represents value indicates database as firestore
+// LOCAL represents value indicates database for local usage or testing
+const (
+	FIRESTORE Database = "firestore"
+	LOCAL     Database = "local"
+)
+
+func (db Database) String() string {
+	return string(db)
+}
+
+type SnippetDB interface {
+	PutSnippet(ctx context.Context, id string, snip *share.Snippet) error
+
+	GetSnippet(ctx context.Context, id string) (*share.Snippet, error)
+}

@@ -19,13 +19,21 @@ import (
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/code_processing"
+	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/logger"
 	"beam.apache.org/playground/backend/internal/setup_tools/life_cycle"
+	"beam.apache.org/playground/backend/internal/share"
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"github.com/google/uuid"
+	"strings"
+	"time"
+)
+
+const (
+	maxSnippetSize = 64 * 1024
 )
 
 // playgroundController processes `gRPC' requests from clients.
@@ -33,6 +41,7 @@ import (
 type playgroundController struct {
 	env          *environment.Environment
 	cacheService cache.Cache
+	snippetDB    db.SnippetDB
 
 	pb.UnimplementedPlaygroundServiceServer
 }
@@ -343,5 +352,83 @@ func (controller *playgroundController) GetDefaultPrecompiledObject(ctx context.
 		return nil, errors.InternalError("Error during getting Precompiled Objects", "Error with cloud connection")
 	}
 	response := pb.GetDefaultPrecompiledObjectResponse{PrecompiledObject: precompiledObject}
+	return &response, nil
+}
+
+// SaveCode returns the generated ID
+func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.SaveCodeRequest) (*pb.SaveCodeResponse, error) {
+	errorTitle := "Error during saving code"
+	switch info.Sdk {
+	case pb.Sdk_SDK_UNSPECIFIED:
+		logger.Errorf("SaveCode(): unimplemented sdk: %s\n", info.Sdk)
+		return nil, errors.InvalidArgumentError(errorTitle, "Sdk is not implemented yet: %s", info.Sdk.String())
+	}
+
+	var codes []share.Code
+	for _, code := range info.Codes {
+		if code.Code == "" {
+			logger.Error("SaveCode(): snippet is empty")
+			return nil, errors.InvalidArgumentError(errorTitle, "Snippet must have some code")
+		}
+
+		if len(code.Code) > maxSnippetSize {
+			logger.Errorf("SaveCode(): snippet is too large. Max snippet size: %d", maxSnippetSize)
+			return nil, errors.InvalidArgumentError(errorTitle, "Snippet size is more than %d", maxSnippetSize)
+		}
+
+		codes = append(codes, share.Code{
+			Name:        code.Name,
+			Code:        code.Code,
+			ContextLine: 1,
+			IsMain:      strings.Contains(code.Code, "main"),
+		})
+	}
+
+	snippet := share.Snippet{
+		Salt:            controller.env.ApplicationEnvs.PlaygroundSalt(),
+		OwnerId:         "",
+		Sdk:             info.Sdk,
+		PipelineOptions: info.PipelineOptions,
+		Created:         time.Now(),
+		Source:          share.PLAYGROUND,
+		Codes:           codes,
+	}
+	id, err := snippet.ID()
+	if err != nil {
+		logger.Errorf("SaveCode(): ID(): error during ID generation: %s", err.Error())
+		return nil, errors.InternalError(errorTitle, "Failed to generate ID")
+	}
+
+	if err := controller.snippetDB.PutSnippet(ctx, id, &snippet); err != nil {
+		logger.Errorf("SaveCode(): PutSnippet(): error during snippet saving: %s", err.Error())
+		return nil, errors.InternalError(errorTitle, "Failed to save a code snippet")
+	}
+
+	response := pb.SaveCodeResponse{Id: id}
+	return &response, nil
+}
+
+// GetCode returns the code snippet
+func (controller *playgroundController) GetCode(ctx context.Context, info *pb.GetCodeRequest) (*pb.GetCodeResponse, error) {
+	snippet, err := controller.snippetDB.GetSnippet(ctx, info.GetId())
+	if err != nil {
+		logger.Errorf("GetCode(): GetCode(): error during getting code: %s", err.Error())
+		return nil, errors.InternalError("Error during getting code", "Failed to retrieve the code")
+	}
+
+	var codes []*pb.CodeResponse
+	for _, code := range snippet.Codes {
+		codes = append(codes, &pb.CodeResponse{
+			Name:   code.Name,
+			Code:   code.Code,
+			IsMain: code.IsMain,
+		})
+	}
+
+	response := pb.GetCodeResponse{
+		Codes:           codes,
+		Sdk:             snippet.Sdk,
+		PipelineOptions: snippet.PipelineOptions,
+	}
 	return &response, nil
 }

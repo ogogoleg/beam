@@ -31,6 +31,7 @@ module "backend-go" {
   docker_image_tag        = var.docker_image_tag
   service_name            = "${var.base_service_name}-go"
   cache_type              = var.cache_type
+  snippet_db_type         = var.snippet_db_type
   volume_size             = var.go_volume_size
   cpu                     = var.go_cpu
   memory                  = var.go_memory
@@ -50,6 +51,7 @@ module "backend-java" {
   docker_image_tag        = var.docker_image_tag
   service_name            = "${var.base_service_name}-java"
   cache_type              = var.cache_type
+  snippet_db_type         = var.snippet_db_type
   volume_size             = var.java_volume_size
   cpu                     = var.java_cpu
   memory                  = var.java_memory
@@ -69,6 +71,7 @@ module "backend-python" {
   docker_image_tag        = var.docker_image_tag
   service_name            = "${var.base_service_name}-python"
   cache_type              = var.cache_type
+  snippet_db_type         = var.snippet_db_type
   volume_size             = var.python_volume_size
   cpu                     = var.python_cpu
   memory                  = var.python_memory
@@ -88,6 +91,7 @@ module "backend-router" {
   docker_image_tag        = var.docker_image_tag
   service_name            = "${var.base_service_name}-router"
   cache_type              = var.cache_type
+  snippet_db_type         = var.snippet_db_type
   volume_size             = var.router_volume_size
   cpu                     = var.router_cpu
   memory                  = var.router_memory
@@ -107,6 +111,7 @@ module "backend-scio" {
   docker_image_tag        = var.docker_image_tag
   service_name            = "${var.base_service_name}-scio"
   cache_type              = var.cache_type
+  snippet_db_type         = var.snippet_db_type
   volume_size             = var.scio_volume_size
   cpu                     = var.scio_cpu
   memory                  = var.scio_memory

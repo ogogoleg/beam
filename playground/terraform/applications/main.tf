@@ -44,6 +44,7 @@ module "backend" {
   docker_image_tag        = var.docker_image_tag == "" ? var.environment : var.docker_image_tag
   docker_image_name       = "${var.docker_image_name}-backend"
   cache_type              = var.cache_type
+  snippet_db_type         = var.snippet_db_type
 
   go_volume_size      = var.go_volume_size
   go_cpu              = var.go_cpu

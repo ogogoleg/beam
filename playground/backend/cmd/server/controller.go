@@ -28,12 +28,7 @@ import (
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"github.com/google/uuid"
-	"strings"
 	"time"
-)
-
-const (
-	maxSnippetSize = 64 * 1024
 )
 
 // playgroundController processes `gRPC' requests from clients.
@@ -364,35 +359,37 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 		return nil, errors.InvalidArgumentError(errorTitle, "Sdk is not implemented yet: %s", info.Sdk.String())
 	}
 
-	var codes []share.Code
+	nowDate := time.Now()
+	snippet := share.Snippet{
+		Salt:            controller.env.ApplicationEnvs.PlaygroundSalt(),
+		OwnerId:         "",
+		Sdk:             info.Sdk,
+		PipelineOptions: info.PipelineOptions,
+		Created:         nowDate,
+		LastVisited:     nowDate,
+		Source:          share.PLAYGROUND,
+	}
+
 	for _, code := range info.Codes {
 		if code.Code == "" {
 			logger.Error("SaveCode(): snippet is empty")
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet must have some code")
 		}
 
+		maxSnippetSize := controller.env.ApplicationEnvs.MaxSnippetSize()
 		if len(code.Code) > maxSnippetSize {
 			logger.Errorf("SaveCode(): snippet is too large. Max snippet size: %d", maxSnippetSize)
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet size is more than %d", maxSnippetSize)
 		}
 
-		codes = append(codes, share.Code{
-			Name:        code.Name,
+		snippet.Codes = append(snippet.Codes, share.Code{
+			Name:        utils.GetCodeName(code.Name, info.Sdk),
 			Code:        code.Code,
 			ContextLine: 1,
-			IsMain:      strings.Contains(code.Code, "main"),
+			IsMain:      utils.IsCodeMain(code.Code, info.Sdk),
 		})
 	}
 
-	snippet := share.Snippet{
-		Salt:            controller.env.ApplicationEnvs.PlaygroundSalt(),
-		OwnerId:         "",
-		Sdk:             info.Sdk,
-		PipelineOptions: info.PipelineOptions,
-		Created:         time.Now(),
-		Source:          share.PLAYGROUND,
-		Codes:           codes,
-	}
 	id, err := snippet.ID()
 	if err != nil {
 		logger.Errorf("SaveCode(): ID(): error during ID generation: %s", err.Error())
@@ -416,19 +413,17 @@ func (controller *playgroundController) GetCode(ctx context.Context, info *pb.Ge
 		return nil, errors.InternalError("Error during getting code", "Failed to retrieve the code")
 	}
 
-	var codes []*pb.CodeFullInfo
+	response := pb.GetCodeResponse{
+		Sdk:             snippet.Sdk,
+		PipelineOptions: snippet.PipelineOptions,
+	}
 	for _, code := range snippet.Codes {
-		codes = append(codes, &pb.CodeFullInfo{
+		response.Codes = append(response.Codes, &pb.CodeFullInfo{
 			Name:   code.Name,
 			Code:   code.Code,
 			IsMain: code.IsMain,
 		})
 	}
 
-	response := pb.GetCodeResponse{
-		Codes:           codes,
-		Sdk:             snippet.Sdk,
-		PipelineOptions: snippet.PipelineOptions,
-	}
 	return &response, nil
 }

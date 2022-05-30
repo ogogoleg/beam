@@ -22,6 +22,7 @@ import (
 	"context"
 	"encoding/json"
 	"google.golang.org/api/iterator"
+	"time"
 )
 
 const (
@@ -107,5 +108,14 @@ func (f *Firestore) GetSnippet(ctx context.Context, id string) (*share.Snippet, 
 		}
 		snip.Codes = append(snip.Codes, code)
 	}
+
+	snip.LastVisited = time.Now()
+	snip.VisitCount += 1
+	_, err = f.client.Collection(snippetCollection).Doc(id).Set(ctx, snip)
+	if err != nil {
+		logger.Errorf("Firestore: GetSnippet(): error during data setting, err: %s\n", err.Error())
+		return nil, err
+	}
+
 	return &snip, nil
 }

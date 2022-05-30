@@ -109,6 +109,9 @@ type ApplicationEnvs struct {
 
 	// playgroundSalt is a salt to generate hash
 	playgroundSalt string
+
+	// maxSnippetSize is snippet size limit
+	maxSnippetSize int
 }
 
 // NewApplicationEnvs constructor for ApplicationEnvs
@@ -117,6 +120,7 @@ func NewApplicationEnvs(
 	cacheEnvs *CacheEnvs,
 	pipelineExecuteTimeout time.Duration,
 	snippetDBType db.Database,
+	maxSnippetSize int,
 ) *ApplicationEnvs {
 	return &ApplicationEnvs{
 		workingDir:             workingDir,
@@ -128,6 +132,7 @@ func NewApplicationEnvs(
 		bucketName:             bucketName,
 		snippetDB:              snippetDBType,
 		playgroundSalt:         playgroundSalt,
+		maxSnippetSize:         maxSnippetSize,
 	}
 }
 
@@ -174,4 +179,9 @@ func (ae *ApplicationEnvs) SnippetDB() db.Database {
 // PlaygroundSalt returns playground salt for hash generation
 func (ae *ApplicationEnvs) PlaygroundSalt() string {
 	return ae.playgroundSalt
+}
+
+// MaxSnippetSize returns snippet size limit
+func (ae *ApplicationEnvs) MaxSnippetSize() int {
+	return ae.maxSnippetSize
 }

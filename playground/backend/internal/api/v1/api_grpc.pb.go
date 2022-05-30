@@ -53,7 +53,7 @@ type PlaygroundServiceClient interface {
 	GetPreparationOutput(ctx context.Context, in *GetPreparationOutputRequest, opts ...grpc.CallOption) (*GetPreparationOutputResponse, error)
 	// Get the result of pipeline compilation.
 	GetCompileOutput(ctx context.Context, in *GetCompileOutputRequest, opts ...grpc.CallOption) (*GetCompileOutputResponse, error)
-	// Cancel code processing
+	// Cancel code processing.
 	Cancel(ctx context.Context, in *CancelRequest, opts ...grpc.CallOption) (*CancelResponse, error)
 	// Get all precompiled objects from the cloud storage.
 	GetPrecompiledObjects(ctx context.Context, in *GetPrecompiledObjectsRequest, opts ...grpc.CallOption) (*GetPrecompiledObjectsResponse, error)
@@ -69,6 +69,10 @@ type PlaygroundServiceClient interface {
 	GetPrecompiledObjectGraph(ctx context.Context, in *GetPrecompiledObjectGraphRequest, opts ...grpc.CallOption) (*GetPrecompiledObjectGraphResponse, error)
 	// Get the default precompile object for the sdk.
 	GetDefaultPrecompiledObject(ctx context.Context, in *GetDefaultPrecompiledObjectRequest, opts ...grpc.CallOption) (*GetDefaultPrecompiledObjectResponse, error)
+	// Save the code required for the sharing.
+	SaveCode(ctx context.Context, in *SaveCodeRequest, opts ...grpc.CallOption) (*SaveCodeResponse, error)
+	// Get the code of playground.
+	GetCode(ctx context.Context, in *GetCodeRequest, opts ...grpc.CallOption) (*GetCodeResponse, error)
 }
 
 type playgroundServiceClient struct {
@@ -232,6 +236,24 @@ func (c *playgroundServiceClient) GetDefaultPrecompiledObject(ctx context.Contex
 	return out, nil
 }
 
+func (c *playgroundServiceClient) SaveCode(ctx context.Context, in *SaveCodeRequest, opts ...grpc.CallOption) (*SaveCodeResponse, error) {
+	out := new(SaveCodeResponse)
+	err := c.cc.Invoke(ctx, "/api.v1.PlaygroundService/SaveCode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *playgroundServiceClient) GetCode(ctx context.Context, in *GetCodeRequest, opts ...grpc.CallOption) (*GetCodeResponse, error) {
+	out := new(GetCodeResponse)
+	err := c.cc.Invoke(ctx, "/api.v1.PlaygroundService/GetCode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PlaygroundServiceServer is the server API for PlaygroundService service.
 // All implementations should embed UnimplementedPlaygroundServiceServer
 // for forward compatibility
@@ -254,7 +276,7 @@ type PlaygroundServiceServer interface {
 	GetPreparationOutput(context.Context, *GetPreparationOutputRequest) (*GetPreparationOutputResponse, error)
 	// Get the result of pipeline compilation.
 	GetCompileOutput(context.Context, *GetCompileOutputRequest) (*GetCompileOutputResponse, error)
-	// Cancel code processing
+	// Cancel code processing.
 	Cancel(context.Context, *CancelRequest) (*CancelResponse, error)
 	// Get all precompiled objects from the cloud storage.
 	GetPrecompiledObjects(context.Context, *GetPrecompiledObjectsRequest) (*GetPrecompiledObjectsResponse, error)
@@ -270,6 +292,10 @@ type PlaygroundServiceServer interface {
 	GetPrecompiledObjectGraph(context.Context, *GetPrecompiledObjectGraphRequest) (*GetPrecompiledObjectGraphResponse, error)
 	// Get the default precompile object for the sdk.
 	GetDefaultPrecompiledObject(context.Context, *GetDefaultPrecompiledObjectRequest) (*GetDefaultPrecompiledObjectResponse, error)
+	// Save the code required for the sharing.
+	SaveCode(context.Context, *SaveCodeRequest) (*SaveCodeResponse, error)
+	// Get the code of playground.
+	GetCode(context.Context, *GetCodeRequest) (*GetCodeResponse, error)
 }
 
 // UnimplementedPlaygroundServiceServer should be embedded to have forward compatible implementations.
@@ -326,6 +352,12 @@ func (UnimplementedPlaygroundServiceServer) GetPrecompiledObjectGraph(context.Co
 }
 func (UnimplementedPlaygroundServiceServer) GetDefaultPrecompiledObject(context.Context, *GetDefaultPrecompiledObjectRequest) (*GetDefaultPrecompiledObjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDefaultPrecompiledObject not implemented")
+}
+func (UnimplementedPlaygroundServiceServer) SaveCode(context.Context, *SaveCodeRequest) (*SaveCodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveCode not implemented")
+}
+func (UnimplementedPlaygroundServiceServer) GetCode(context.Context, *GetCodeRequest) (*GetCodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCode not implemented")
 }
 
 // UnsafePlaygroundServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -645,6 +677,42 @@ func _PlaygroundService_GetDefaultPrecompiledObject_Handler(srv interface{}, ctx
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PlaygroundService_SaveCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlaygroundServiceServer).SaveCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.PlaygroundService/SaveCode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlaygroundServiceServer).SaveCode(ctx, req.(*SaveCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PlaygroundService_GetCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlaygroundServiceServer).GetCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.v1.PlaygroundService/GetCode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlaygroundServiceServer).GetCode(ctx, req.(*GetCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PlaygroundService_ServiceDesc is the grpc.ServiceDesc for PlaygroundService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -719,6 +787,14 @@ var PlaygroundService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDefaultPrecompiledObject",
 			Handler:    _PlaygroundService_GetDefaultPrecompiledObject_Handler,
+		},
+		{
+			MethodName: "SaveCode",
+			Handler:    _PlaygroundService_SaveCode_Handler,
+		},
+		{
+			MethodName: "GetCode",
+			Handler:    _PlaygroundService_GetCode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

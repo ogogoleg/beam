@@ -138,6 +138,18 @@ class PlaygroundServiceClient extends $grpc.Client {
       ($0.GetDefaultPrecompiledObjectRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) =>
           $0.GetDefaultPrecompiledObjectResponse.fromBuffer(value));
+  static final _$saveCode =
+      $grpc.ClientMethod<$0.SaveCodeRequest, $0.SaveCodeResponse>(
+          '/api.v1.PlaygroundService/SaveCode',
+          ($0.SaveCodeRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) =>
+              $0.SaveCodeResponse.fromBuffer(value));
+  static final _$getCode =
+      $grpc.ClientMethod<$0.GetCodeRequest, $0.GetCodeResponse>(
+          '/api.v1.PlaygroundService/GetCode',
+          ($0.GetCodeRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) =>
+              $0.GetCodeResponse.fromBuffer(value));
 
   PlaygroundServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -245,6 +257,16 @@ class PlaygroundServiceClient extends $grpc.Client {
           {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$getDefaultPrecompiledObject, request,
         options: options);
+  }
+
+  $grpc.ResponseFuture<$0.SaveCodeResponse> saveCode($0.SaveCodeRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$saveCode, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.GetCodeResponse> getCode($0.GetCodeRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getCode, request, options: options);
   }
 }
 
@@ -399,6 +421,20 @@ abstract class PlaygroundServiceBase extends $grpc.Service {
             $0.GetDefaultPrecompiledObjectRequest.fromBuffer(value),
         ($0.GetDefaultPrecompiledObjectResponse value) =>
             value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SaveCodeRequest, $0.SaveCodeResponse>(
+        'SaveCode',
+        saveCode_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.SaveCodeRequest.fromBuffer(value),
+        ($0.SaveCodeResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GetCodeRequest, $0.GetCodeResponse>(
+        'GetCode',
+        getCode_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GetCodeRequest.fromBuffer(value),
+        ($0.GetCodeResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.RunCodeResponse> runCode_Pre(
@@ -497,6 +533,16 @@ abstract class PlaygroundServiceBase extends $grpc.Service {
     return getDefaultPrecompiledObject(call, await request);
   }
 
+  $async.Future<$0.SaveCodeResponse> saveCode_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.SaveCodeRequest> request) async {
+    return saveCode(call, await request);
+  }
+
+  $async.Future<$0.GetCodeResponse> getCode_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.GetCodeRequest> request) async {
+    return getCode(call, await request);
+  }
+
   $async.Future<$0.RunCodeResponse> runCode(
       $grpc.ServiceCall call, $0.RunCodeRequest request);
   $async.Future<$0.CheckStatusResponse> checkStatus(
@@ -533,4 +579,8 @@ abstract class PlaygroundServiceBase extends $grpc.Service {
   $async.Future<$0.GetDefaultPrecompiledObjectResponse>
       getDefaultPrecompiledObject($grpc.ServiceCall call,
           $0.GetDefaultPrecompiledObjectRequest request);
+  $async.Future<$0.SaveCodeResponse> saveCode(
+      $grpc.ServiceCall call, $0.SaveCodeRequest request);
+  $async.Future<$0.GetCodeResponse> getCode(
+      $grpc.ServiceCall call, $0.GetCodeRequest request);
 }

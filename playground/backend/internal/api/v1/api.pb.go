@@ -2040,6 +2040,352 @@ func (x *GetDefaultPrecompiledObjectResponse) GetPrecompiledObject() *Precompile
 	return nil
 }
 
+// CodeRequest represents the code content to save.
+type CodeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Code string `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+}
+
+func (x *CodeRequest) Reset() {
+	*x = CodeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_api_proto_msgTypes[36]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CodeRequest) ProtoMessage() {}
+
+func (x *CodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_api_proto_msgTypes[36]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CodeRequest.ProtoReflect.Descriptor instead.
+func (*CodeRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_api_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *CodeRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CodeRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+// SaveCodeRequest represents a code text and options of SDK which executes the code.
+type SaveCodeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Codes []*CodeRequest `protobuf:"bytes,1,rep,name=codes,proto3" json:"codes,omitempty"`
+	Sdk   Sdk            `protobuf:"varint,2,opt,name=sdk,proto3,enum=api.v1.Sdk" json:"sdk,omitempty"`
+	// The pipeline options as they would be passed to the program (e.g. "--option1 value1 --option2 value2")
+	PipelineOptions string `protobuf:"bytes,3,opt,name=pipeline_options,json=pipelineOptions,proto3" json:"pipeline_options,omitempty"`
+}
+
+func (x *SaveCodeRequest) Reset() {
+	*x = SaveCodeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_api_proto_msgTypes[37]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SaveCodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SaveCodeRequest) ProtoMessage() {}
+
+func (x *SaveCodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_api_proto_msgTypes[37]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SaveCodeRequest.ProtoReflect.Descriptor instead.
+func (*SaveCodeRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_api_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *SaveCodeRequest) GetCodes() []*CodeRequest {
+	if x != nil {
+		return x.Codes
+	}
+	return nil
+}
+
+func (x *SaveCodeRequest) GetSdk() Sdk {
+	if x != nil {
+		return x.Sdk
+	}
+	return Sdk_SDK_UNSPECIFIED
+}
+
+func (x *SaveCodeRequest) GetPipelineOptions() string {
+	if x != nil {
+		return x.PipelineOptions
+	}
+	return ""
+}
+
+// SaveCodeResponse contains information of the generated ID.
+type SaveCodeResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *SaveCodeResponse) Reset() {
+	*x = SaveCodeResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_api_proto_msgTypes[38]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SaveCodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SaveCodeResponse) ProtoMessage() {}
+
+func (x *SaveCodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_api_proto_msgTypes[38]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SaveCodeResponse.ProtoReflect.Descriptor instead.
+func (*SaveCodeResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_api_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *SaveCodeResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+// GetCodeRequest represents the generated ID.
+type GetCodeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *GetCodeRequest) Reset() {
+	*x = GetCodeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_api_proto_msgTypes[39]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetCodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCodeRequest) ProtoMessage() {}
+
+func (x *GetCodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_api_proto_msgTypes[39]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCodeRequest.ProtoReflect.Descriptor instead.
+func (*GetCodeRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_api_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *GetCodeRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+// CodeResponse represents the code content.
+type CodeResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name   string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Code   string `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	IsMain bool   `protobuf:"varint,3,opt,name=isMain,proto3" json:"isMain,omitempty"`
+}
+
+func (x *CodeResponse) Reset() {
+	*x = CodeResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_api_proto_msgTypes[40]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CodeResponse) ProtoMessage() {}
+
+func (x *CodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_api_proto_msgTypes[40]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CodeResponse.ProtoReflect.Descriptor instead.
+func (*CodeResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_api_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *CodeResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CodeResponse) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *CodeResponse) GetIsMain() bool {
+	if x != nil {
+		return x.IsMain
+	}
+	return false
+}
+
+// GetCodeResponse contains information of a code text and options of SDK which executes the code.
+type GetCodeResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Codes []*CodeResponse `protobuf:"bytes,1,rep,name=codes,proto3" json:"codes,omitempty"`
+	Sdk   Sdk             `protobuf:"varint,2,opt,name=sdk,proto3,enum=api.v1.Sdk" json:"sdk,omitempty"`
+	// The pipeline options as they would be passed to the program (e.g. "--option1 value1 --option2 value2")
+	PipelineOptions string `protobuf:"bytes,3,opt,name=pipeline_options,json=pipelineOptions,proto3" json:"pipeline_options,omitempty"`
+}
+
+func (x *GetCodeResponse) Reset() {
+	*x = GetCodeResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_api_v1_api_proto_msgTypes[41]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetCodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCodeResponse) ProtoMessage() {}
+
+func (x *GetCodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_api_proto_msgTypes[41]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCodeResponse.ProtoReflect.Descriptor instead.
+func (*GetCodeResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_api_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *GetCodeResponse) GetCodes() []*CodeResponse {
+	if x != nil {
+		return x.Codes
+	}
+	return nil
+}
+
+func (x *GetCodeResponse) GetSdk() Sdk {
+	if x != nil {
+		return x.Sdk
+	}
+	return Sdk_SDK_UNSPECIFIED
+}
+
+func (x *GetCodeResponse) GetPipelineOptions() string {
+	if x != nil {
+		return x.PipelineOptions
+	}
+	return ""
+}
+
 type Categories_Category struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2052,7 +2398,7 @@ type Categories_Category struct {
 func (x *Categories_Category) Reset() {
 	*x = Categories_Category{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_api_v1_api_proto_msgTypes[36]
+		mi := &file_api_v1_api_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2065,7 +2411,7 @@ func (x *Categories_Category) String() string {
 func (*Categories_Category) ProtoMessage() {}
 
 func (x *Categories_Category) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_api_proto_msgTypes[36]
+	mi := &file_api_v1_api_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2270,7 +2616,37 @@ var file_api_v1_api_proto_rawDesc = []byte{
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e,
 	0x50, 0x72, 0x65, 0x63, 0x6f, 0x6d, 0x70, 0x69, 0x6c, 0x65, 0x64, 0x4f, 0x62, 0x6a, 0x65, 0x63,
 	0x74, 0x52, 0x11, 0x70, 0x72, 0x65, 0x63, 0x6f, 0x6d, 0x70, 0x69, 0x6c, 0x65, 0x64, 0x4f, 0x62,
-	0x6a, 0x65, 0x63, 0x74, 0x2a, 0x52, 0x0a, 0x03, 0x53, 0x64, 0x6b, 0x12, 0x13, 0x0a, 0x0f, 0x53,
+	0x6a, 0x65, 0x63, 0x74, 0x22, 0x35, 0x0a, 0x0b, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x22, 0x86, 0x01, 0x0a, 0x0f,
+	0x53, 0x61, 0x76, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x29, 0x0a, 0x05, 0x63, 0x6f, 0x64, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x13,
+	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x52, 0x05, 0x63, 0x6f, 0x64, 0x65, 0x73, 0x12, 0x1d, 0x0a, 0x03, 0x73, 0x64,
+	0x6b, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0b, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
+	0x2e, 0x53, 0x64, 0x6b, 0x52, 0x03, 0x73, 0x64, 0x6b, 0x12, 0x29, 0x0a, 0x10, 0x70, 0x69, 0x70,
+	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0f, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x4f, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x22, 0x22, 0x0a, 0x10, 0x53, 0x61, 0x76, 0x65, 0x43, 0x6f, 0x64, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x20, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x43,
+	0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x4e, 0x0a, 0x0c, 0x43, 0x6f,
+	0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12,
+	0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6f,
+	0x64, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x69, 0x73, 0x4d, 0x61, 0x69, 0x6e, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x06, 0x69, 0x73, 0x4d, 0x61, 0x69, 0x6e, 0x22, 0x87, 0x01, 0x0a, 0x0f, 0x47,
+	0x65, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a,
+	0x0a, 0x05, 0x63, 0x6f, 0x64, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x14, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x52, 0x05, 0x63, 0x6f, 0x64, 0x65, 0x73, 0x12, 0x1d, 0x0a, 0x03, 0x73, 0x64,
+	0x6b, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x0b, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
+	0x2e, 0x53, 0x64, 0x6b, 0x52, 0x03, 0x73, 0x64, 0x6b, 0x12, 0x29, 0x0a, 0x10, 0x70, 0x69, 0x70,
+	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0f, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x4f, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x2a, 0x52, 0x0a, 0x03, 0x53, 0x64, 0x6b, 0x12, 0x13, 0x0a, 0x0f, 0x53,
 	0x44, 0x4b, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00,
 	0x12, 0x0c, 0x0a, 0x08, 0x53, 0x44, 0x4b, 0x5f, 0x4a, 0x41, 0x56, 0x41, 0x10, 0x01, 0x12, 0x0a,
 	0x0a, 0x06, 0x53, 0x44, 0x4b, 0x5f, 0x47, 0x4f, 0x10, 0x02, 0x12, 0x0e, 0x0a, 0x0a, 0x53, 0x44,
@@ -2306,7 +2682,7 @@ var file_api_v1_api_proto_rawDesc = []byte{
 	0x54, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x4b, 0x41, 0x54, 0x41, 0x10, 0x02, 0x12, 0x25, 0x0a,
 	0x21, 0x50, 0x52, 0x45, 0x43, 0x4f, 0x4d, 0x50, 0x49, 0x4c, 0x45, 0x44, 0x5f, 0x4f, 0x42, 0x4a,
 	0x45, 0x43, 0x54, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e, 0x49, 0x54, 0x5f, 0x54, 0x45,
-	0x53, 0x54, 0x10, 0x03, 0x32, 0xfe, 0x0b, 0x0a, 0x11, 0x50, 0x6c, 0x61, 0x79, 0x67, 0x72, 0x6f,
+	0x53, 0x54, 0x10, 0x03, 0x32, 0xf9, 0x0c, 0x0a, 0x11, 0x50, 0x6c, 0x61, 0x79, 0x67, 0x72, 0x6f,
 	0x75, 0x6e, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x3a, 0x0a, 0x07, 0x52, 0x75,
 	0x6e, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x52,
 	0x75, 0x6e, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e,
@@ -2402,11 +2778,19 @@ var file_api_v1_api_proto_rawDesc = []byte{
 	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2b, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
 	0x31, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x50, 0x72, 0x65, 0x63,
 	0x6f, 0x6d, 0x70, 0x69, 0x6c, 0x65, 0x64, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x38, 0x5a, 0x36, 0x62, 0x65, 0x61, 0x6d, 0x2e, 0x61, 0x70,
-	0x61, 0x63, 0x68, 0x65, 0x2e, 0x6f, 0x72, 0x67, 0x2f, 0x70, 0x6c, 0x61, 0x79, 0x67, 0x72, 0x6f,
-	0x75, 0x6e, 0x64, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x69, 0x6e, 0x74, 0x65,
-	0x72, 0x6e, 0x61, 0x6c, 0x3b, 0x70, 0x6c, 0x61, 0x79, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3d, 0x0a, 0x08, 0x53, 0x61, 0x76, 0x65, 0x43, 0x6f, 0x64,
+	0x65, 0x12, 0x17, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x61, 0x76, 0x65, 0x43,
+	0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x61, 0x70, 0x69,
+	0x2e, 0x76, 0x31, 0x2e, 0x53, 0x61, 0x76, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3a, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x12,
+	0x16, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x64, 0x65,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
+	0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x42, 0x38, 0x5a, 0x36, 0x62, 0x65, 0x61, 0x6d, 0x2e, 0x61, 0x70, 0x61, 0x63, 0x68, 0x65, 0x2e,
+	0x6f, 0x72, 0x67, 0x2f, 0x70, 0x6c, 0x61, 0x79, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2f, 0x62,
+	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x3b,
+	0x70, 0x6c, 0x61, 0x79, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -2422,7 +2806,7 @@ func file_api_v1_api_proto_rawDescGZIP() []byte {
 }
 
 var file_api_v1_api_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_api_v1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
+var file_api_v1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
 var file_api_v1_api_proto_goTypes = []interface{}{
 	(Sdk)(0),                                    // 0: api.v1.Sdk
 	(Status)(0),                                 // 1: api.v1.Status
@@ -2463,59 +2847,73 @@ var file_api_v1_api_proto_goTypes = []interface{}{
 	(*GetPrecompiledObjectLogsResponse)(nil),    // 36: api.v1.GetPrecompiledObjectLogsResponse
 	(*GetPrecompiledObjectGraphResponse)(nil),   // 37: api.v1.GetPrecompiledObjectGraphResponse
 	(*GetDefaultPrecompiledObjectResponse)(nil), // 38: api.v1.GetDefaultPrecompiledObjectResponse
-	(*Categories_Category)(nil),                 // 39: api.v1.Categories.Category
+	(*CodeRequest)(nil),                         // 39: api.v1.CodeRequest
+	(*SaveCodeRequest)(nil),                     // 40: api.v1.SaveCodeRequest
+	(*SaveCodeResponse)(nil),                    // 41: api.v1.SaveCodeResponse
+	(*GetCodeRequest)(nil),                      // 42: api.v1.GetCodeRequest
+	(*CodeResponse)(nil),                        // 43: api.v1.CodeResponse
+	(*GetCodeResponse)(nil),                     // 44: api.v1.GetCodeResponse
+	(*Categories_Category)(nil),                 // 45: api.v1.Categories.Category
 }
 var file_api_v1_api_proto_depIdxs = []int32{
 	0,  // 0: api.v1.RunCodeRequest.sdk:type_name -> api.v1.Sdk
 	1,  // 1: api.v1.CheckStatusResponse.status:type_name -> api.v1.Status
 	2,  // 2: api.v1.PrecompiledObject.type:type_name -> api.v1.PrecompiledObjectType
 	0,  // 3: api.v1.Categories.sdk:type_name -> api.v1.Sdk
-	39, // 4: api.v1.Categories.categories:type_name -> api.v1.Categories.Category
+	45, // 4: api.v1.Categories.categories:type_name -> api.v1.Categories.Category
 	0,  // 5: api.v1.GetPrecompiledObjectsRequest.sdk:type_name -> api.v1.Sdk
 	0,  // 6: api.v1.GetDefaultPrecompiledObjectRequest.sdk:type_name -> api.v1.Sdk
 	24, // 7: api.v1.GetPrecompiledObjectsResponse.sdk_categories:type_name -> api.v1.Categories
 	23, // 8: api.v1.GetPrecompiledObjectResponse.precompiled_object:type_name -> api.v1.PrecompiledObject
 	23, // 9: api.v1.GetDefaultPrecompiledObjectResponse.precompiled_object:type_name -> api.v1.PrecompiledObject
-	23, // 10: api.v1.Categories.Category.precompiled_objects:type_name -> api.v1.PrecompiledObject
-	3,  // 11: api.v1.PlaygroundService.RunCode:input_type -> api.v1.RunCodeRequest
-	5,  // 12: api.v1.PlaygroundService.CheckStatus:input_type -> api.v1.CheckStatusRequest
-	13, // 13: api.v1.PlaygroundService.GetRunOutput:input_type -> api.v1.GetRunOutputRequest
-	17, // 14: api.v1.PlaygroundService.GetLogs:input_type -> api.v1.GetLogsRequest
-	19, // 15: api.v1.PlaygroundService.GetGraph:input_type -> api.v1.GetGraphRequest
-	15, // 16: api.v1.PlaygroundService.GetRunError:input_type -> api.v1.GetRunErrorRequest
-	7,  // 17: api.v1.PlaygroundService.GetValidationOutput:input_type -> api.v1.GetValidationOutputRequest
-	9,  // 18: api.v1.PlaygroundService.GetPreparationOutput:input_type -> api.v1.GetPreparationOutputRequest
-	11, // 19: api.v1.PlaygroundService.GetCompileOutput:input_type -> api.v1.GetCompileOutputRequest
-	21, // 20: api.v1.PlaygroundService.Cancel:input_type -> api.v1.CancelRequest
-	25, // 21: api.v1.PlaygroundService.GetPrecompiledObjects:input_type -> api.v1.GetPrecompiledObjectsRequest
-	26, // 22: api.v1.PlaygroundService.GetPrecompiledObject:input_type -> api.v1.GetPrecompiledObjectRequest
-	27, // 23: api.v1.PlaygroundService.GetPrecompiledObjectCode:input_type -> api.v1.GetPrecompiledObjectCodeRequest
-	28, // 24: api.v1.PlaygroundService.GetPrecompiledObjectOutput:input_type -> api.v1.GetPrecompiledObjectOutputRequest
-	29, // 25: api.v1.PlaygroundService.GetPrecompiledObjectLogs:input_type -> api.v1.GetPrecompiledObjectLogsRequest
-	30, // 26: api.v1.PlaygroundService.GetPrecompiledObjectGraph:input_type -> api.v1.GetPrecompiledObjectGraphRequest
-	31, // 27: api.v1.PlaygroundService.GetDefaultPrecompiledObject:input_type -> api.v1.GetDefaultPrecompiledObjectRequest
-	4,  // 28: api.v1.PlaygroundService.RunCode:output_type -> api.v1.RunCodeResponse
-	6,  // 29: api.v1.PlaygroundService.CheckStatus:output_type -> api.v1.CheckStatusResponse
-	14, // 30: api.v1.PlaygroundService.GetRunOutput:output_type -> api.v1.GetRunOutputResponse
-	18, // 31: api.v1.PlaygroundService.GetLogs:output_type -> api.v1.GetLogsResponse
-	20, // 32: api.v1.PlaygroundService.GetGraph:output_type -> api.v1.GetGraphResponse
-	16, // 33: api.v1.PlaygroundService.GetRunError:output_type -> api.v1.GetRunErrorResponse
-	8,  // 34: api.v1.PlaygroundService.GetValidationOutput:output_type -> api.v1.GetValidationOutputResponse
-	10, // 35: api.v1.PlaygroundService.GetPreparationOutput:output_type -> api.v1.GetPreparationOutputResponse
-	12, // 36: api.v1.PlaygroundService.GetCompileOutput:output_type -> api.v1.GetCompileOutputResponse
-	22, // 37: api.v1.PlaygroundService.Cancel:output_type -> api.v1.CancelResponse
-	32, // 38: api.v1.PlaygroundService.GetPrecompiledObjects:output_type -> api.v1.GetPrecompiledObjectsResponse
-	33, // 39: api.v1.PlaygroundService.GetPrecompiledObject:output_type -> api.v1.GetPrecompiledObjectResponse
-	34, // 40: api.v1.PlaygroundService.GetPrecompiledObjectCode:output_type -> api.v1.GetPrecompiledObjectCodeResponse
-	35, // 41: api.v1.PlaygroundService.GetPrecompiledObjectOutput:output_type -> api.v1.GetPrecompiledObjectOutputResponse
-	36, // 42: api.v1.PlaygroundService.GetPrecompiledObjectLogs:output_type -> api.v1.GetPrecompiledObjectLogsResponse
-	37, // 43: api.v1.PlaygroundService.GetPrecompiledObjectGraph:output_type -> api.v1.GetPrecompiledObjectGraphResponse
-	38, // 44: api.v1.PlaygroundService.GetDefaultPrecompiledObject:output_type -> api.v1.GetDefaultPrecompiledObjectResponse
-	28, // [28:45] is the sub-list for method output_type
-	11, // [11:28] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	39, // 10: api.v1.SaveCodeRequest.codes:type_name -> api.v1.CodeRequest
+	0,  // 11: api.v1.SaveCodeRequest.sdk:type_name -> api.v1.Sdk
+	43, // 12: api.v1.GetCodeResponse.codes:type_name -> api.v1.CodeResponse
+	0,  // 13: api.v1.GetCodeResponse.sdk:type_name -> api.v1.Sdk
+	23, // 14: api.v1.Categories.Category.precompiled_objects:type_name -> api.v1.PrecompiledObject
+	3,  // 15: api.v1.PlaygroundService.RunCode:input_type -> api.v1.RunCodeRequest
+	5,  // 16: api.v1.PlaygroundService.CheckStatus:input_type -> api.v1.CheckStatusRequest
+	13, // 17: api.v1.PlaygroundService.GetRunOutput:input_type -> api.v1.GetRunOutputRequest
+	17, // 18: api.v1.PlaygroundService.GetLogs:input_type -> api.v1.GetLogsRequest
+	19, // 19: api.v1.PlaygroundService.GetGraph:input_type -> api.v1.GetGraphRequest
+	15, // 20: api.v1.PlaygroundService.GetRunError:input_type -> api.v1.GetRunErrorRequest
+	7,  // 21: api.v1.PlaygroundService.GetValidationOutput:input_type -> api.v1.GetValidationOutputRequest
+	9,  // 22: api.v1.PlaygroundService.GetPreparationOutput:input_type -> api.v1.GetPreparationOutputRequest
+	11, // 23: api.v1.PlaygroundService.GetCompileOutput:input_type -> api.v1.GetCompileOutputRequest
+	21, // 24: api.v1.PlaygroundService.Cancel:input_type -> api.v1.CancelRequest
+	25, // 25: api.v1.PlaygroundService.GetPrecompiledObjects:input_type -> api.v1.GetPrecompiledObjectsRequest
+	26, // 26: api.v1.PlaygroundService.GetPrecompiledObject:input_type -> api.v1.GetPrecompiledObjectRequest
+	27, // 27: api.v1.PlaygroundService.GetPrecompiledObjectCode:input_type -> api.v1.GetPrecompiledObjectCodeRequest
+	28, // 28: api.v1.PlaygroundService.GetPrecompiledObjectOutput:input_type -> api.v1.GetPrecompiledObjectOutputRequest
+	29, // 29: api.v1.PlaygroundService.GetPrecompiledObjectLogs:input_type -> api.v1.GetPrecompiledObjectLogsRequest
+	30, // 30: api.v1.PlaygroundService.GetPrecompiledObjectGraph:input_type -> api.v1.GetPrecompiledObjectGraphRequest
+	31, // 31: api.v1.PlaygroundService.GetDefaultPrecompiledObject:input_type -> api.v1.GetDefaultPrecompiledObjectRequest
+	40, // 32: api.v1.PlaygroundService.SaveCode:input_type -> api.v1.SaveCodeRequest
+	42, // 33: api.v1.PlaygroundService.GetCode:input_type -> api.v1.GetCodeRequest
+	4,  // 34: api.v1.PlaygroundService.RunCode:output_type -> api.v1.RunCodeResponse
+	6,  // 35: api.v1.PlaygroundService.CheckStatus:output_type -> api.v1.CheckStatusResponse
+	14, // 36: api.v1.PlaygroundService.GetRunOutput:output_type -> api.v1.GetRunOutputResponse
+	18, // 37: api.v1.PlaygroundService.GetLogs:output_type -> api.v1.GetLogsResponse
+	20, // 38: api.v1.PlaygroundService.GetGraph:output_type -> api.v1.GetGraphResponse
+	16, // 39: api.v1.PlaygroundService.GetRunError:output_type -> api.v1.GetRunErrorResponse
+	8,  // 40: api.v1.PlaygroundService.GetValidationOutput:output_type -> api.v1.GetValidationOutputResponse
+	10, // 41: api.v1.PlaygroundService.GetPreparationOutput:output_type -> api.v1.GetPreparationOutputResponse
+	12, // 42: api.v1.PlaygroundService.GetCompileOutput:output_type -> api.v1.GetCompileOutputResponse
+	22, // 43: api.v1.PlaygroundService.Cancel:output_type -> api.v1.CancelResponse
+	32, // 44: api.v1.PlaygroundService.GetPrecompiledObjects:output_type -> api.v1.GetPrecompiledObjectsResponse
+	33, // 45: api.v1.PlaygroundService.GetPrecompiledObject:output_type -> api.v1.GetPrecompiledObjectResponse
+	34, // 46: api.v1.PlaygroundService.GetPrecompiledObjectCode:output_type -> api.v1.GetPrecompiledObjectCodeResponse
+	35, // 47: api.v1.PlaygroundService.GetPrecompiledObjectOutput:output_type -> api.v1.GetPrecompiledObjectOutputResponse
+	36, // 48: api.v1.PlaygroundService.GetPrecompiledObjectLogs:output_type -> api.v1.GetPrecompiledObjectLogsResponse
+	37, // 49: api.v1.PlaygroundService.GetPrecompiledObjectGraph:output_type -> api.v1.GetPrecompiledObjectGraphResponse
+	38, // 50: api.v1.PlaygroundService.GetDefaultPrecompiledObject:output_type -> api.v1.GetDefaultPrecompiledObjectResponse
+	41, // 51: api.v1.PlaygroundService.SaveCode:output_type -> api.v1.SaveCodeResponse
+	44, // 52: api.v1.PlaygroundService.GetCode:output_type -> api.v1.GetCodeResponse
+	34, // [34:53] is the sub-list for method output_type
+	15, // [15:34] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_api_proto_init() }
@@ -2957,6 +3355,78 @@ func file_api_v1_api_proto_init() {
 			}
 		}
 		file_api_v1_api_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CodeRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_api_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SaveCodeRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_api_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SaveCodeResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_api_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetCodeRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_api_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CodeResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_api_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetCodeResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_api_v1_api_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Categories_Category); i {
 			case 0:
 				return &v.state
@@ -2975,7 +3445,7 @@ func file_api_v1_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_api_v1_api_proto_rawDesc,
 			NumEnums:      3,
-			NumMessages:   37,
+			NumMessages:   43,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -249,6 +249,45 @@ message GetDefaultPrecompiledObjectResponse {
   PrecompiledObject precompiled_object = 1;
 }
 
+// CodeRequest represents the code content to save.
+message CodeRequest {
+  string name = 1;
+  string code = 2;
+}
+
+// SaveCodeRequest represents a code text and options of SDK which executes the code.
+message SaveCodeRequest {
+  repeated CodeRequest codes = 1;
+  Sdk sdk = 2;
+  // The pipeline options as they would be passed to the program (e.g. "--option1 value1 --option2 value2")
+  string pipeline_options = 3;
+}
+
+// SaveCodeResponse contains information of the generated ID.
+message SaveCodeResponse {
+  string id = 1;
+}
+
+// GetCodeRequest represents the generated ID.
+message GetCodeRequest {
+  string id = 1;
+}
+
+// CodeResponse represents the code content.
+message CodeResponse {
+  string name = 1;
+  string code = 2;
+  bool isMain = 3;
+}
+
+// GetCodeResponse contains information of a code text and options of SDK which executes the code.
+message GetCodeResponse {
+  repeated CodeResponse codes = 1;
+  Sdk sdk = 2;
+  // The pipeline options as they would be passed to the program (e.g. "--option1 value1 --option2 value2")
+  string pipeline_options = 3;
+}
+
 service PlaygroundService {
 
   // Submit the job for an execution and get the pipeline uuid.
@@ -278,7 +317,7 @@ service PlaygroundService {
   // Get the result of pipeline compilation.
   rpc GetCompileOutput(GetCompileOutputRequest) returns (GetCompileOutputResponse);
 
-  // Cancel code processing
+  // Cancel code processing.
   rpc Cancel(CancelRequest) returns (CancelResponse);
 
   // Get all precompiled objects from the cloud storage.
@@ -301,4 +340,10 @@ service PlaygroundService {
 
   // Get the default precompile object for the sdk.
   rpc GetDefaultPrecompiledObject(GetDefaultPrecompiledObjectRequest) returns (GetDefaultPrecompiledObjectResponse);
+
+  // Save the code required for the sharing.
+  rpc SaveCode(SaveCodeRequest) returns (SaveCodeResponse);
+
+  // Get the code of playground.
+  rpc GetCode(GetCodeRequest) returns (GetCodeResponse);
 }

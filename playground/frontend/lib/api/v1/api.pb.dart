@@ -1920,15 +1920,15 @@ class GetDefaultPrecompiledObjectResponse extends $pb.GeneratedMessage {
   PrecompiledObject ensurePrecompiledObject() => $_ensure(0);
 }
 
-class CodeRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CodeRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
+class CodeInfo extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CodeInfo', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'code')
     ..hasRequiredFields = false
   ;
 
-  CodeRequest._() : super();
-  factory CodeRequest({
+  CodeInfo._() : super();
+  factory CodeInfo({
     $core.String? name,
     $core.String? code,
   }) {
@@ -1941,26 +1941,26 @@ class CodeRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory CodeRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory CodeRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory CodeInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CodeInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  CodeRequest clone() => CodeRequest()..mergeFromMessage(this);
+  CodeInfo clone() => CodeInfo()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  CodeRequest copyWith(void Function(CodeRequest) updates) => super.copyWith((message) => updates(message as CodeRequest)) as CodeRequest; // ignore: deprecated_member_use
+  CodeInfo copyWith(void Function(CodeInfo) updates) => super.copyWith((message) => updates(message as CodeInfo)) as CodeInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static CodeRequest create() => CodeRequest._();
-  CodeRequest createEmptyInstance() => create();
-  static $pb.PbList<CodeRequest> createRepeated() => $pb.PbList<CodeRequest>();
+  static CodeInfo create() => CodeInfo._();
+  CodeInfo createEmptyInstance() => create();
+  static $pb.PbList<CodeInfo> createRepeated() => $pb.PbList<CodeInfo>();
   @$core.pragma('dart2js:noInline')
-  static CodeRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CodeRequest>(create);
-  static CodeRequest? _defaultInstance;
+  static CodeInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CodeInfo>(create);
+  static CodeInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get name => $_getSZ(0);
@@ -1983,7 +1983,7 @@ class CodeRequest extends $pb.GeneratedMessage {
 
 class SaveCodeRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SaveCodeRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..pc<CodeRequest>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'codes', $pb.PbFieldType.PM, subBuilder: CodeRequest.create)
+    ..pc<CodeInfo>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'codes', $pb.PbFieldType.PM, subBuilder: CodeInfo.create)
     ..e<Sdk>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sdk', $pb.PbFieldType.OE, defaultOrMaker: Sdk.SDK_UNSPECIFIED, valueOf: Sdk.valueOf, enumValues: Sdk.values)
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pipelineOptions')
     ..hasRequiredFields = false
@@ -1991,7 +1991,7 @@ class SaveCodeRequest extends $pb.GeneratedMessage {
 
   SaveCodeRequest._() : super();
   factory SaveCodeRequest({
-    $core.Iterable<CodeRequest>? codes,
+    $core.Iterable<CodeInfo>? codes,
     Sdk? sdk,
     $core.String? pipelineOptions,
   }) {
@@ -2029,7 +2029,7 @@ class SaveCodeRequest extends $pb.GeneratedMessage {
   static SaveCodeRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<CodeRequest> get codes => $_getList(0);
+  $core.List<CodeInfo> get codes => $_getList(0);
 
   @$pb.TagNumber(2)
   Sdk get sdk => $_getN(1);
@@ -2144,16 +2144,16 @@ class GetCodeRequest extends $pb.GeneratedMessage {
   void clearId() => clearField(1);
 }
 
-class CodeResponse extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CodeResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
+class CodeFullInfo extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CodeFullInfo', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'code')
     ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isMain', protoName: 'isMain')
     ..hasRequiredFields = false
   ;
 
-  CodeResponse._() : super();
-  factory CodeResponse({
+  CodeFullInfo._() : super();
+  factory CodeFullInfo({
     $core.String? name,
     $core.String? code,
     $core.bool? isMain,
@@ -2170,26 +2170,26 @@ class CodeResponse extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory CodeResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory CodeResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory CodeFullInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CodeFullInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  CodeResponse clone() => CodeResponse()..mergeFromMessage(this);
+  CodeFullInfo clone() => CodeFullInfo()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  CodeResponse copyWith(void Function(CodeResponse) updates) => super.copyWith((message) => updates(message as CodeResponse)) as CodeResponse; // ignore: deprecated_member_use
+  CodeFullInfo copyWith(void Function(CodeFullInfo) updates) => super.copyWith((message) => updates(message as CodeFullInfo)) as CodeFullInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static CodeResponse create() => CodeResponse._();
-  CodeResponse createEmptyInstance() => create();
-  static $pb.PbList<CodeResponse> createRepeated() => $pb.PbList<CodeResponse>();
+  static CodeFullInfo create() => CodeFullInfo._();
+  CodeFullInfo createEmptyInstance() => create();
+  static $pb.PbList<CodeFullInfo> createRepeated() => $pb.PbList<CodeFullInfo>();
   @$core.pragma('dart2js:noInline')
-  static CodeResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CodeResponse>(create);
-  static CodeResponse? _defaultInstance;
+  static CodeFullInfo getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CodeFullInfo>(create);
+  static CodeFullInfo? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get name => $_getSZ(0);
@@ -2221,7 +2221,7 @@ class CodeResponse extends $pb.GeneratedMessage {
 
 class GetCodeResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetCodeResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..pc<CodeResponse>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'codes', $pb.PbFieldType.PM, subBuilder: CodeResponse.create)
+    ..pc<CodeFullInfo>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'codes', $pb.PbFieldType.PM, subBuilder: CodeFullInfo.create)
     ..e<Sdk>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sdk', $pb.PbFieldType.OE, defaultOrMaker: Sdk.SDK_UNSPECIFIED, valueOf: Sdk.valueOf, enumValues: Sdk.values)
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pipelineOptions')
     ..hasRequiredFields = false
@@ -2229,7 +2229,7 @@ class GetCodeResponse extends $pb.GeneratedMessage {
 
   GetCodeResponse._() : super();
   factory GetCodeResponse({
-    $core.Iterable<CodeResponse>? codes,
+    $core.Iterable<CodeFullInfo>? codes,
     Sdk? sdk,
     $core.String? pipelineOptions,
   }) {
@@ -2267,7 +2267,7 @@ class GetCodeResponse extends $pb.GeneratedMessage {
   static GetCodeResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<CodeResponse> get codes => $_getList(0);
+  $core.List<CodeFullInfo> get codes => $_getList(0);
 
   @$pb.TagNumber(2)
   Sdk get sdk => $_getN(1);

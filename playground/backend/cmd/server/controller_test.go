@@ -743,7 +743,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeRequest{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
+					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
 					Sdk:   pb.Sdk_SDK_UNSPECIFIED,
 				},
 			},
@@ -756,7 +756,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeRequest{{Name: "MOCK_NAME", Code: ""}},
+					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: ""}},
 					Sdk:   pb.Sdk_SDK_JAVA,
 				},
 			},
@@ -769,7 +769,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeRequest{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
+					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
 					Sdk:   pb.Sdk_SDK_GO,
 				},
 			},

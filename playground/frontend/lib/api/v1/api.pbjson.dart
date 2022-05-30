@@ -454,29 +454,29 @@ const GetDefaultPrecompiledObjectResponse$json = const {
 
 /// Descriptor for `GetDefaultPrecompiledObjectResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getDefaultPrecompiledObjectResponseDescriptor = $convert.base64Decode('CiNHZXREZWZhdWx0UHJlY29tcGlsZWRPYmplY3RSZXNwb25zZRJIChJwcmVjb21waWxlZF9vYmplY3QYASABKAsyGS5hcGkudjEuUHJlY29tcGlsZWRPYmplY3RSEXByZWNvbXBpbGVkT2JqZWN0');
-@$core.Deprecated('Use codeRequestDescriptor instead')
-const CodeRequest$json = const {
-  '1': 'CodeRequest',
+@$core.Deprecated('Use codeInfoDescriptor instead')
+const CodeInfo$json = const {
+  '1': 'CodeInfo',
   '2': const [
     const {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
     const {'1': 'code', '3': 2, '4': 1, '5': 9, '10': 'code'},
   ],
 };
 
-/// Descriptor for `CodeRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List codeRequestDescriptor = $convert.base64Decode('CgtDb2RlUmVxdWVzdBISCgRuYW1lGAEgASgJUgRuYW1lEhIKBGNvZGUYAiABKAlSBGNvZGU=');
+/// Descriptor for `CodeInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List codeInfoDescriptor = $convert.base64Decode('CghDb2RlSW5mbxISCgRuYW1lGAEgASgJUgRuYW1lEhIKBGNvZGUYAiABKAlSBGNvZGU=');
 @$core.Deprecated('Use saveCodeRequestDescriptor instead')
 const SaveCodeRequest$json = const {
   '1': 'SaveCodeRequest',
   '2': const [
-    const {'1': 'codes', '3': 1, '4': 3, '5': 11, '6': '.api.v1.CodeRequest', '10': 'codes'},
+    const {'1': 'codes', '3': 1, '4': 3, '5': 11, '6': '.api.v1.CodeInfo', '10': 'codes'},
     const {'1': 'sdk', '3': 2, '4': 1, '5': 14, '6': '.api.v1.Sdk', '10': 'sdk'},
     const {'1': 'pipeline_options', '3': 3, '4': 1, '5': 9, '10': 'pipelineOptions'},
   ],
 };
 
 /// Descriptor for `SaveCodeRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List saveCodeRequestDescriptor = $convert.base64Decode('Cg9TYXZlQ29kZVJlcXVlc3QSKQoFY29kZXMYASADKAsyEy5hcGkudjEuQ29kZVJlcXVlc3RSBWNvZGVzEh0KA3NkaxgCIAEoDjILLmFwaS52MS5TZGtSA3NkaxIpChBwaXBlbGluZV9vcHRpb25zGAMgASgJUg9waXBlbGluZU9wdGlvbnM=');
+final $typed_data.Uint8List saveCodeRequestDescriptor = $convert.base64Decode('Cg9TYXZlQ29kZVJlcXVlc3QSJgoFY29kZXMYASADKAsyEC5hcGkudjEuQ29kZUluZm9SBWNvZGVzEh0KA3NkaxgCIAEoDjILLmFwaS52MS5TZGtSA3NkaxIpChBwaXBlbGluZV9vcHRpb25zGAMgASgJUg9waXBlbGluZU9wdGlvbnM=');
 @$core.Deprecated('Use saveCodeResponseDescriptor instead')
 const SaveCodeResponse$json = const {
   '1': 'SaveCodeResponse',
@@ -497,9 +497,9 @@ const GetCodeRequest$json = const {
 
 /// Descriptor for `GetCodeRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getCodeRequestDescriptor = $convert.base64Decode('Cg5HZXRDb2RlUmVxdWVzdBIOCgJpZBgBIAEoCVICaWQ=');
-@$core.Deprecated('Use codeResponseDescriptor instead')
-const CodeResponse$json = const {
-  '1': 'CodeResponse',
+@$core.Deprecated('Use codeFullInfoDescriptor instead')
+const CodeFullInfo$json = const {
+  '1': 'CodeFullInfo',
   '2': const [
     const {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
     const {'1': 'code', '3': 2, '4': 1, '5': 9, '10': 'code'},
@@ -507,17 +507,17 @@ const CodeResponse$json = const {
   ],
 };
 
-/// Descriptor for `CodeResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List codeResponseDescriptor = $convert.base64Decode('CgxDb2RlUmVzcG9uc2USEgoEbmFtZRgBIAEoCVIEbmFtZRISCgRjb2RlGAIgASgJUgRjb2RlEhYKBmlzTWFpbhgDIAEoCFIGaXNNYWlu');
+/// Descriptor for `CodeFullInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List codeFullInfoDescriptor = $convert.base64Decode('CgxDb2RlRnVsbEluZm8SEgoEbmFtZRgBIAEoCVIEbmFtZRISCgRjb2RlGAIgASgJUgRjb2RlEhYKBmlzTWFpbhgDIAEoCFIGaXNNYWlu');
 @$core.Deprecated('Use getCodeResponseDescriptor instead')
 const GetCodeResponse$json = const {
   '1': 'GetCodeResponse',
   '2': const [
-    const {'1': 'codes', '3': 1, '4': 3, '5': 11, '6': '.api.v1.CodeResponse', '10': 'codes'},
+    const {'1': 'codes', '3': 1, '4': 3, '5': 11, '6': '.api.v1.CodeFullInfo', '10': 'codes'},
     const {'1': 'sdk', '3': 2, '4': 1, '5': 14, '6': '.api.v1.Sdk', '10': 'sdk'},
     const {'1': 'pipeline_options', '3': 3, '4': 1, '5': 9, '10': 'pipelineOptions'},
   ],
 };
 
 /// Descriptor for `GetCodeResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getCodeResponseDescriptor = $convert.base64Decode('Cg9HZXRDb2RlUmVzcG9uc2USKgoFY29kZXMYASADKAsyFC5hcGkudjEuQ29kZVJlc3BvbnNlUgVjb2RlcxIdCgNzZGsYAiABKA4yCy5hcGkudjEuU2RrUgNzZGsSKQoQcGlwZWxpbmVfb3B0aW9ucxgDIAEoCVIPcGlwZWxpbmVPcHRpb25z');
+final $typed_data.Uint8List getCodeResponseDescriptor = $convert.base64Decode('Cg9HZXRDb2RlUmVzcG9uc2USKgoFY29kZXMYASADKAsyFC5hcGkudjEuQ29kZUZ1bGxJbmZvUgVjb2RlcxIdCgNzZGsYAiABKA4yCy5hcGkudjEuU2RrUgNzZGsSKQoQcGlwZWxpbmVfb3B0aW9ucxgDIAEoCVIPcGlwZWxpbmVPcHRpb25z');

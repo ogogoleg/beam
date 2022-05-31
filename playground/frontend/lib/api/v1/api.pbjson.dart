@@ -503,12 +503,12 @@ const CodeFullInfo$json = const {
   '2': const [
     const {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
     const {'1': 'code', '3': 2, '4': 1, '5': 9, '10': 'code'},
-    const {'1': 'isMain', '3': 3, '4': 1, '5': 8, '10': 'isMain'},
+    const {'1': 'is_main', '3': 3, '4': 1, '5': 8, '10': 'isMain'},
   ],
 };
 
 /// Descriptor for `CodeFullInfo`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List codeFullInfoDescriptor = $convert.base64Decode('CgxDb2RlRnVsbEluZm8SEgoEbmFtZRgBIAEoCVIEbmFtZRISCgRjb2RlGAIgASgJUgRjb2RlEhYKBmlzTWFpbhgDIAEoCFIGaXNNYWlu');
+final $typed_data.Uint8List codeFullInfoDescriptor = $convert.base64Decode('CgxDb2RlRnVsbEluZm8SEgoEbmFtZRgBIAEoCVIEbmFtZRISCgRjb2RlGAIgASgJUgRjb2RlEhcKB2lzX21haW4YAyABKAhSBmlzTWFpbg==');
 @$core.Deprecated('Use getCodeResponseDescriptor instead')
 const GetCodeResponse$json = const {
   '1': 'GetCodeResponse',

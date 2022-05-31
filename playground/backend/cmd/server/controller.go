@@ -361,13 +361,13 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 
 	nowDate := time.Now()
 	snippet := share.Snippet{
-		Salt:            controller.env.ApplicationEnvs.PlaygroundSalt(),
-		OwnerId:         "",
-		Sdk:             info.Sdk,
-		PipelineOptions: info.PipelineOptions,
-		Created:         nowDate,
-		LastVisited:     nowDate,
-		Source:          share.PLAYGROUND,
+		Salt:     controller.env.ApplicationEnvs.PlaygroundSalt(),
+		OwnerId:  "", // will be used in Tour of Beam project
+		Sdk:      info.Sdk,
+		PipeOpts: info.PipelineOptions,
+		Created:  nowDate,
+		LVisited: nowDate,
+		Origin:   share.PLAYGROUND,
 	}
 
 	for _, code := range info.Codes {
@@ -383,10 +383,10 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 		}
 
 		snippet.Codes = append(snippet.Codes, share.Code{
-			Name:        utils.GetCodeName(code.Name, info.Sdk),
-			Code:        code.Code,
-			ContextLine: 1,
-			IsMain:      utils.IsCodeMain(code.Code, info.Sdk),
+			Name:     utils.GetCodeName(code.Name, info.Sdk),
+			Code:     code.Code,
+			CntxLine: 1,
+			IsMain:   utils.IsCodeMain(code.Code, info.Sdk),
 		})
 	}
 
@@ -415,7 +415,7 @@ func (controller *playgroundController) GetCode(ctx context.Context, info *pb.Ge
 
 	response := pb.GetCodeResponse{
 		Sdk:             snippet.Sdk,
-		PipelineOptions: snippet.PipelineOptions,
+		PipelineOptions: snippet.PipeOpts,
 	}
 	for _, code := range snippet.Codes {
 		response.Codes = append(response.Codes, &pb.CodeFullInfo{

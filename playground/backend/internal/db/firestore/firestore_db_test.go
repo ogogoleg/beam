@@ -75,8 +75,8 @@ func TestFirestore_PutSnippet(t *testing.T) {
 					Code:   "MOCK_CODE",
 					IsMain: false,
 				}},
-				Sdk:             1,
-				PipelineOptions: "MOCK_OPTIONS",
+				Sdk:      1,
+				PipeOpts: "MOCK_OPTIONS",
 			}},
 			wantErr: false,
 		},
@@ -120,11 +120,11 @@ func TestFirestore_GetSnippet(t *testing.T) {
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
-					Sdk:             1,
-					PipelineOptions: "MOCK_OPTIONS",
-					Created:         nowDate,
-					Source:          share.PLAYGROUND,
-					OwnerId:         "",
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+					Created:  nowDate,
+					Origin:   share.PLAYGROUND,
+					OwnerId:  "",
 				})
 			},
 			args:    args{ctx: ctx, id: "MOCK_ID"},
@@ -141,7 +141,7 @@ func TestFirestore_GetSnippet(t *testing.T) {
 			}
 
 			if err == nil {
-				if snip.Sdk != 1 || snip.Codes[0].Code != "MOCK_CODE" || snip.PipelineOptions != "MOCK_OPTIONS" || snip.Created.Local() != nowDate.Local() || snip.Source != share.PLAYGROUND || snip.OwnerId != "" {
+				if snip.Sdk != 1 || snip.Codes[0].Code != "MOCK_CODE" || snip.PipeOpts != "MOCK_OPTIONS" || snip.Created.Local() != nowDate.Local() || snip.Origin != share.PLAYGROUND || snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
 			}

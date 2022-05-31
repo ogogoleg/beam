@@ -53,7 +53,7 @@ func (f *Firestore) PutSnippet(ctx context.Context, id string, snip *share.Snipp
 	}
 
 	for _, code := range snip.Codes {
-		code.SnipId = id
+		code.SnpId = id
 		codeId, err := code.ID(snip.Salt)
 		if err != nil {
 			logger.Errorf("Firestore: PutSnippet(): error during code id generation, err: %s\n", err.Error())
@@ -86,7 +86,7 @@ func (f *Firestore) GetSnippet(ctx context.Context, id string) (*share.Snippet, 
 		return nil, err
 	}
 
-	codeIter := f.client.Collection(codeCollection).Where("snipId", "==", id).Documents(ctx)
+	codeIter := f.client.Collection(codeCollection).Where("snpId", "==", id).Documents(ctx)
 	for {
 		doc, err := codeIter.Next()
 		if err == iterator.Done {
@@ -109,7 +109,7 @@ func (f *Firestore) GetSnippet(ctx context.Context, id string) (*share.Snippet, 
 		snip.Codes = append(snip.Codes, code)
 	}
 
-	snip.LastVisited = time.Now()
+	snip.LVisited = time.Now()
 	snip.VisitCount += 1
 	_, err = f.client.Collection(snippetCollection).Doc(id).Set(ctx, snip)
 	if err != nil {

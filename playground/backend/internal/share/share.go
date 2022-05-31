@@ -31,35 +31,35 @@ const (
 	idLength = 11
 )
 
-type Source int32
+type Origin int32
 
 const (
-	TOUR_OF_BEAM Source = 0
-	PLAYGROUND   Source = 1
+	TOUR_OF_BEAM Origin = 0
+	PLAYGROUND   Origin = 1
 )
 
-func (s Source) Value() int32 {
+func (s Origin) Value() int32 {
 	return int32(s)
 }
 
 type Code struct {
-	Name        string `firestore:"name"`
-	Code        string `firestore:"code"`
-	ContextLine int32  `firestore:"contextLine"`
-	IsMain      bool   `firestore:"isMain"`
-	SnipId      string `firestore:"snipId"`
+	Name     string `firestore:"name"`
+	Code     string `firestore:"code"`
+	CntxLine int32  `firestore:"cntxLine"`
+	IsMain   bool   `firestore:"isMain"`
+	SnpId    string `firestore:"snpId"`
 }
 
 type Snippet struct {
-	Salt            string    `firestore:"-"`
-	OwnerId         string    `firestore:"ownerId"`
-	Sdk             pb.Sdk    `firestore:"sdk"`
-	PipelineOptions string    `firestore:"pipelineOptions"`
-	Created         time.Time `firestore:"created"`
-	LastVisited     time.Time `firestore:"lastVisited"`
-	Source          Source    `firestore:"source"`
-	VisitCount      int       `firestore:"visitCount"`
-	Codes           []Code    `firestore:"-"`
+	Salt       string    `firestore:"-"`
+	OwnerId    string    `firestore:"ownerId"`
+	Sdk        pb.Sdk    `firestore:"sdk"`
+	PipeOpts   string    `firestore:"pipeOpts"`
+	Created    time.Time `firestore:"created"`
+	LVisited   time.Time `firestore:"lVisited"`
+	Origin     Origin    `firestore:"origin"`
+	VisitCount int       `firestore:"visitCount"`
+	Codes      []Code    `firestore:"-"`
 }
 
 // ID generates id according to content of a snippet
@@ -78,7 +78,7 @@ func (s *Snippet) ID() (string, error) {
 	for i, v := range codes {
 		content += v
 		if i == len(codes)-1 {
-			content += fmt.Sprintf("%v%s", s.Sdk, s.PipelineOptions)
+			content += fmt.Sprintf("%v%s", s.Sdk, s.PipeOpts)
 		}
 	}
 	hash.Write([]byte(content))
@@ -99,7 +99,7 @@ func (c *Code) ID(salt string) (string, error) {
 		logger.Errorf("ID(): error while writing ID and salt: %s", err.Error())
 		return "", errors.InternalError("Error during ID generation", "Error with writing ID and salt")
 	}
-	content := fmt.Sprintf("%s%s%s", c.Code, c.Name, c.SnipId)
+	content := fmt.Sprintf("%s%s%s", c.Code, c.Name, c.SnpId)
 	hash.Write([]byte(content))
 	sum := hash.Sum(nil)
 	b := make([]byte, base64.URLEncoding.EncodedLen(len(sum)))

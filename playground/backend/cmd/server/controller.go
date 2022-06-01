@@ -367,7 +367,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 		PipeOpts: info.PipelineOptions,
 		Created:  nowDate,
 		LVisited: nowDate,
-		Origin:   share.PLAYGROUND,
+		Origin:   share.PLAYGROUND, // will be used in Tour of Beam project also later. If the owner ID is empty, then the origin is Playground, otherwise it's Tour of Beam
 	}
 
 	for _, code := range info.Codes {
@@ -382,11 +382,18 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet size is more than %d", maxSnippetSize)
 		}
 
+		var isMain bool
+		if len(info.Codes) == 1 {
+			isMain = true
+		} else {
+			isMain = utils.IsCodeMain(code.Code, info.Sdk)
+		}
+
 		snippet.Codes = append(snippet.Codes, share.Code{
 			Name:     utils.GetCodeName(code.Name, info.Sdk),
 			Code:     code.Code,
-			CntxLine: 1,
-			IsMain:   utils.IsCodeMain(code.Code, info.Sdk),
+			CntxLine: 1, // it is necessary for examples from playground
+			IsMain:   isMain,
 		})
 	}
 

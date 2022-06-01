@@ -34,7 +34,7 @@ const (
 type Origin int32
 
 const (
-	TOUR_OF_BEAM Origin = 0
+	TOUR_OF_BEAM Origin = 0 //will be used in Tour of Beam project
 	PLAYGROUND   Origin = 1
 )
 

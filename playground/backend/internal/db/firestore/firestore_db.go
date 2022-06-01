@@ -26,8 +26,8 @@ import (
 )
 
 const (
-	snippetCollection = "snippets"
-	codeCollection    = "codes"
+	snippetCollection = "pg_snippets"
+	codeCollection    = "pg_codes"
 )
 
 type Firestore struct {

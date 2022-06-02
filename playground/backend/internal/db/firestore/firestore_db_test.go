@@ -40,8 +40,11 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	if err := os.Setenv(firestoreEmulatorHostKey, firestoreEmulatorHostValue); err != nil {
-		panic(err)
+	firestoreEmulatorHost := os.Getenv(firestoreEmulatorHostKey)
+	if firestoreEmulatorHost == "" {
+		if err := os.Setenv(firestoreEmulatorHostKey, firestoreEmulatorHostValue); err != nil {
+			panic(err)
+		}
 	}
 	ctx = context.Background()
 	var err error

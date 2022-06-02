@@ -23,9 +23,10 @@ import (
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/db/firestore"
-	local_db "beam.apache.org/playground/backend/internal/db/local"
+	localdb "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/share"
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
@@ -53,6 +54,10 @@ func runServer() error {
 
 	snippetDb, err := setupSnippetDB(ctx, envService.ApplicationEnvs)
 	if err != nil {
+		return err
+	}
+
+	if err = initDBstructure(ctx, snippetDb); err != nil {
 		return err
 	}
 
@@ -159,8 +164,30 @@ func setupSnippetDB(ctx context.Context, appEnv environment.ApplicationEnvs) (db
 	case db.FIRESTORE:
 		return firestore.New(ctx, appEnv.GoogleProjectId())
 	default:
-		return local_db.New()
+		return localdb.New()
 	}
+}
+
+// initDBstructure initializes the data structure in NoSQL databases to create indexes after that
+func initDBstructure(ctx context.Context, snippetDb db.SnippetDB) error {
+	dummyStr := "dummy"
+	snip := &share.Snippet{
+		Salt:     dummyStr,
+		OwnerId:  dummyStr,
+		PipeOpts: dummyStr,
+		Codes: []share.Code{
+			{
+				Name:  dummyStr,
+				Code:  dummyStr,
+				SnpId: dummyStr,
+			},
+		},
+	}
+	id, err := snip.ID()
+	if err != nil {
+		return err
+	}
+	return snippetDb.PutSnippet(ctx, id, snip)
 }
 
 func main() {

@@ -71,6 +71,7 @@ func TestFirestore_PutSnippet(t *testing.T) {
 		{
 			name: "PutSnippet() in the usual case",
 			args: args{ctx: ctx, id: "MOCK_ID", snip: &share.Snippet{
+				IdLength: 11,
 				Codes: []share.Code{{
 					Code:   "MOCK_CODE",
 					IsMain: false,
@@ -116,6 +117,7 @@ func TestFirestore_GetSnippet(t *testing.T) {
 			name: "GetSnippet() in the usual case",
 			prepare: func() {
 				_ = firestoreDb.PutSnippet(ctx, "MOCK_ID", &share.Snippet{
+					IdLength: 11,
 					Codes: []share.Code{{
 						Code:   "MOCK_CODE",
 						IsMain: false,

@@ -14,13 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Launch firestore emulator on port 8082
-PID=$(lsof -t -i :8082 -s tcp:LISTEN)
+# Launch firestore emulator on port from FIRESTORE_EMULATOR_HOST env or use default port is 8082
+FIRESTORE_FULL_ADDRESS="${FIRESTORE_EMULATOR_HOST:-"localhost:8082"}"
+echo "FIRESTORE_FULL_ADDRESS:" "${FIRESTORE_FULL_ADDRESS}"
+FIRESTORE_PORT="${FIRESTORE_FULL_ADDRESS##*:}"
+PID=$(lsof -t -i :"${FIRESTORE_PORT}" -s tcp:LISTEN)
 if [ -z "$PID" ]; then
-  echo "Starting mock Firestore server on port 8082"
+  echo "Starting mock Firestore server on port from FIRESTORE_EMULATOR_HOST env or use default port is 8082"
   nohup gcloud beta emulators firestore start \
-    --host-port=127.0.0.1:8082 \
+    --host-port="${FIRESTORE_FULL_ADDRESS}" \
     >/tmp/mock-firestore-logs &
 else
-  echo "There is an instance of Firestore already running on port 8082"
+  echo "There is an instance of Firestore already running on port from FIRESTORE_EMULATOR_HOST env or use default port is 8082"
 fi

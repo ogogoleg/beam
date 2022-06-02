@@ -54,7 +54,7 @@ func (f *Firestore) PutSnippet(ctx context.Context, id string, snip *share.Snipp
 
 	for _, code := range snip.Codes {
 		code.SnpId = id
-		codeId, err := code.ID(snip.Salt)
+		codeId, err := code.ID(snip)
 		if err != nil {
 			logger.Errorf("Firestore: PutSnippet(): error during code id generation, err: %s\n", err.Error())
 			return err

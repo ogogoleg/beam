@@ -362,6 +362,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 	nowDate := time.Now()
 	snippet := share.Snippet{
 		Salt:     controller.env.ApplicationEnvs.PlaygroundSalt(),
+		IdLength: controller.env.ApplicationEnvs.FirestoreIdLength(),
 		OwnerId:  "", // will be used in Tour of Beam project
 		Sdk:      info.Sdk,
 		PipeOpts: info.PipelineOptions,

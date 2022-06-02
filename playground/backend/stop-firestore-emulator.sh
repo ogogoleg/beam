@@ -15,7 +15,9 @@
 # limitations under the License.
 
 # Stop mock firestore
-PID=$(lsof -t -i :8082 -s tcp:LISTEN)
+FIRESTORE_FULL_ADDRESS="${FIRESTORE_EMULATOR_HOST:-"localhost:8082"}"
+FIRESTORE_PORT="${FIRESTORE_FULL_ADDRESS##*:}"
+PID=$(lsof -t -i :"${FIRESTORE_PORT}" -s tcp:LISTEN)
 if [ ! -z "$PID" ]; then
   echo "Stopping mock Firestore server"
   kill "$PID"

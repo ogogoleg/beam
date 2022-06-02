@@ -27,10 +27,6 @@ import (
 	"time"
 )
 
-const (
-	idLength = 11
-)
-
 type Origin int32
 
 const (
@@ -52,6 +48,7 @@ type Code struct {
 
 type Snippet struct {
 	Salt       string    `firestore:"-"`
+	IdLength   int       `firestore:"-"`
 	OwnerId    string    `firestore:"ownerId"`
 	Sdk        pb.Sdk    `firestore:"sdk"`
 	PipeOpts   string    `firestore:"pipeOpts"`
@@ -85,7 +82,7 @@ func (s *Snippet) ID() (string, error) {
 	sum := hash.Sum(nil)
 	b := make([]byte, base64.URLEncoding.EncodedLen(len(sum)))
 	base64.URLEncoding.Encode(b, sum)
-	hashLen := idLength
+	hashLen := s.IdLength
 	for hashLen <= len(b) && b[hashLen-1] == '_' {
 		hashLen++
 	}
@@ -93,9 +90,9 @@ func (s *Snippet) ID() (string, error) {
 }
 
 // ID generates id according to content of a code and its name
-func (c *Code) ID(salt string) (string, error) {
+func (c *Code) ID(snip *Snippet) (string, error) {
 	hash := sha256.New()
-	if _, err := io.WriteString(hash, salt); err != nil {
+	if _, err := io.WriteString(hash, snip.Salt); err != nil {
 		logger.Errorf("ID(): error while writing ID and salt: %s", err.Error())
 		return "", errors.InternalError("Error during ID generation", "Error with writing ID and salt")
 	}
@@ -104,7 +101,7 @@ func (c *Code) ID(salt string) (string, error) {
 	sum := hash.Sum(nil)
 	b := make([]byte, base64.URLEncoding.EncodedLen(len(sum)))
 	base64.URLEncoding.Encode(b, sum)
-	hashLen := idLength
+	hashLen := snip.IdLength
 	for hashLen <= len(b) && b[hashLen-1] == '_' {
 		hashLen++
 	}

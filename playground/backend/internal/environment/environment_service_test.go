@@ -104,7 +104,7 @@ func TestNewEnvironment(t *testing.T) {
 		{name: "Create env service with default envs", want: &Environment{
 			NetworkEnvs:     *NewNetworkEnvs(defaultIp, defaultPort, defaultProtocol),
 			BeamSdkEnvs:     *NewBeamEnvs(defaultSdk, executorConfig, preparedModDir, 0),
-			ApplicationEnvs: *NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize),
+			ApplicationEnvs: *NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, defaultFirestoreEmulatorHost, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize, defaultFirestoreIdLength),
 		}},
 	}
 	for _, tt := range tests {
@@ -112,7 +112,7 @@ func TestNewEnvironment(t *testing.T) {
 			if got := NewEnvironment(
 				*NewNetworkEnvs(defaultIp, defaultPort, defaultProtocol),
 				*NewBeamEnvs(defaultSdk, executorConfig, preparedModDir, 0),
-				*NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize)); !reflect.DeepEqual(got, tt.want) {
+				*NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, defaultFirestoreEmulatorHost, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize, defaultFirestoreIdLength)); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewEnvironment() = %v, want %v", got, tt.want)
 			}
 		})
@@ -223,7 +223,7 @@ func Test_getApplicationEnvsFromOsEnvs(t *testing.T) {
 	}{
 		{
 			name:      "Working dir is provided",
-			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize),
+			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, defaultFirestoreEmulatorHost, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize, defaultFirestoreIdLength),
 			wantErr:   false,
 			envsToSet: map[string]string{workingDirKey: "/app", launchSiteKey: defaultLaunchSite, projectIdKey: defaultProjectId},
 		},
@@ -234,25 +234,25 @@ func Test_getApplicationEnvsFromOsEnvs(t *testing.T) {
 		},
 		{
 			name:      "CacheKeyExpirationTimeKey is set with the correct value",
-			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, &CacheEnvs{defaultCacheType, defaultCacheAddress, convertedTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize),
+			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, defaultFirestoreEmulatorHost, &CacheEnvs{defaultCacheType, defaultCacheAddress, convertedTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize, defaultFirestoreIdLength),
 			wantErr:   false,
 			envsToSet: map[string]string{workingDirKey: "/app", cacheKeyExpirationTimeKey: hour},
 		},
 		{
 			name:      "CacheKeyExpirationTimeKey is set with the incorrect value",
-			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize),
+			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, defaultFirestoreEmulatorHost, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize, defaultFirestoreIdLength),
 			wantErr:   false,
 			envsToSet: map[string]string{workingDirKey: "/app", cacheKeyExpirationTimeKey: "1"},
 		},
 		{
 			name:      "CacheKeyExpirationTimeKey is set with the correct value",
-			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, convertedTime, defaultSnippetDBType, defaultMaxSnippetSize),
+			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, defaultFirestoreEmulatorHost, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, convertedTime, defaultSnippetDBType, defaultMaxSnippetSize, defaultFirestoreIdLength),
 			wantErr:   false,
 			envsToSet: map[string]string{workingDirKey: "/app", pipelineExecuteTimeoutKey: hour},
 		},
 		{
 			name:      "PipelineExecuteTimeoutKey is set with the incorrect value",
-			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize),
+			want:      NewApplicationEnvs("/app", defaultLaunchSite, defaultProjectId, defaultPipelinesFolder, defaultBucketName, defaultPlaygroundSalt, defaultFirestoreEmulatorHost, &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout, defaultSnippetDBType, defaultMaxSnippetSize, defaultFirestoreIdLength),
 			wantErr:   false,
 			envsToSet: map[string]string{workingDirKey: "/app", pipelineExecuteTimeoutKey: "1"},
 		},

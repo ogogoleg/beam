@@ -19,9 +19,10 @@ import (
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
 	"beam.apache.org/playground/backend/internal/db"
-	local_db "beam.apache.org/playground/backend/internal/db/local"
+	localdb "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/share"
+	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"fmt"
 	"github.com/google/uuid"
@@ -85,7 +86,7 @@ func setup() *grpc.Server {
 	cacheService = local.New(context.Background())
 
 	// setup snippet storage
-	snippetDb, err = local_db.New()
+	snippetDb, err = localdb.New()
 	if err != nil {
 		panic(err)
 	}
@@ -774,6 +775,19 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 				},
 			},
 			wantErr: false,
+		},
+		// Test case with calling SaveCode method with too large snippet.
+		// As a result, want to receive an error.
+		{
+			name: "SaveCode with too large snippet",
+			args: args{
+				ctx: ctx,
+				info: &pb.SaveCodeRequest{
+					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: utils.RandomString(65537)}},
+					Sdk:   pb.Sdk_SDK_JAVA,
+				},
+			},
+			wantErr: true,
 		},
 	}
 

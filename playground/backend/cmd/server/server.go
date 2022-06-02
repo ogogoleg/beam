@@ -57,7 +57,7 @@ func runServer() error {
 		return err
 	}
 
-	if err = initDBstructure(ctx, snippetDb); err != nil {
+	if err = initDBstructure(ctx, snippetDb, envService); err != nil {
 		return err
 	}
 
@@ -169,17 +169,19 @@ func setupSnippetDB(ctx context.Context, appEnv environment.ApplicationEnvs) (db
 }
 
 // initDBstructure initializes the data structure in NoSQL databases to create indexes after that
-func initDBstructure(ctx context.Context, snippetDb db.SnippetDB) error {
+func initDBstructure(ctx context.Context, snippetDb db.SnippetDB, env *environment.Environment) error {
 	dummyStr := "dummy"
 	snip := &share.Snippet{
+		IdLength: env.ApplicationEnvs.FirestoreIdLength(),
 		Salt:     dummyStr,
-		OwnerId:  dummyStr,
-		PipeOpts: dummyStr,
-		Codes: []share.Code{
+		Snippet: &share.SnippetDocument{
+			OwnerId:  dummyStr,
+			PipeOpts: dummyStr,
+		},
+		Codes: []*share.CodeDocument{
 			{
-				Name:  dummyStr,
-				Code:  dummyStr,
-				SnpId: dummyStr,
+				Name: dummyStr,
+				Code: dummyStr,
 			},
 		},
 	}

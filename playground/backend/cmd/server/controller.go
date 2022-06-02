@@ -363,12 +363,14 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 	snippet := share.Snippet{
 		Salt:     controller.env.ApplicationEnvs.PlaygroundSalt(),
 		IdLength: controller.env.ApplicationEnvs.FirestoreIdLength(),
-		OwnerId:  "", // will be used in Tour of Beam project
-		Sdk:      info.Sdk,
-		PipeOpts: info.PipelineOptions,
-		Created:  nowDate,
-		LVisited: nowDate,
-		Origin:   share.PLAYGROUND, // will be used in Tour of Beam project also later. If the owner ID is empty, then the origin is Playground, otherwise it's Tour of Beam
+		Snippet: &share.SnippetDocument{
+			OwnerId:  "", // will be used in Tour of Beam project
+			Sdk:      info.Sdk,
+			PipeOpts: info.PipelineOptions,
+			Created:  nowDate,
+			LVisited: nowDate,
+			Origin:   share.PLAYGROUND, // will be used in Tour of Beam project also later. If the owner ID is empty, then the origin is Playground, otherwise it's Tour of Beam
+		},
 	}
 
 	for _, code := range info.Codes {
@@ -390,7 +392,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			isMain = utils.IsCodeMain(code.Code, info.Sdk)
 		}
 
-		snippet.Codes = append(snippet.Codes, share.Code{
+		snippet.Codes = append(snippet.Codes, &share.CodeDocument{
 			Name:     utils.GetCodeName(code.Name, info.Sdk),
 			Code:     code.Code,
 			CntxLine: 1, // it is necessary for examples from playground
@@ -422,8 +424,8 @@ func (controller *playgroundController) GetCode(ctx context.Context, info *pb.Ge
 	}
 
 	response := pb.GetCodeResponse{
-		Sdk:             snippet.Sdk,
-		PipelineOptions: snippet.PipeOpts,
+		Sdk:             snippet.Snippet.Sdk,
+		PipelineOptions: snippet.Snippet.PipeOpts,
 	}
 	for _, code := range snippet.Codes {
 		response.Codes = append(response.Codes, &pb.CodeFullInfo{

@@ -38,17 +38,14 @@ func (s Origin) Value() int32 {
 	return int32(s)
 }
 
-type Code struct {
+type CodeDocument struct {
 	Name     string `firestore:"name"`
 	Code     string `firestore:"code"`
 	CntxLine int32  `firestore:"cntxLine"`
 	IsMain   bool   `firestore:"isMain"`
-	SnpId    string `firestore:"snpId"`
 }
 
-type Snippet struct {
-	Salt       string    `firestore:"-"`
-	IdLength   int       `firestore:"-"`
+type SnippetDocument struct {
 	OwnerId    string    `firestore:"ownerId"`
 	Sdk        pb.Sdk    `firestore:"sdk"`
 	PipeOpts   string    `firestore:"pipeOpts"`
@@ -56,7 +53,13 @@ type Snippet struct {
 	LVisited   time.Time `firestore:"lVisited"`
 	Origin     Origin    `firestore:"origin"`
 	VisitCount int       `firestore:"visitCount"`
-	Codes      []Code    `firestore:"-"`
+}
+
+type Snippet struct {
+	Salt     string
+	IdLength int
+	Snippet  *SnippetDocument
+	Codes    []*CodeDocument
 }
 
 // ID generates id according to content of a snippet
@@ -68,14 +71,14 @@ func (s *Snippet) ID() (string, error) {
 	}
 	var codes []string
 	for _, v := range s.Codes {
-		codes = append(codes, v.Code)
+		codes = append(codes, v.Code+v.Name)
 	}
 	sort.Strings(codes)
 	var content string
 	for i, v := range codes {
 		content += v
 		if i == len(codes)-1 {
-			content += fmt.Sprintf("%v%s", s.Sdk, s.PipeOpts)
+			content += fmt.Sprintf("%v%s", s.Snippet.Sdk, s.Snippet.PipeOpts)
 		}
 	}
 	hash.Write([]byte(content))
@@ -90,13 +93,13 @@ func (s *Snippet) ID() (string, error) {
 }
 
 // ID generates id according to content of a code and its name
-func (c *Code) ID(snip *Snippet) (string, error) {
+func (c *CodeDocument) ID(snip *Snippet) (string, error) {
 	hash := sha256.New()
 	if _, err := io.WriteString(hash, snip.Salt); err != nil {
 		logger.Errorf("ID(): error while writing ID and salt: %s", err.Error())
 		return "", errors.InternalError("Error during ID generation", "Error with writing ID and salt")
 	}
-	content := fmt.Sprintf("%s%s%s", c.Code, c.Name, c.SnpId)
+	content := fmt.Sprintf("%s%s", c.Code, c.Name)
 	hash.Write([]byte(content))
 	sum := hash.Sum(nil)
 	b := make([]byte, base64.URLEncoding.EncodedLen(len(sum)))

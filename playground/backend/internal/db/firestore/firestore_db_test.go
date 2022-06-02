@@ -75,12 +75,14 @@ func TestFirestore_PutSnippet(t *testing.T) {
 			name: "PutSnippet() in the usual case",
 			args: args{ctx: ctx, id: "MOCK_ID", snip: &share.Snippet{
 				IdLength: 11,
-				Codes: []share.Code{{
+				Codes: []*share.CodeDocument{{
 					Code:   "MOCK_CODE",
 					IsMain: false,
 				}},
-				Sdk:      1,
-				PipeOpts: "MOCK_OPTIONS",
+				Snippet: &share.SnippetDocument{
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+				},
 			}},
 			wantErr: false,
 		},
@@ -121,15 +123,17 @@ func TestFirestore_GetSnippet(t *testing.T) {
 			prepare: func() {
 				_ = firestoreDb.PutSnippet(ctx, "MOCK_ID", &share.Snippet{
 					IdLength: 11,
-					Codes: []share.Code{{
+					Codes: []*share.CodeDocument{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
-					Sdk:      1,
-					PipeOpts: "MOCK_OPTIONS",
-					Created:  nowDate,
-					Origin:   share.PLAYGROUND,
-					OwnerId:  "",
+					Snippet: &share.SnippetDocument{
+						Sdk:      1,
+						PipeOpts: "MOCK_OPTIONS",
+						Created:  nowDate,
+						Origin:   share.PLAYGROUND,
+						OwnerId:  "",
+					},
 				})
 			},
 			args:    args{ctx: ctx, id: "MOCK_ID"},
@@ -146,7 +150,12 @@ func TestFirestore_GetSnippet(t *testing.T) {
 			}
 
 			if err == nil {
-				if snip.Sdk != 1 || snip.Codes[0].Code != "MOCK_CODE" || snip.PipeOpts != "MOCK_OPTIONS" || snip.Created.Local() != nowDate.Local() || snip.Origin != share.PLAYGROUND || snip.OwnerId != "" {
+				if snip.Snippet.Sdk != 1 ||
+					snip.Codes[0].Code != "MOCK_CODE" ||
+					snip.Snippet.PipeOpts != "MOCK_OPTIONS" ||
+					snip.Snippet.Created.Local() != nowDate.Local() ||
+					snip.Snippet.Origin != share.PLAYGROUND ||
+					snip.Snippet.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
 			}

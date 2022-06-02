@@ -27,13 +27,15 @@ func TestSnippet_ID(t *testing.T) {
 		{
 			name: "Snippet ID() in the usual case",
 			snip: &Snippet{
-				Codes: []Code{{
+				Codes: []*CodeDocument{{
 					Name:   "MOCK_NAME",
 					Code:   "MOCK_CODE",
 					IsMain: false,
 				}},
-				Sdk:      1,
-				PipeOpts: "MOCK_OPTIONS",
+				Snippet: &SnippetDocument{
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+				},
 				IdLength: 11,
 				Salt:     "MOCK_SALT",
 			},
@@ -53,7 +55,7 @@ func TestSnippet_ID(t *testing.T) {
 				if len(id) != tt.snip.IdLength {
 					t.Error("The ID length is not 11")
 				}
-				if "5PVEFkm-lHO" != id {
+				if "OnY1ocoN0EO" != id {
 					t.Error("ID is wrong")
 				}
 			}
@@ -62,7 +64,7 @@ func TestSnippet_ID(t *testing.T) {
 }
 
 func TestCode_ID(t *testing.T) {
-	code := &Code{
+	code := &CodeDocument{
 		Name:   "MOCK_NAME",
 		Code:   "MOCK_CODE",
 		IsMain: false,
@@ -71,17 +73,19 @@ func TestCode_ID(t *testing.T) {
 	tests := []struct {
 		name    string
 		snip    *Snippet
-		code    *Code
+		code    *CodeDocument
 		want    string
 		wantErr bool
 	}{
 		{
-			name: "Code ID() in the usual case",
+			name: "CodeDocument ID() in the usual case",
 			snip: &Snippet{
-				Salt:     "MOCK_SALT",
-				Codes:    []Code{*code},
-				Sdk:      1,
-				PipeOpts: "MOCK_OPTIONS",
+				Salt:  "MOCK_SALT",
+				Codes: []*CodeDocument{code},
+				Snippet: &SnippetDocument{
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+				},
 				IdLength: 11,
 			},
 			code:    code,
@@ -92,8 +96,6 @@ func TestCode_ID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			snipId, _ := tt.snip.ID()
-			tt.code.SnpId = snipId
 			id, err := tt.code.ID(tt.snip)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ID() error = %v, wantErr %v", err, tt.wantErr)
@@ -103,7 +105,7 @@ func TestCode_ID(t *testing.T) {
 				if len(id) != tt.snip.IdLength {
 					t.Error("The ID length is not 11")
 				}
-				if "Ln3rhx39M8s" != id {
+				if "XSnhl0HoUOd" != id {
 					t.Error("ID is wrong")
 				}
 			}

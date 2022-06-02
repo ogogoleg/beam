@@ -45,48 +45,51 @@ func New(ctx context.Context, projectId string) (*Firestore, error) {
 
 // PutSnippet puts the snippet to firestore database
 func (f *Firestore) PutSnippet(ctx context.Context, id string, snip *share.Snippet) error {
+	batch := f.client.Batch()
 	snipDoc := f.client.Collection(snippetCollection).Doc(id)
-	_, err := snipDoc.Set(ctx, snip)
-	if err != nil {
-		logger.Errorf("Firestore: PutSnippet(): error during data setting, err: %s\n", err.Error())
-		return err
-	}
+	batch.Set(snipDoc, snip.Snippet)
 
 	for _, code := range snip.Codes {
-		code.SnpId = id
 		codeId, err := code.ID(snip)
 		if err != nil {
 			logger.Errorf("Firestore: PutSnippet(): error during code id generation, err: %s\n", err.Error())
 			return err
 		}
-		_, err = f.client.Collection(codeCollection).Doc(codeId).Set(ctx, code)
-		if err != nil {
-			logger.Errorf("Firestore: PutSnippet(): error during data setting, err: %s\n", err.Error())
-			return err
-		}
+		codeDoc := snipDoc.Collection(codeCollection).Doc(codeId)
+		batch.Set(codeDoc, code)
 	}
+
+	_, err := batch.Commit(ctx)
+	if err != nil {
+		logger.Errorf("Firestore: PutSnippet(): error during the snippet saving, err: %s\n", err.Error())
+		return err
+	}
+
 	return nil
 }
 
 // GetSnippet returns the code snippet
 func (f *Firestore) GetSnippet(ctx context.Context, id string) (*share.Snippet, error) {
-	dsnap, err := f.client.Collection(snippetCollection).Doc(id).Get(ctx)
+	snipFSDoc := f.client.Collection(snippetCollection).Doc(id)
+	dsnap, err := snipFSDoc.Get(ctx)
 	if err != nil {
 		logger.Errorf("Firestore: GetSnippet(): error during snippets getting, err: %s\n", err.Error())
 		return nil, err
 	}
+	var snipDoc share.SnippetDocument
 	var snip share.Snippet
 	jsonStr, err := json.Marshal(dsnap.Data())
 	if err != nil {
 		logger.Errorf("Firestore: GetSnippet(): error during data transformation, err: %s\n", err.Error())
 		return nil, err
 	}
-	if err := json.Unmarshal(jsonStr, &snip); err != nil {
+	if err := json.Unmarshal(jsonStr, &snipDoc); err != nil {
 		logger.Errorf("Firestore: GetSnippet(): error during data transformation, err: %s\n", err.Error())
 		return nil, err
 	}
+	snip.Snippet = &snipDoc
 
-	codeIter := f.client.Collection(codeCollection).Where("snpId", "==", id).Documents(ctx)
+	codeIter := snipFSDoc.Collection(codeCollection).Documents(ctx)
 	for {
 		doc, err := codeIter.Next()
 		if err == iterator.Done {
@@ -101,17 +104,17 @@ func (f *Firestore) GetSnippet(ctx context.Context, id string) (*share.Snippet, 
 			logger.Errorf("Firestore: GetSnippet(): error during data transformation, err: %s\n", err.Error())
 			return nil, err
 		}
-		var code share.Code
+		var code share.CodeDocument
 		if err := json.Unmarshal(jsonStr, &code); err != nil {
 			logger.Errorf("Firestore: GetSnippet(): error during data transformation, err: %s\n", err.Error())
 			return nil, err
 		}
-		snip.Codes = append(snip.Codes, code)
+		snip.Codes = append(snip.Codes, &code)
 	}
 
-	snip.LVisited = time.Now()
-	snip.VisitCount += 1
-	_, err = f.client.Collection(snippetCollection).Doc(id).Set(ctx, snip)
+	snip.Snippet.LVisited = time.Now()
+	snip.Snippet.VisitCount += 1
+	_, err = f.client.Collection(snippetCollection).Doc(id).Set(ctx, snip.Snippet)
 	if err != nil {
 		logger.Errorf("Firestore: GetSnippet(): error during data setting, err: %s\n", err.Error())
 		return nil, err

@@ -25,6 +25,7 @@ This guide consists of:
 - [Generated Files](#generated-files)
 - [Code processing pipeline](#code-processing-pipeline)
 - [How to add a new supported language](#how-to-add-a-new-supported-language)
+- [How to add a new collection to CloudFirestore](#how to add a new collection to Cloud Firestore)
 
 ## Project structure
 
@@ -118,3 +119,10 @@ enum Sdk {
     language [here](internal/code_processing/code_processing.go) (`compileStep()` method)
 12. Update a method to execute client's code according to a new
     language [here](internal/code_processing/code_processing.go) (`runStep()` method)
+
+## How to add a new collection to Cloud Firestore
+
+1. Add a new method [here](internal/db/db.go)
+2. Implement this method [here](internal/db/firestore/firestore_db.go)
+3. Write unit tests [here](internal/db/firestore/firestore_db_test.go)
+4. Update the method that initialize data structure to create indexes [here](cmd/server/server.go)

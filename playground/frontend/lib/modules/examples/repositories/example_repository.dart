@@ -19,6 +19,8 @@
 import 'package:playground/modules/examples/models/category_model.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_client/example_client.dart';
+import 'package:playground/modules/examples/repositories/models/get_code_request.dart';
+import 'package:playground/modules/examples/repositories/models/get_code_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
@@ -75,5 +77,12 @@ class ExampleRepository {
   ) async {
     final result = await _client.getExample(request);
     return result.example;
+  }
+
+  Future<GetCodeResponse> getCode(
+    GetCodeRequestWrapper request,
+  ) async {
+    final result = await _client.getCode(request);
+    return result;
   }
 }

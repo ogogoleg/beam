@@ -16,10 +16,13 @@
  * limitations under the License.
  */
 
-const kExampleParam = 'example';
-const kIsEditable = 'enabled';
-const kSourceCode = 'code';
-const kContextLine = 'line';
-const kIsShared = 'shared';
+import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
-const kQuickStartCategoryName = 'quick start';
+class GetCodeResponse {
+  final List<SharedFile> codes;
+  final SDK sdk;
+  final String pipelineOptions;
+
+  GetCodeResponse(this.codes, this.sdk, this.pipelineOptions);
+}

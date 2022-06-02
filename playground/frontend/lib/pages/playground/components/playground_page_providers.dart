@@ -94,9 +94,16 @@ class PlaygroundPageProviders extends StatelessWidget {
     PlaygroundState playground,
   ) {
     final examplePath = Uri.base.queryParameters[kExampleParam];
+    final shared = Uri.base.queryParameters[kIsShared];
 
     if (exampleState.defaultExamplesMap.isEmpty) {
       exampleState.loadDefaultExamples();
+    }
+
+    if (shared?.isNotEmpty ?? false) {
+      exampleState.getSharedExample(shared!);
+      playground.setSdk(exampleState.sharedFilesMap!.keys.first);
+      return exampleState.sharedFilesMap!.values.first;
     }
 
     if (examplePath?.isEmpty ?? true) {

@@ -30,6 +30,7 @@ class ExampleState with ChangeNotifier {
   Map<SDK, ExampleModel> defaultExamplesMap = {};
   ExampleModel? defaultExample;
   bool isSelectorOpened = false;
+  Map<SDK, ExampleModel>? sharedFilesMap;
 
   ExampleState(this._exampleRepository);
 
@@ -74,6 +75,34 @@ class ExampleState with ChangeNotifier {
     return await _exampleRepository.getExampleGraph(
       GetExampleRequestWrapper(id, sdk),
     );
+  }
+
+  getSharedExample(String id) async {
+    // GetCodeResponse result = await _exampleRepository.getCode(
+    //   GetCodeRequestWrapper(id),
+    // );
+    // sharedFilesMap = {
+    //   result.sdk: ExampleModel(
+    //     name: result.codes.first.name,
+    //     path: '',
+    //     description: 'Shared Example',
+    //     type: ExampleType.example,
+    //     source: result.codes.first.code,
+    //     pipelineOptions: result.pipelineOptions,
+    //   ),
+    // };
+    await Future.delayed(const Duration(seconds: 3));
+    sharedFilesMap = {
+      SDK.python: ExampleModel(
+        name: 'empty',
+        path: 'path',
+        description: 'description',
+        type: ExampleType.example,
+        source: 'source code',
+        pipelineOptions: 'pplopt',
+      ),
+    };
+    notifyListeners();
   }
 
   Future<ExampleModel> loadExampleInfo(ExampleModel example, SDK sdk) async {

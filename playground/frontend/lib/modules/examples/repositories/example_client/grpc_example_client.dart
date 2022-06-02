@@ -24,11 +24,14 @@ import 'package:playground/modules/editor/repository/code_repository/code_client
 import 'package:playground/modules/examples/models/category_model.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_client/example_client.dart';
+import 'package:playground/modules/examples/repositories/models/get_code_request.dart';
+import 'package:playground/modules/examples/repositories/models/get_code_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_code_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_response.dart';
+import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 import 'package:playground/utils/replace_incorrect_symbols.dart';
 
@@ -136,6 +139,21 @@ class GrpcExampleClient implements ExampleClient {
     );
   }
 
+  @override
+  Future<GetCodeResponse> getCode(
+    GetCodeRequestWrapper request,
+  ) {
+    return _runSafely(
+      () => _defaultClient.getCode(_getCodeRequestToGrpcRequest(request)).then(
+            (response) => GetCodeResponse(
+              _convertToSharedFileList(response.codes),
+              _getAppSdk(response.sdk),
+              response.pipelineOptions,
+            ),
+          ),
+    );
+  }
+
   Future<T> _runSafely<T>(Future<T> Function() invoke) {
     try {
       return invoke();
@@ -184,6 +202,12 @@ class GrpcExampleClient implements ExampleClient {
     GetExampleRequestWrapper request,
   ) {
     return grpc.GetPrecompiledObjectGraphRequest()..cloudPath = request.path;
+  }
+
+  grpc.GetCodeRequest _getCodeRequestToGrpcRequest(
+    GetCodeRequestWrapper request,
+  ) {
+    return grpc.GetCodeRequest()..id = request.id;
   }
 
   grpc.Sdk _getGrpcSdk(SDK sdk) {
@@ -264,5 +288,21 @@ class GrpcExampleClient implements ExampleClient {
       isMultiFile: example.multifile,
       link: example.link,
     );
+  }
+
+  List<SharedFile> _convertToSharedFileList(
+    List<grpc.CodeFullInfo> codesList,
+  ) {
+    List<SharedFile> sharedFilesList = [];
+
+    for (grpc.CodeFullInfo item in codesList) {
+      sharedFilesList.add(SharedFile(
+        item.code,
+        item.isMain,
+        item.name,
+      ));
+    }
+
+    return sharedFilesList;
   }
 }

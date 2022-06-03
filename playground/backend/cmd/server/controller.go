@@ -28,6 +28,7 @@ import (
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"github.com/google/uuid"
+	"html/template"
 	"time"
 )
 
@@ -385,16 +386,18 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet size is more than %d", maxSnippetSize)
 		}
 
+		filteredCode := template.HTMLEscapeString(code.Code)
+
 		var isMain bool
 		if len(info.Codes) == 1 {
 			isMain = true
 		} else {
-			isMain = utils.IsCodeMain(code.Code, info.Sdk)
+			isMain = utils.IsCodeMain(filteredCode, info.Sdk)
 		}
 
 		snippet.Codes = append(snippet.Codes, &share.CodeDocument{
 			Name:     utils.GetCodeName(code.Name, info.Sdk),
-			Code:     code.Code,
+			Code:     filteredCode,
 			CntxLine: 1, // it is necessary for examples from playground
 			IsMain:   isMain,
 		})

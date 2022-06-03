@@ -386,18 +386,16 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet size is more than %d", maxSnippetSize)
 		}
 
-		filteredCode := template.HTMLEscapeString(code.Code)
-
 		var isMain bool
 		if len(info.Codes) == 1 {
 			isMain = true
 		} else {
-			isMain = utils.IsCodeMain(filteredCode, info.Sdk)
+			isMain = utils.IsCodeMain(code.Code, info.Sdk)
 		}
 
 		snippet.Codes = append(snippet.Codes, &share.CodeDocument{
 			Name:     utils.GetCodeName(code.Name, info.Sdk),
-			Code:     filteredCode,
+			Code:     template.HTMLEscapeString(code.Code),
 			CntxLine: 1, // it is necessary for examples from playground
 			IsMain:   isMain,
 		})

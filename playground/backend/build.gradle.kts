@@ -40,11 +40,21 @@ task("tidy") {
   }
 }
 
+task("updateFirestoreIndexes") {
+    description = "Update firestore indexes"
+    doLast {
+        exec {
+            executable("sh")
+            args("update_firestore_indexes.sh")
+        }
+    }
+}
+
 task("startMockFirestore") {
   doLast {
     exec {
       executable("sh")
-      args("start-firestore-emulator.sh")
+      args("start_firestore_emulator.sh")
     }
   }
 }
@@ -62,7 +72,7 @@ task("test") {
   doLast {
       exec {
         executable("sh")
-        args("stop-firestore-emulator.sh")
+        args("stop_firestore_emulator.sh")
       }
   }
 }

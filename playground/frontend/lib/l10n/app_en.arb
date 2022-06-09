@@ -226,5 +226,21 @@
   "result": "Result",
   "@result": {
     "description": "Name for the output tab"
+  },
+  "shareMyCode": "Share my code",
+  "@shareMyCode": {
+    "description": "Text for the share button"
+  },
+  "linkCopied": "Link Copied! Anyone on the Internet with this link can view your example.",
+  "@linkCopied": {
+    "description": "Text that appears when you copy link to your code sample"
+  },
+  "clickForLink": "Click the button to see the link and share your code",
+  "@clickForLink": {
+    "description": "Description for the share dropdown"
+  },
+  "showAndCopyLink": "Show and copy code link",
+  "@showAndCopyLink": {
+    "description": "Description for the copy link button"
   }
 }

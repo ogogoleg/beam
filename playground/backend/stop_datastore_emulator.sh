@@ -14,11 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Stop mock firestore
-FIRESTORE_FULL_ADDRESS="${FIRESTORE_EMULATOR_HOST:-"localhost:8082"}"
-FIRESTORE_PORT="${FIRESTORE_FULL_ADDRESS##*:}"
-PID=$(lsof -t -i :"${FIRESTORE_PORT}" -s tcp:LISTEN)
+# Kill datastore emulator
+current_dir="$(dirname "$0")"
+source "$current_dir/envs_and_functions.sh"
+
+PID=$(lsof -t -i :"${DATASTORE_PORT}" -s tcp:LISTEN)
 if [ ! -z "$PID" ]; then
-  echo "Stopping mock Firestore server"
+  echo "Stopping Datastore emulator"
   kill "$PID"
 fi

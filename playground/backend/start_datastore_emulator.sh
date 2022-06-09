@@ -14,16 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Launch firestore emulator on port from FIRESTORE_EMULATOR_HOST env or use default port is 8082
-FIRESTORE_FULL_ADDRESS="${FIRESTORE_EMULATOR_HOST:-"localhost:8082"}"
-echo "FIRESTORE_FULL_ADDRESS:" "${FIRESTORE_FULL_ADDRESS}"
-FIRESTORE_PORT="${FIRESTORE_FULL_ADDRESS##*:}"
-PID=$(lsof -t -i :"${FIRESTORE_PORT}" -s tcp:LISTEN)
+# Launch datastore emulator
+current_dir="$(dirname "$0")"
+source "$current_dir/envs_and_functions.sh"
+
+PID=$(lsof -t -i :"${DATASTORE_PORT}" -s tcp:LISTEN)
+
 if [ -z "$PID" ]; then
-  echo "Starting mock Firestore server on port from FIRESTORE_EMULATOR_HOST env or use default port is 8082"
-  nohup gcloud beta emulators firestore start \
-    --host-port="${FIRESTORE_FULL_ADDRESS}" \
-    >/tmp/mock-firestore-logs &
+  echo "Starting Datastore emulator"
+  nohup gcloud beta emulators datastore start \
+    --host-port="${DATASTORE_FULL_ADDRESS}" \
+    --project="${TEST_PROJECT_ID}" \
+    --consistency=1 \
+    --no-store-on-disk \
+    >/tmp/mock-datastore-logs &
 else
-  echo "There is an instance of Firestore already running on port from FIRESTORE_EMULATOR_HOST env or use default port is 8082"
+  echo "There is an instance of Datastore emulator already running"
 fi
+
+echo "waiting for datastore emulator to start..."
+sleep 1

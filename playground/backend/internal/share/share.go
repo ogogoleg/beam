@@ -24,7 +24,9 @@ import (
 	"fmt"
 	"io"
 	"sort"
+	"strings"
 	"time"
+	"unicode"
 )
 
 type Origin int32
@@ -39,27 +41,27 @@ func (s Origin) Value() int32 {
 }
 
 type CodeDocument struct {
-	Name     string `firestore:"name"`
-	Code     string `firestore:"code"`
-	CntxLine int32  `firestore:"cntxLine"`
-	IsMain   bool   `firestore:"isMain"`
+	Name     string `datastore:"name"`
+	Code     string `datastore:"code"`
+	CntxLine int32  `datastore:"cntxLine"`
+	IsMain   bool   `datastore:"isMain"`
 }
 
 type SnippetDocument struct {
-	OwnerId    string    `firestore:"ownerId"`
-	Sdk        pb.Sdk    `firestore:"sdk"`
-	PipeOpts   string    `firestore:"pipeOpts"`
-	Created    time.Time `firestore:"created"`
-	LVisited   time.Time `firestore:"lVisited"`
-	Origin     Origin    `firestore:"origin"`
-	VisitCount int       `firestore:"visitCount"`
+	OwnerId    string          `datastore:"ownerId"`
+	Sdk        pb.Sdk          `datastore:"sdk"`
+	PipeOpts   string          `datastore:"pipeOpts"`
+	Created    time.Time       `datastore:"created"`
+	LVisited   time.Time       `datastore:"lVisited"`
+	Origin     Origin          `datastore:"origin"`
+	VisitCount int             `datastore:"visitCount"`
+	Codes      []*CodeDocument `datastore:"codes"`
 }
 
 type Snippet struct {
 	Salt     string
 	IdLength int
 	Snippet  *SnippetDocument
-	Codes    []*CodeDocument
 }
 
 // ID generates id according to content of a snippet
@@ -70,15 +72,15 @@ func (s *Snippet) ID() (string, error) {
 		return "", errors.InternalError("Error during ID generation", "Error with writing ID and salt")
 	}
 	var codes []string
-	for _, v := range s.Codes {
-		codes = append(codes, v.Code+v.Name)
+	for _, v := range s.Snippet.Codes {
+		codes = append(codes, spaceStringsBuilder(v.Code)+spaceStringsBuilder(v.Name))
 	}
 	sort.Strings(codes)
 	var content string
 	for i, v := range codes {
 		content += v
 		if i == len(codes)-1 {
-			content += fmt.Sprintf("%v%s", s.Snippet.Sdk, s.Snippet.PipeOpts)
+			content += fmt.Sprintf("%v%s", s.Snippet.Sdk, spaceStringsBuilder(s.Snippet.PipeOpts))
 		}
 	}
 	hash.Write([]byte(content))
@@ -99,7 +101,7 @@ func (c *CodeDocument) ID(snip *Snippet) (string, error) {
 		logger.Errorf("ID(): error while writing ID and salt: %s", err.Error())
 		return "", errors.InternalError("Error during ID generation", "Error with writing ID and salt")
 	}
-	content := fmt.Sprintf("%s%s", c.Code, c.Name)
+	content := fmt.Sprintf("%s%s", spaceStringsBuilder(c.Code), spaceStringsBuilder(c.Name))
 	hash.Write([]byte(content))
 	sum := hash.Sum(nil)
 	b := make([]byte, base64.URLEncoding.EncodedLen(len(sum)))
@@ -109,4 +111,15 @@ func (c *CodeDocument) ID(snip *Snippet) (string, error) {
 		hashLen++
 	}
 	return string(b)[:hashLen], nil
+}
+
+func spaceStringsBuilder(str string) string {
+	var b strings.Builder
+	b.Grow(len(str))
+	for _, ch := range str {
+		if !unicode.IsSpace(ch) {
+			b.WriteRune(ch)
+		}
+	}
+	return b.String()
 }

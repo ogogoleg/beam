@@ -22,7 +22,7 @@ import (
 	"beam.apache.org/playground/backend/internal/cache/redis"
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/db"
-	"beam.apache.org/playground/backend/internal/db/firestore"
+	"beam.apache.org/playground/backend/internal/db/datastore"
 	localdb "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
@@ -161,8 +161,8 @@ func setupExamplesCatalog(ctx context.Context, cacheService cache.Cache, bucketN
 // setupSnippetDB constructs required database by application environment
 func setupSnippetDB(ctx context.Context, appEnv environment.ApplicationEnvs) (db.SnippetDB, error) {
 	switch appEnv.SnippetDB() {
-	case db.FIRESTORE:
-		return firestore.New(ctx, appEnv.GoogleProjectId())
+	case db.DATASTORE:
+		return datastore.New(ctx, appEnv.GoogleProjectId())
 	default:
 		return localdb.New()
 	}
@@ -177,11 +177,11 @@ func initDBstructure(ctx context.Context, snippetDb db.SnippetDB, env *environme
 		Snippet: &share.SnippetDocument{
 			OwnerId:  dummyStr,
 			PipeOpts: dummyStr,
-		},
-		Codes: []*share.CodeDocument{
-			{
-				Name: dummyStr,
-				Code: dummyStr,
+			Codes: []*share.CodeDocument{
+				{
+					Name: dummyStr,
+					Code: dummyStr,
+				},
 			},
 		},
 	}
@@ -189,7 +189,7 @@ func initDBstructure(ctx context.Context, snippetDb db.SnippetDB, env *environme
 	if err != nil {
 		return err
 	}
-	return snippetDb.PutSnippet(ctx, id, snip)
+	return snippetDb.PutSnippet(ctx, id, snip.Snippet)
 }
 
 func main() {

@@ -34,7 +34,7 @@ func New() (*LocalDB, error) {
 }
 
 // PutSnippet puts the snippet to local database
-func (f *LocalDB) PutSnippet(_ context.Context, id string, snip *share.Snippet) error {
+func (f *LocalDB) PutSnippet(_ context.Context, id string, snip *share.SnippetDocument) error {
 	f.Lock()
 	defer f.Unlock()
 	f.items[id] = snip
@@ -42,7 +42,7 @@ func (f *LocalDB) PutSnippet(_ context.Context, id string, snip *share.Snippet) 
 }
 
 // GetSnippet returns the code snippet
-func (f *LocalDB) GetSnippet(_ context.Context, id string) (*share.Snippet, error) {
+func (f *LocalDB) GetSnippet(_ context.Context, id string) (*share.SnippetDocument, error) {
 	f.RLock()
 	value, found := f.items[id]
 	if !found {
@@ -50,6 +50,6 @@ func (f *LocalDB) GetSnippet(_ context.Context, id string) (*share.Snippet, erro
 		return nil, fmt.Errorf("value with id: %s not found", id)
 	}
 	f.RUnlock()
-	snippet, _ := value.(*share.Snippet)
+	snippet, _ := value.(*share.SnippetDocument)
 	return snippet, nil
 }

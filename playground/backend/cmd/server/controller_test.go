@@ -843,14 +843,12 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 				info: &pb.GetCodeRequest{Id: "MOCK_ID"},
 			},
 			prepare: func() {
-				_ = snippetDb.PutSnippet(ctx, "MOCK_ID", &share.Snippet{
-					Snippet: &share.SnippetDocument{
-						OwnerId:  "",
-						Sdk:      1,
-						PipeOpts: "MOCK_OPTIONS",
-						Created:  nowDate,
-						Origin:   share.PLAYGROUND,
-					},
+				_ = snippetDb.PutSnippet(ctx, "MOCK_ID", &share.SnippetDocument{
+					OwnerId:  "",
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+					Created:  nowDate,
+					Origin:   share.PLAYGROUND,
 					Codes: []*share.CodeDocument{{
 						Code:   "MOCK_CODE",
 						IsMain: false,

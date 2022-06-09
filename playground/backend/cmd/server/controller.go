@@ -28,7 +28,6 @@ import (
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"github.com/google/uuid"
-	"html/template"
 	"time"
 )
 
@@ -393,9 +392,9 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			isMain = utils.IsCodeMain(code.Code, info.Sdk)
 		}
 
-		snippet.Codes = append(snippet.Codes, &share.CodeDocument{
+		snippet.Snippet.Codes = append(snippet.Snippet.Codes, &share.CodeDocument{
 			Name:     utils.GetCodeName(code.Name, info.Sdk),
-			Code:     template.HTMLEscapeString(code.Code),
+			Code:     code.Code,
 			CntxLine: 1, // it is necessary for examples from playground
 			IsMain:   isMain,
 		})
@@ -407,7 +406,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 		return nil, errors.InternalError(errorTitle, "Failed to generate ID")
 	}
 
-	if err := controller.snippetDB.PutSnippet(ctx, id, &snippet); err != nil {
+	if err := controller.snippetDB.PutSnippet(ctx, id, snippet.Snippet); err != nil {
 		logger.Errorf("SaveCode(): PutSnippet(): error during snippet saving: %s", err.Error())
 		return nil, errors.InternalError(errorTitle, "Failed to save a code snippet")
 	}
@@ -425,8 +424,8 @@ func (controller *playgroundController) GetCode(ctx context.Context, info *pb.Ge
 	}
 
 	response := pb.GetCodeResponse{
-		Sdk:             snippet.Snippet.Sdk,
-		PipelineOptions: snippet.Snippet.PipeOpts,
+		Sdk:             snippet.Sdk,
+		PipelineOptions: snippet.PipeOpts,
 	}
 	for _, code := range snippet.Codes {
 		response.Codes = append(response.Codes, &pb.CodeFullInfo{

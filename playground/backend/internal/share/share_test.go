@@ -27,14 +27,14 @@ func TestSnippet_ID(t *testing.T) {
 		{
 			name: "Snippet ID() in the usual case",
 			snip: &Snippet{
-				Codes: []*CodeDocument{{
-					Name:   "MOCK_NAME",
-					Code:   "MOCK_CODE",
-					IsMain: false,
-				}},
 				Snippet: &SnippetDocument{
 					Sdk:      1,
 					PipeOpts: "MOCK_OPTIONS",
+					Codes: []*CodeDocument{{
+						Name:   "MOCK_NAME",
+						Code:   "MOCK_CODE",
+						IsMain: false,
+					}},
 				},
 				IdLength: 11,
 				Salt:     "MOCK_SALT",
@@ -80,11 +80,11 @@ func TestCode_ID(t *testing.T) {
 		{
 			name: "CodeDocument ID() in the usual case",
 			snip: &Snippet{
-				Salt:  "MOCK_SALT",
-				Codes: []*CodeDocument{code},
+				Salt: "MOCK_SALT",
 				Snippet: &SnippetDocument{
 					Sdk:      1,
 					PipeOpts: "MOCK_OPTIONS",
+					Codes:    []*CodeDocument{code},
 				},
 				IdLength: 11,
 			},

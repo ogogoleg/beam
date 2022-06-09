@@ -38,7 +38,7 @@ func TestLocalDB_PutSnippet(t *testing.T) {
 	type args struct {
 		ctx  context.Context
 		id   string
-		snip *share.Snippet
+		snip *share.SnippetDocument
 	}
 	tests := []struct {
 		name    string
@@ -50,17 +50,15 @@ func TestLocalDB_PutSnippet(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				id:  "MOCK_ID",
-				snip: &share.Snippet{
+				snip: &share.SnippetDocument{
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+					Origin:   share.PLAYGROUND,
+					OwnerId:  "",
 					Codes: []*share.CodeDocument{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
-					Snippet: &share.SnippetDocument{
-						Sdk:      1,
-						PipeOpts: "MOCK_OPTIONS",
-						Origin:   share.PLAYGROUND,
-						OwnerId:  "",
-					},
 				},
 			},
 			wantErr: false,
@@ -103,18 +101,16 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 		{
 			name: "GetSnippet() in the usual case",
 			prepare: func() {
-				_ = localDb.PutSnippet(ctx, "MOCK_ID", &share.Snippet{
+				_ = localDb.PutSnippet(ctx, "MOCK_ID", &share.SnippetDocument{
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+					Created:  nowDate,
+					Origin:   share.PLAYGROUND,
+					OwnerId:  "",
 					Codes: []*share.CodeDocument{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
-					Snippet: &share.SnippetDocument{
-						Sdk:      1,
-						PipeOpts: "MOCK_OPTIONS",
-						Created:  nowDate,
-						Origin:   share.PLAYGROUND,
-						OwnerId:  "",
-					},
 				})
 			},
 			args: args{
@@ -134,12 +130,11 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 			}
 
 			if err == nil {
-				if snip.Snippet.Sdk != 1 ||
+				if snip.Sdk != 1 ||
 					snip.Codes[0].Code != "MOCK_CODE" ||
-					snip.Snippet.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Snippet.Created != nowDate ||
-					snip.Snippet.Origin != share.PLAYGROUND ||
-					snip.Snippet.OwnerId != "" {
+					snip.PipeOpts != "MOCK_OPTIONS" ||
+					snip.Origin != share.PLAYGROUND ||
+					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
 			}

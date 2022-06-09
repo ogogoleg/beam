@@ -13,10 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package firestore
+package datastore
 
 import (
 	"beam.apache.org/playground/backend/internal/share"
+	"cloud.google.com/go/datastore"
 	"context"
 	"os"
 	"testing"
@@ -24,12 +25,12 @@ import (
 )
 
 const (
-	firestoreEmulatorHostKey   = "FIRESTORE_EMULATOR_HOST"
-	firestoreEmulatorHostValue = "localhost:8082"
-	firestoreEmulatorProjectId = "dummy-emulator-firestore-project"
+	datastoreEmulatorHostKey   = "DATASTORE_EMULATOR_HOST"
+	datastoreEmulatorHostValue = "0.0.0.0:8888"
+	datastoreEmulatorProjectId = "test"
 )
 
-var firestoreDb *Firestore
+var datastoreDb *Datastore
 var ctx context.Context
 
 func TestMain(m *testing.M) {
@@ -40,31 +41,31 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	firestoreEmulatorHost := os.Getenv(firestoreEmulatorHostKey)
-	if firestoreEmulatorHost == "" {
-		if err := os.Setenv(firestoreEmulatorHostKey, firestoreEmulatorHostValue); err != nil {
+	datastoreEmulatorHost := os.Getenv(datastoreEmulatorHostKey)
+	if datastoreEmulatorHost == "" {
+		if err := os.Setenv(datastoreEmulatorHostKey, datastoreEmulatorHostValue); err != nil {
 			panic(err)
 		}
 	}
 	ctx = context.Background()
 	var err error
-	firestoreDb, err = New(ctx, firestoreEmulatorProjectId)
+	datastoreDb, err = New(ctx, datastoreEmulatorProjectId)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func teardown() {
-	if err := firestoreDb.client.Close(); err != nil {
+	if err := datastoreDb.client.Close(); err != nil {
 		panic(err)
 	}
 }
 
-func TestFirestore_PutSnippet(t *testing.T) {
+func TestDatastore_PutSnippet(t *testing.T) {
 	type args struct {
 		ctx  context.Context
 		id   string
-		snip *share.Snippet
+		snip *share.SnippetDocument
 	}
 	tests := []struct {
 		name    string
@@ -73,16 +74,13 @@ func TestFirestore_PutSnippet(t *testing.T) {
 	}{
 		{
 			name: "PutSnippet() in the usual case",
-			args: args{ctx: ctx, id: "MOCK_ID", snip: &share.Snippet{
-				IdLength: 11,
+			args: args{ctx: ctx, id: "MOCK_ID", snip: &share.SnippetDocument{
+				Sdk:      1,
+				PipeOpts: "MOCK_OPTIONS",
 				Codes: []*share.CodeDocument{{
 					Code:   "MOCK_CODE",
 					IsMain: false,
 				}},
-				Snippet: &share.SnippetDocument{
-					Sdk:      1,
-					PipeOpts: "MOCK_OPTIONS",
-				},
 			}},
 			wantErr: false,
 		},
@@ -90,7 +88,7 @@ func TestFirestore_PutSnippet(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := firestoreDb.PutSnippet(tt.args.ctx, tt.args.id, tt.args.snip)
+			err := datastoreDb.PutSnippet(tt.args.ctx, tt.args.id, tt.args.snip)
 			if err != nil {
 				t.Error("PutSnippet() method failed")
 			}
@@ -100,7 +98,7 @@ func TestFirestore_PutSnippet(t *testing.T) {
 	cleanData(t)
 }
 
-func TestFirestore_GetSnippet(t *testing.T) {
+func TestDatastore_GetSnippet(t *testing.T) {
 	nowDate := time.Now()
 	type args struct {
 		ctx context.Context
@@ -121,19 +119,16 @@ func TestFirestore_GetSnippet(t *testing.T) {
 		{
 			name: "GetSnippet() in the usual case",
 			prepare: func() {
-				_ = firestoreDb.PutSnippet(ctx, "MOCK_ID", &share.Snippet{
-					IdLength: 11,
+				_ = datastoreDb.PutSnippet(ctx, "MOCK_ID", &share.SnippetDocument{
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+					Created:  nowDate,
+					Origin:   share.PLAYGROUND,
+					OwnerId:  "",
 					Codes: []*share.CodeDocument{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
-					Snippet: &share.SnippetDocument{
-						Sdk:      1,
-						PipeOpts: "MOCK_OPTIONS",
-						Created:  nowDate,
-						Origin:   share.PLAYGROUND,
-						OwnerId:  "",
-					},
 				})
 			},
 			args:    args{ctx: ctx, id: "MOCK_ID"},
@@ -144,18 +139,17 @@ func TestFirestore_GetSnippet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.prepare()
-			snip, err := firestoreDb.GetSnippet(tt.args.ctx, tt.args.id)
+			snip, err := datastoreDb.GetSnippet(tt.args.ctx, tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetSnippet() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if err == nil {
-				if snip.Snippet.Sdk != 1 ||
+				if snip.Sdk != 1 ||
 					snip.Codes[0].Code != "MOCK_CODE" ||
-					snip.Snippet.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Snippet.Created.Local() != nowDate.Local() ||
-					snip.Snippet.Origin != share.PLAYGROUND ||
-					snip.Snippet.OwnerId != "" {
+					snip.PipeOpts != "MOCK_OPTIONS" ||
+					snip.Origin != share.PLAYGROUND ||
+					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
 			}
@@ -176,15 +170,15 @@ func TestNew(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "Initialize firestore database",
-			args:    args{ctx: ctx, projectId: firestoreEmulatorProjectId},
+			name:    "Initialize datastore database",
+			args:    args{ctx: ctx, projectId: datastoreEmulatorProjectId},
 			wantErr: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := New(ctx, firestoreEmulatorProjectId)
+			_, err := New(ctx, datastoreEmulatorProjectId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -193,8 +187,7 @@ func TestNew(t *testing.T) {
 }
 
 func cleanData(t *testing.T) {
-	_, err := firestoreDb.client.Collection(snippetCollection).Doc("MOCK_ID").Delete(ctx)
-	if err != nil {
+	if err := datastoreDb.client.Delete(ctx, datastore.NameKey(snippetCollection, "MOCK_ID", nil)); err != nil {
 		t.Error("Error during data cleaning after the test")
 	}
 }

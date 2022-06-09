@@ -113,10 +113,10 @@ type ApplicationEnvs struct {
 	// maxSnippetSize is snippet size limit
 	maxSnippetSize int
 
-	// firestoreIdLength is a firestore ID length
+	// firestoreIdLength is a datastore ID length
 	firestoreIdLength int
 
-	// firestoreEmulatorHost is the address of firestore emulator
+	// firestoreEmulatorHost is the address of datastore emulator
 	firestoreEmulatorHost string
 }
 
@@ -194,12 +194,12 @@ func (ae *ApplicationEnvs) MaxSnippetSize() int {
 	return ae.maxSnippetSize
 }
 
-// FirestoreIdLength returns the firestore ID length
+// FirestoreIdLength returns the datastore ID length
 func (ae *ApplicationEnvs) FirestoreIdLength() int {
 	return ae.firestoreIdLength
 }
 
-// FirestoreEmulatorHost returns the address of firestore emulator
+// FirestoreEmulatorHost returns the address of datastore emulator
 func (ae *ApplicationEnvs) FirestoreEmulatorHost() string {
 	return ae.firestoreEmulatorHost
 }

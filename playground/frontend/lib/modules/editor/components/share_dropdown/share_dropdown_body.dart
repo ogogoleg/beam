@@ -22,6 +22,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
+import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
+import 'package:playground/pages/playground/states/examples_state.dart';
+import 'package:playground/pages/playground/states/playground_state.dart';
+import 'package:provider/provider.dart';
 
 class ShareDropdownBody extends StatefulWidget {
   final Function close;
@@ -42,63 +46,77 @@ class _ShareDropdownBodyState extends State<ShareDropdownBody> {
   Widget build(BuildContext context) {
     AppLocalizations appLocale = AppLocalizations.of(context)!;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: kXlSpacing,
-        horizontal: kXlSpacing,
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(isPressed ? appLocale.linkCopied : appLocale.clickForLink),
-            GestureDetector(
-              onTap: () async {
-                setState(() {
-                  isPressed = true;
-                });
-                await Clipboard.setData(
-                  const ClipboardData(
-                    text:
-                        'https://play.beam.apache.org/fhudiu89lkd/mycodeexample',
+    return Consumer2<ExampleState, PlaygroundState>(
+      builder: (context, exampleState, playgroundState, child) => Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: kXlSpacing,
+          horizontal: kXlSpacing,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(isPressed ? appLocale.linkCopied : appLocale.clickForLink),
+              GestureDetector(
+                onTap: () async {
+                  setState(() {
+                    isPressed = true;
+                  });
+                  exampleState.setShareLink('');
+                  if (playgroundState.isExampleChanged) {
+                    exampleState.getShareLink(
+                      [SharedFile(playgroundState.source, true, '')],
+                      playgroundState.sdk,
+                      playgroundState.pipelineOptions,
+                    );
+                  } else {
+                    exampleState.setDefaultShareLink(
+                      playgroundState.selectedExample!.path,
+                    );
+                  }
+                  await Clipboard.setData(ClipboardData(
+                    text: exampleState.link,
+                  ));
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isPressed
+                        ? ThemeColors.of(context).greyColor
+                        : ThemeColors.of(context).primaryBackground,
+                    border: Border.all(
+                      color: ThemeColors.of(context).primary,
+                    ),
+                    borderRadius: BorderRadius.circular(kSmBorderRadius),
                   ),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isPressed
-                      ? ThemeColors.of(context).greyColor
-                      : ThemeColors.of(context).primaryBackground,
-                  border: Border.all(
-                    color: ThemeColors.of(context).primary,
-                  ),
-                  borderRadius: BorderRadius.circular(kSmBorderRadius),
-                ),
-                child: Center(
-                  child: Padding(
+                  child: Container(
                     padding: const EdgeInsets.symmetric(vertical: kLgSpacing),
-                    child: isPressed
-                        ? SelectableText(
-                            'https://play.beam.apache.org/fhudiu89lkd/mycodeexample',
-                            style: TextStyle(
-                              fontSize: kLabelFontSize,
-                              fontWeight: kNormalWeight,
-                              color: ThemeColors.of(context).primary,
+                    margin: const EdgeInsets.symmetric(horizontal: kMdSpacing),
+                    child: Center(
+                      child: isPressed
+                          ? SelectableText(
+                              exampleState.link ?? '',
+                              maxLines: 1,
+                              style: TextStyle(
+                                overflow: TextOverflow.ellipsis,
+                                fontSize: kLabelFontSize,
+                                fontWeight: kNormalWeight,
+                                color: ThemeColors.of(context).primary,
+                              ),
+                            )
+                          : Text(
+                              appLocale.showAndCopyLink,
+                              style: TextStyle(
+                                fontSize: kLabelFontSize,
+                                fontWeight: kBoldWeight,
+                                color: ThemeColors.of(context).primary,
+                              ),
                             ),
-                          )
-                        : Text(
-                            appLocale.showAndCopyLink,
-                            style: TextStyle(
-                              fontSize: kLabelFontSize,
-                              fontWeight: kBoldWeight,
-                              color: ThemeColors.of(context).primary,
-                            ),
-                          ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

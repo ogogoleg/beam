@@ -24,13 +24,16 @@ import 'package:playground/modules/examples/repositories/models/get_example_requ
 import 'package:playground/modules/examples/repositories/models/get_example_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_response.dart';
+import 'package:playground/modules/examples/repositories/models/save_code_request.dart';
+import 'package:playground/modules/examples/repositories/models/save_code_response.dart';
 
 abstract class ExampleClient {
   Future<GetListOfExampleResponse> getListOfExamples(
     GetListOfExamplesRequestWrapper request,
   );
 
-  Future<GetExampleCodeResponse> getExampleSource(GetExampleRequestWrapper request);
+  Future<GetExampleCodeResponse> getExampleSource(
+      GetExampleRequestWrapper request);
 
   Future<GetExampleResponse> getDefaultExample(
     GetExampleRequestWrapper request,
@@ -47,4 +50,6 @@ abstract class ExampleClient {
   Future<OutputResponse> getExampleGraph(GetExampleRequestWrapper request);
 
   Future<GetCodeResponse> getCode(GetCodeRequestWrapper request);
+
+  Future<SaveCodeResponse> saveCode(SaveCodeRequestWrapper request);
 }

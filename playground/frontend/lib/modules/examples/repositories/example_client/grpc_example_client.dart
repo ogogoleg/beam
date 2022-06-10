@@ -31,6 +31,8 @@ import 'package:playground/modules/examples/repositories/models/get_example_requ
 import 'package:playground/modules/examples/repositories/models/get_example_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_response.dart';
+import 'package:playground/modules/examples/repositories/models/save_code_request.dart';
+import 'package:playground/modules/examples/repositories/models/save_code_response.dart';
 import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 import 'package:playground/utils/replace_incorrect_symbols.dart';
@@ -154,6 +156,17 @@ class GrpcExampleClient implements ExampleClient {
     );
   }
 
+  @override
+  Future<SaveCodeResponse> saveCode(
+    SaveCodeRequestWrapper request,
+  ) {
+    return _runSafely(
+      () => _defaultClient.saveCode(_saveCodeRequestToGrpcRequest(request)).then(
+            (response) => SaveCodeResponse(response.id),
+          ),
+    );
+  }
+
   Future<T> _runSafely<T>(Future<T> Function() invoke) {
     try {
       return invoke();
@@ -208,6 +221,15 @@ class GrpcExampleClient implements ExampleClient {
     GetCodeRequestWrapper request,
   ) {
     return grpc.GetCodeRequest()..id = request.id;
+  }
+
+  grpc.SaveCodeRequest _saveCodeRequestToGrpcRequest(
+    SaveCodeRequestWrapper request,
+  ) {
+    return grpc.SaveCodeRequest()
+      ..sdk = _getGrpcSdk(request.sdk)
+      ..pipelineOptions = request.pipelineOptions
+      ..codes.addAll(_convertToCodeInfoList(request.codes));
   }
 
   grpc.Sdk _getGrpcSdk(SDK sdk) {
@@ -304,5 +326,21 @@ class GrpcExampleClient implements ExampleClient {
     }
 
     return sharedFilesList;
+  }
+
+  List<grpc.CodeInfo> _convertToCodeInfoList(
+    List<SharedFile> sharedFilesList,
+  ) {
+    List<grpc.CodeInfo> codesList = [];
+
+    for (SharedFile item in sharedFilesList) {
+      codesList.add(
+        grpc.CodeInfo()
+          ..name = item.name
+          ..code = item.code,
+      );
+    }
+
+    return codesList;
   }
 }

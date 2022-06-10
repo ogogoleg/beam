@@ -23,6 +23,7 @@ import 'package:playground/modules/examples/repositories/models/get_code_request
 import 'package:playground/modules/examples/repositories/models/get_code_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
+import 'package:playground/modules/examples/repositories/models/save_code_request.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
 class ExampleRepository {
@@ -84,5 +85,12 @@ class ExampleRepository {
   ) async {
     final result = await _client.getCode(request);
     return result;
+  }
+
+  Future<String> saveCode(
+    SaveCodeRequestWrapper request,
+  ) async {
+    final result = await _client.saveCode(request);
+    return result.id;
   }
 }

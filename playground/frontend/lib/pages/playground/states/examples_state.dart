@@ -21,8 +21,12 @@ import 'package:playground/constants/params.dart';
 import 'package:playground/modules/examples/models/category_model.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_repository.dart';
+import 'package:playground/modules/examples/repositories/models/get_code_request.dart';
+import 'package:playground/modules/examples/repositories/models/get_code_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
+import 'package:playground/modules/examples/repositories/models/save_code_request.dart';
+import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
 class ExampleState with ChangeNotifier {
@@ -32,6 +36,7 @@ class ExampleState with ChangeNotifier {
   ExampleModel? defaultExample;
   bool isSelectorOpened = false;
   Map<SDK, ExampleModel>? sharedFilesMap;
+  String? link;
 
   ExampleState(this._exampleRepository);
 
@@ -81,30 +86,39 @@ class ExampleState with ChangeNotifier {
   }
 
   getSharedExample(String id) async {
-    // GetCodeResponse result = await _exampleRepository.getCode(
-    //   GetCodeRequestWrapper(id),
-    // );
-    // sharedFilesMap = {
-    //   result.sdk: ExampleModel(
-    //     name: result.codes.first.name,
-    //     path: '',
-    //     description: 'Shared Example',
-    //     type: ExampleType.example,
-    //     source: result.codes.first.code,
-    //     pipelineOptions: result.pipelineOptions,
-    //   ),
-    // };
-    await Future.delayed(const Duration(seconds: 3));
+    GetCodeResponse result = await _exampleRepository.getCode(
+      GetCodeRequestWrapper(id),
+    );
     sharedFilesMap = {
-      SDK.python: ExampleModel(
-        name: 'empty',
-        path: 'path',
-        description: 'description',
+      result.sdk: ExampleModel(
+        name: result.codes.first.name,
+        path: '',
+        description: '',
         type: ExampleType.example,
-        source: 'source code',
-        pipelineOptions: 'pplopt',
+        source: result.codes.first.code,
+        pipelineOptions: result.pipelineOptions,
       ),
     };
+    notifyListeners();
+  }
+
+  setDefaultShareLink(String path) {
+    setShareLink('${Uri.base.toString()}?$kExampleParam=$path');
+  }
+
+  setShareLink(String path) {
+    link = path;
+    notifyListeners();
+  }
+
+  getShareLink(
+    List<SharedFile> codes,
+    SDK sdk,
+    String pipelineOptions,
+  ) async {
+    String id = await _exampleRepository
+        .saveCode(SaveCodeRequestWrapper(codes, sdk, pipelineOptions));
+    setShareLink('${Uri.base}?shared=$id');
     notifyListeners();
   }
 

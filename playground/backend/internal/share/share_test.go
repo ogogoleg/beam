@@ -25,14 +25,19 @@ func TestSnippet_ID(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "ID() in the usual case",
+			name: "Snippet ID() in the usual case",
 			snip: &Snippet{
-				Codes: []Code{{
-					Code:   "MOCK_CODE",
-					IsMain: false,
-				}},
-				Sdk:      1,
-				PipeOpts: "MOCK_OPTIONS",
+				Snippet: &SnippetDocument{
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+					Codes: []*CodeDocument{{
+						Name:   "MOCK_NAME",
+						Code:   "MOCK_CODE",
+						IsMain: false,
+					}},
+				},
+				IdLength: 11,
+				Salt:     "MOCK_SALT",
 			},
 			want:    "",
 			wantErr: false,
@@ -47,10 +52,60 @@ func TestSnippet_ID(t *testing.T) {
 			}
 
 			if err == nil {
-				if len(id) != 11 {
+				if len(id) != tt.snip.IdLength {
 					t.Error("The ID length is not 11")
 				}
-				if "y6wpJAfO6ik" != id {
+				if "OnY1ocoN0EO" != id {
+					t.Error("ID is wrong")
+				}
+			}
+		})
+	}
+}
+
+func TestCode_ID(t *testing.T) {
+	code := &CodeDocument{
+		Name:   "MOCK_NAME",
+		Code:   "MOCK_CODE",
+		IsMain: false,
+	}
+
+	tests := []struct {
+		name    string
+		snip    *Snippet
+		code    *CodeDocument
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "CodeDocument ID() in the usual case",
+			snip: &Snippet{
+				Salt: "MOCK_SALT",
+				Snippet: &SnippetDocument{
+					Sdk:      1,
+					PipeOpts: "MOCK_OPTIONS",
+					Codes:    []*CodeDocument{code},
+				},
+				IdLength: 11,
+			},
+			code:    code,
+			want:    "",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			id, err := tt.code.ID(tt.snip)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ID() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if err == nil {
+				if len(id) != tt.snip.IdLength {
+					t.Error("The ID length is not 11")
+				}
+				if "XSnhl0HoUOd" != id {
 					t.Error("ID is wrong")
 				}
 			}

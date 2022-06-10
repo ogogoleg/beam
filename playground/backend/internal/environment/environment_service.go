@@ -69,6 +69,10 @@ const (
 	defaultPlaygroundSalt         = "Beam playground salt\n"
 	maxSnippetSizeKey             = "MAX_SNIPPET_SIZE"
 	defaultMaxSnippetSize         = 64 * 1024 //65536
+	firestoreIdLengthKey          = "FIRESTORE_ID_LENGTH"
+	defaultFirestoreIdLength      = 11
+	firestoreEmulatorHostKey      = "FIRESTORE_EMULATOR_HOST"
+	defaultFirestoreEmulatorHost  = "localhost:8082"
 )
 
 // Environment operates with environment structures: NetworkEnvs, BeamEnvs, ApplicationEnvs
@@ -114,6 +118,8 @@ func GetApplicationEnvsFromOsEnvs() (*ApplicationEnvs, error) {
 	snippetDBType := db.Database(getEnv(snippetDBTypeKey, defaultSnippetDBType.String()))
 	playgroundSalt := getEnv(playgroundSaltKey, defaultPlaygroundSalt)
 	maxSnippetSize := getEnvAsInt(maxSnippetSizeKey, defaultMaxSnippetSize)
+	firestoreIdLength := getEnvAsInt(firestoreIdLengthKey, defaultFirestoreIdLength)
+	firestoreEmulatorHost := getEnv(firestoreEmulatorHostKey, defaultFirestoreEmulatorHost)
 
 	if value, present := os.LookupEnv(cacheKeyExpirationTimeKey); present {
 		if converted, err := time.ParseDuration(value); err == nil {
@@ -131,7 +137,7 @@ func GetApplicationEnvsFromOsEnvs() (*ApplicationEnvs, error) {
 	}
 
 	if value, present := os.LookupEnv(workingDirKey); present {
-		return NewApplicationEnvs(value, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, NewCacheEnvs(cacheType, cacheAddress, cacheExpirationTime), pipelineExecuteTimeout, snippetDBType, maxSnippetSize), nil
+		return NewApplicationEnvs(value, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, firestoreEmulatorHost, NewCacheEnvs(cacheType, cacheAddress, cacheExpirationTime), pipelineExecuteTimeout, snippetDBType, maxSnippetSize, firestoreIdLength), nil
 	}
 	return nil, errors.New("APP_WORK_DIR env should be provided with os.env")
 }

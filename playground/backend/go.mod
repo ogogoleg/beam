@@ -18,7 +18,7 @@ module beam.apache.org/playground/backend
 go 1.16
 
 require (
-	cloud.google.com/go/firestore v1.6.1
+	cloud.google.com/go/datastore v1.6.0
 	cloud.google.com/go/logging v1.4.2
 	cloud.google.com/go/storage v1.18.2
 	github.com/go-redis/redis/v8 v8.11.4

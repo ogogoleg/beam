@@ -14,13 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Launch firestore emulator on port 8082
-PID=$(lsof -t -i :8082 -s tcp:LISTEN)
-if [ -z "$PID" ]; then
-  echo "Starting mock Firestore server on port 8082"
-  nohup gcloud beta emulators firestore start \
-    --host-port=127.0.0.1:8082 \
-    >/tmp/mock-firestore-logs &
-else
-  echo "There is an instance of Firestore already running on port 8082"
+# Kill datastore emulator
+current_dir="$(dirname "$0")"
+source "$current_dir/envs_and_functions.sh"
+
+PID=$(lsof -t -i :"${DATASTORE_PORT}" -s tcp:LISTEN)
+if [ ! -z "$PID" ]; then
+  echo "Stopping Datastore emulator"
+  kill "$PID"
 fi

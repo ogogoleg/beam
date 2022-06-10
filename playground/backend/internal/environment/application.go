@@ -112,15 +112,21 @@ type ApplicationEnvs struct {
 
 	// maxSnippetSize is snippet size limit
 	maxSnippetSize int
+
+	// firestoreIdLength is a datastore ID length
+	firestoreIdLength int
+
+	// firestoreEmulatorHost is the address of datastore emulator
+	firestoreEmulatorHost string
 }
 
 // NewApplicationEnvs constructor for ApplicationEnvs
 func NewApplicationEnvs(
-	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt string,
+	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, firestoreEmulatorHost string,
 	cacheEnvs *CacheEnvs,
 	pipelineExecuteTimeout time.Duration,
 	snippetDBType db.Database,
-	maxSnippetSize int,
+	maxSnippetSize, firestoreIdLength int,
 ) *ApplicationEnvs {
 	return &ApplicationEnvs{
 		workingDir:             workingDir,
@@ -133,6 +139,8 @@ func NewApplicationEnvs(
 		snippetDB:              snippetDBType,
 		playgroundSalt:         playgroundSalt,
 		maxSnippetSize:         maxSnippetSize,
+		firestoreIdLength:      firestoreIdLength,
+		firestoreEmulatorHost:  firestoreEmulatorHost,
 	}
 }
 
@@ -184,4 +192,14 @@ func (ae *ApplicationEnvs) PlaygroundSalt() string {
 // MaxSnippetSize returns snippet size limit
 func (ae *ApplicationEnvs) MaxSnippetSize() int {
 	return ae.maxSnippetSize
+}
+
+// FirestoreIdLength returns the datastore ID length
+func (ae *ApplicationEnvs) FirestoreIdLength() int {
+	return ae.firestoreIdLength
+}
+
+// FirestoreEmulatorHost returns the address of datastore emulator
+func (ae *ApplicationEnvs) FirestoreEmulatorHost() string {
+	return ae.firestoreEmulatorHost
 }

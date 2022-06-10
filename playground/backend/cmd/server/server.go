@@ -22,10 +22,11 @@ import (
 	"beam.apache.org/playground/backend/internal/cache/redis"
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/db"
-	"beam.apache.org/playground/backend/internal/db/firestore"
-	local_db "beam.apache.org/playground/backend/internal/db/local"
+	"beam.apache.org/playground/backend/internal/db/datastore"
+	localdb "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/share"
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
@@ -53,6 +54,10 @@ func runServer() error {
 
 	snippetDb, err := setupSnippetDB(ctx, envService.ApplicationEnvs)
 	if err != nil {
+		return err
+	}
+
+	if err = initDBstructure(ctx, snippetDb, envService); err != nil {
 		return err
 	}
 
@@ -156,11 +161,35 @@ func setupExamplesCatalog(ctx context.Context, cacheService cache.Cache, bucketN
 // setupSnippetDB constructs required database by application environment
 func setupSnippetDB(ctx context.Context, appEnv environment.ApplicationEnvs) (db.SnippetDB, error) {
 	switch appEnv.SnippetDB() {
-	case db.FIRESTORE:
-		return firestore.New(ctx, appEnv.GoogleProjectId())
+	case db.DATASTORE:
+		return datastore.New(ctx, appEnv.GoogleProjectId())
 	default:
-		return local_db.New()
+		return localdb.New()
 	}
+}
+
+// initDBstructure initializes the data structure in NoSQL databases to create indexes after that
+func initDBstructure(ctx context.Context, snippetDb db.SnippetDB, env *environment.Environment) error {
+	dummyStr := "dummy"
+	snip := &share.Snippet{
+		IdLength: env.ApplicationEnvs.FirestoreIdLength(),
+		Salt:     dummyStr,
+		Snippet: &share.SnippetDocument{
+			OwnerId:  dummyStr,
+			PipeOpts: dummyStr,
+			Codes: []*share.CodeDocument{
+				{
+					Name: dummyStr,
+					Code: dummyStr,
+				},
+			},
+		},
+	}
+	id, err := snip.ID()
+	if err != nil {
+		return err
+	}
+	return snippetDb.PutSnippet(ctx, id, snip.Snippet)
 }
 
 func main() {

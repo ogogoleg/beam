@@ -40,18 +40,33 @@ task("tidy") {
   }
 }
 
-task("startMockFirestore") {
+task("startDatastoreEmulator") {
   doLast {
     exec {
       executable("sh")
-      args("start-firestore-emulator.sh")
+      args("start_datastore_emulator.sh")
+    }
+  }
+  doLast {
+     exec {
+       executable("sh")
+       args("wait_datastore_running.sh")
+      }
+   }
+}
+
+task("stopDatastoreEmulator") {
+  doFirst {
+    exec {
+      executable("sh")
+      args("stop_datastore_emulator.sh")
     }
   }
 }
 
 task("test") {
   group = "verification"
-  dependsOn(":playground:backend:startMockFirestore")
+  dependsOn(":playground:backend:startDatastoreEmulator")
   description = "Test the backend"
   doFirst {
     exec {
@@ -60,11 +75,11 @@ task("test") {
     }
   }
   doLast {
-      exec {
-        executable("sh")
-        args("stop-firestore-emulator.sh")
-      }
-  }
+     exec {
+       executable("sh")
+       args("stop_datastore_emulator.sh")
+     }
+   }
 }
 
 task("benchmarkPrecompiledObjects") {

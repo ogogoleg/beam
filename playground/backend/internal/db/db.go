@@ -23,10 +23,10 @@ import (
 // Database represents data type that needed to use specific database
 type Database string
 
-// FIRESTORE represents value indicates database as firestore
+// DATASTORE represents value indicates database as datastore
 // LOCAL represents value indicates database for local usage or testing
 const (
-	FIRESTORE Database = "firestore"
+	DATASTORE Database = "datastore"
 	LOCAL     Database = "local"
 )
 
@@ -35,7 +35,7 @@ func (db Database) String() string {
 }
 
 type SnippetDB interface {
-	PutSnippet(ctx context.Context, id string, snip *share.Snippet) error
+	PutSnippet(ctx context.Context, id string, snip *share.SnippetDocument) error
 
-	GetSnippet(ctx context.Context, id string) (*share.Snippet, error)
+	GetSnippet(ctx context.Context, id string) (*share.SnippetDocument, error)
 }

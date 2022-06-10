@@ -362,12 +362,15 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 	nowDate := time.Now()
 	snippet := share.Snippet{
 		Salt:     controller.env.ApplicationEnvs.PlaygroundSalt(),
-		OwnerId:  "", // will be used in Tour of Beam project
-		Sdk:      info.Sdk,
-		PipeOpts: info.PipelineOptions,
-		Created:  nowDate,
-		LVisited: nowDate,
-		Origin:   share.PLAYGROUND,
+		IdLength: controller.env.ApplicationEnvs.FirestoreIdLength(),
+		Snippet: &share.SnippetDocument{
+			OwnerId:  "", // will be used in Tour of Beam project
+			Sdk:      info.Sdk,
+			PipeOpts: info.PipelineOptions,
+			Created:  nowDate,
+			LVisited: nowDate,
+			Origin:   share.PLAYGROUND, // will be used in Tour of Beam project also later. If the owner ID is empty, then the origin is Playground, otherwise it's Tour of Beam
+		},
 	}
 
 	for _, code := range info.Codes {
@@ -382,11 +385,18 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet size is more than %d", maxSnippetSize)
 		}
 
-		snippet.Codes = append(snippet.Codes, share.Code{
+		var isMain bool
+		if len(info.Codes) == 1 {
+			isMain = true
+		} else {
+			isMain = utils.IsCodeMain(code.Code, info.Sdk)
+		}
+
+		snippet.Snippet.Codes = append(snippet.Snippet.Codes, &share.CodeDocument{
 			Name:     utils.GetCodeName(code.Name, info.Sdk),
 			Code:     code.Code,
-			CntxLine: 1,
-			IsMain:   utils.IsCodeMain(code.Code, info.Sdk),
+			CntxLine: 1, // it is necessary for examples from playground
+			IsMain:   isMain,
 		})
 	}
 
@@ -396,7 +406,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 		return nil, errors.InternalError(errorTitle, "Failed to generate ID")
 	}
 
-	if err := controller.snippetDB.PutSnippet(ctx, id, &snippet); err != nil {
+	if err := controller.snippetDB.PutSnippet(ctx, id, snippet.Snippet); err != nil {
 		logger.Errorf("SaveCode(): PutSnippet(): error during snippet saving: %s", err.Error())
 		return nil, errors.InternalError(errorTitle, "Failed to save a code snippet")
 	}

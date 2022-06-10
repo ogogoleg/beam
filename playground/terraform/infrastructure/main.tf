@@ -80,3 +80,9 @@ module "gke" {
   subnetwork        = module.network.playground_subnetwork_id
   network           = module.network.playground_network_id
 }
+
+module "firebase" {
+  source = "./firestore"
+  project_id            = var.project_id
+  depends_on = [module.setup, module.artifact_registry, module.memorystore, module.network]
+}

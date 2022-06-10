@@ -1,0 +1,46 @@
+name: New environment creation
+
+on:
+  workflow_dispatch:
+
+
+permissions:
+  id-token: write
+
+jobs:
+  Infrastructure_deployment:
+    runs-on: ubuntu-latest
+    env:
+      BUCKET_NAME: pg-sndboxbucket
+      PROJECT_ENV: beta
+    steps:
+      - name: git clone repo
+        uses: actions/checkout@v2
+
+      - id: 'auth'
+        name: 'Authenticate to GCP'
+        uses: 'google-github-actions/auth@v0.3.1'
+        with:
+          create_credentials_file: 'true'
+          workload_identity_provider: 'projects/757375655897/locations/global/workloadIdentityPools/playgroundfed/providers/github-google'
+          service_account: 'mailto:pg-sandboxsvs@playgroundsandbox2.iam.gserviceaccount.com'
+      - id: 'gcloud'
+        name: 'gcloud'
+        run: |-
+          gcloud auth login --brief --cred-file='${{ steps.auth.outputs.credentials_file_path }}'
+          gcloud config set project playgroundsandbox2
+
+      - name: Changing bucket name
+        run: |
+          echo "bucket  = "\"${{ env.BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
+          echo "bucket_examples_name = "\"${{ env.BUCKET_NAME }}-1"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "state_bucket = "\"${{ env.BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+
+      - name: Changing bucket name
+        run: |
+          cat playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+
+      - name: Deploy infrastructure
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+        run: ./gradlew playground:terraform:InitInfrastructure -Pproject_environment="${{ env.PROJECT_ENV }}"

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -14,9 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Stop mock firestore
-PID=$(lsof -t -i :8082 -s tcp:LISTEN)
-if [ ! -z "$PID" ]; then
-  echo "Stopping mock Firestore server"
-  kill "$PID"
-fi
+DATASTORE_FULL_ADDRESS="${DATASTORE_EMULATOR_HOST:-"0.0.0.0:8888"}"
+DATASTORE_PORT="${DATASTORE_FULL_ADDRESS##*:}"
+TEST_PROJECT_ID="test"
+
+waitport() {
+  while ! nc -z localhost "$1"; do
+    echo "waiting for datastore emulator to start..."
+    sleep 1
+  done
+}

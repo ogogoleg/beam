@@ -16,7 +16,7 @@
 package datastore
 
 import (
-	"beam.apache.org/playground/backend/internal/share"
+	"beam.apache.org/playground/backend/internal/db/entity"
 	"cloud.google.com/go/datastore"
 	"context"
 	"os"
@@ -65,7 +65,7 @@ func TestDatastore_PutSnippet(t *testing.T) {
 	type args struct {
 		ctx  context.Context
 		id   string
-		snip *share.SnippetDocument
+		snip *entity.SnippetEntity
 	}
 	tests := []struct {
 		name    string
@@ -74,10 +74,10 @@ func TestDatastore_PutSnippet(t *testing.T) {
 	}{
 		{
 			name: "PutSnippet() in the usual case",
-			args: args{ctx: ctx, id: "MOCK_ID", snip: &share.SnippetDocument{
-				Sdk:      1,
+			args: args{ctx: ctx, id: "MOCK_ID", snip: &entity.SnippetEntity{
+				Sdk:      "SDK_GO",
 				PipeOpts: "MOCK_OPTIONS",
-				Codes: []*share.CodeDocument{{
+				Codes: []*entity.CodeEntity{{
 					Code:   "MOCK_CODE",
 					IsMain: false,
 				}},
@@ -119,13 +119,13 @@ func TestDatastore_GetSnippet(t *testing.T) {
 		{
 			name: "GetSnippet() in the usual case",
 			prepare: func() {
-				_ = datastoreDb.PutSnippet(ctx, "MOCK_ID", &share.SnippetDocument{
-					Sdk:      1,
+				_ = datastoreDb.PutSnippet(ctx, "MOCK_ID", &entity.SnippetEntity{
+					Sdk:      "SDK_GO",
 					PipeOpts: "MOCK_OPTIONS",
 					Created:  nowDate,
-					Origin:   share.PLAYGROUND,
+					Origin:   entity.PLAYGROUND,
 					OwnerId:  "",
-					Codes: []*share.CodeDocument{{
+					Codes: []*entity.CodeEntity{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
@@ -145,10 +145,10 @@ func TestDatastore_GetSnippet(t *testing.T) {
 			}
 
 			if err == nil {
-				if snip.Sdk != 1 ||
+				if snip.Sdk != "SDK_GO" ||
 					snip.Codes[0].Code != "MOCK_CODE" ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Origin != share.PLAYGROUND ||
+					snip.Origin != entity.PLAYGROUND ||
 					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
@@ -187,7 +187,9 @@ func TestNew(t *testing.T) {
 }
 
 func cleanData(t *testing.T) {
-	if err := datastoreDb.client.Delete(ctx, datastore.NameKey(snippetCollection, "MOCK_ID", nil)); err != nil {
+	key := datastore.NameKey(snippetKind, "MOCK_ID", nil)
+	key.Namespace = "Playground"
+	if err := datastoreDb.client.Delete(ctx, key); err != nil {
 		t.Error("Error during data cleaning after the test")
 	}
 }

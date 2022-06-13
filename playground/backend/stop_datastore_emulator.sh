@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Kill datastore emulator
+# Kill db emulator
 current_dir="$(dirname "$0")"
 source "$current_dir/envs_and_functions.sh"
 

@@ -40,7 +40,7 @@ const (
 // GetCodeName returns the valid code name.
 func GetCodeName(name string, sdk pb.Sdk) string {
 	if name == "" {
-		logger.Error("The name of code file is empty. Will be used default value")
+		logger.Warn("The name of code file is empty. Will be used default value")
 		switch sdk {
 		case pb.Sdk_SDK_JAVA:
 			return defaultJavaFileName

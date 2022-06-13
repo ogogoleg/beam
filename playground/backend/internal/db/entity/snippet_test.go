@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package share
+package entity
 
 import "testing"
 
@@ -27,19 +27,21 @@ func TestSnippet_ID(t *testing.T) {
 		{
 			name: "Snippet ID() in the usual case",
 			snip: &Snippet{
-				Snippet: &SnippetDocument{
-					Sdk:      1,
+				Snippet: &SnippetEntity{
+					Sdk:      "SDK_GO",
 					PipeOpts: "MOCK_OPTIONS",
-					Codes: []*CodeDocument{{
+					Codes: []*CodeEntity{{
 						Name:   "MOCK_NAME",
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
 				},
-				IdLength: 11,
-				Salt:     "MOCK_SALT",
+				IDInfo: IDInfo{
+					IdLength: 11,
+					Salt:     "MOCK_SALT",
+				},
 			},
-			want:    "",
+			want:    "JBuYwNWTvAk",
 			wantErr: false,
 		},
 	}
@@ -55,7 +57,7 @@ func TestSnippet_ID(t *testing.T) {
 				if len(id) != tt.snip.IdLength {
 					t.Error("The ID length is not 11")
 				}
-				if "OnY1ocoN0EO" != id {
+				if tt.want != id {
 					t.Error("ID is wrong")
 				}
 			}
@@ -64,7 +66,7 @@ func TestSnippet_ID(t *testing.T) {
 }
 
 func TestCode_ID(t *testing.T) {
-	code := &CodeDocument{
+	code := &CodeEntity{
 		Name:   "MOCK_NAME",
 		Code:   "MOCK_CODE",
 		IsMain: false,
@@ -73,23 +75,25 @@ func TestCode_ID(t *testing.T) {
 	tests := []struct {
 		name    string
 		snip    *Snippet
-		code    *CodeDocument
+		code    *CodeEntity
 		want    string
 		wantErr bool
 	}{
 		{
-			name: "CodeDocument ID() in the usual case",
+			name: "CodeEntity ID() in the usual case",
 			snip: &Snippet{
-				Salt: "MOCK_SALT",
-				Snippet: &SnippetDocument{
-					Sdk:      1,
+				Snippet: &SnippetEntity{
+					Sdk:      "SDK_GO",
 					PipeOpts: "MOCK_OPTIONS",
-					Codes:    []*CodeDocument{code},
+					Codes:    []*CodeEntity{code},
 				},
-				IdLength: 11,
+				IDInfo: IDInfo{
+					Salt:     "MOCK_SALT",
+					IdLength: 11,
+				},
 			},
 			code:    code,
-			want:    "",
+			want:    "XSnhl0HoUOd",
 			wantErr: false,
 		},
 	}
@@ -105,7 +109,7 @@ func TestCode_ID(t *testing.T) {
 				if len(id) != tt.snip.IdLength {
 					t.Error("The ID length is not 11")
 				}
-				if "XSnhl0HoUOd" != id {
+				if tt.want != id {
 					t.Error("ID is wrong")
 				}
 			}

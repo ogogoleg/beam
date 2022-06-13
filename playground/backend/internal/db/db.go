@@ -16,26 +16,23 @@
 package db
 
 import (
-	"beam.apache.org/playground/backend/internal/share"
+	"beam.apache.org/playground/backend/internal/db/entity"
 	"context"
 )
 
-// Database represents data type that needed to use specific database
-type Database string
-
-// DATASTORE represents value indicates database as datastore
-// LOCAL represents value indicates database for local usage or testing
-const (
-	DATASTORE Database = "datastore"
-	LOCAL     Database = "local"
-)
-
-func (db Database) String() string {
-	return string(db)
+type Database interface {
+	Snippet
+	Catalogue
 }
 
-type SnippetDB interface {
-	PutSnippet(ctx context.Context, id string, snip *share.SnippetDocument) error
+type Snippet interface {
+	PutSnippet(ctx context.Context, id string, snip *entity.SnippetEntity) error
 
-	GetSnippet(ctx context.Context, id string) (*share.SnippetDocument, error)
+	GetSnippet(ctx context.Context, id string) (*entity.SnippetEntity, error)
+}
+
+type Catalogue interface {
+	PutSchemaVersion(ctx context.Context, id string, schema *entity.SchemaEntity) error
+
+	PutSDKs(ctx context.Context, sdks []*entity.SDKEntity) error
 }

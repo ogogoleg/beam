@@ -23,10 +23,10 @@ import (
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/db/datastore"
+	"beam.apache.org/playground/backend/internal/db/entity"
 	localdb "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/share"
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
@@ -52,19 +52,19 @@ func runServer() error {
 		return err
 	}
 
-	snippetDb, err := setupSnippetDB(ctx, envService.ApplicationEnvs)
+	databaseClient, err := setupDB(ctx, envService.ApplicationEnvs)
 	if err != nil {
 		return err
 	}
 
-	if err = initDBstructure(ctx, snippetDb, envService); err != nil {
+	if err = initDBStructure(ctx, databaseClient, envService); err != nil {
 		return err
 	}
 
 	pb.RegisterPlaygroundServiceServer(grpcServer, &playgroundController{
 		env:          envService,
 		cacheService: cacheService,
-		snippetDB:    snippetDb,
+		db:           databaseClient,
 	})
 
 	// Examples catalog should be retrieved and saved to cache only if the server doesn't suppose to run code, i.e. SDK is unspecified
@@ -158,26 +158,29 @@ func setupExamplesCatalog(ctx context.Context, cacheService cache.Cache, bucketN
 	return nil
 }
 
-// setupSnippetDB constructs required database by application environment
-func setupSnippetDB(ctx context.Context, appEnv environment.ApplicationEnvs) (db.SnippetDB, error) {
-	switch appEnv.SnippetDB() {
-	case db.DATASTORE:
+// setupDB constructs required database by application environment
+func setupDB(ctx context.Context, appEnv environment.ApplicationEnvs) (db.Database, error) {
+	switch appEnv.DbType() {
+	case environment.DatastoreDB:
 		return datastore.New(ctx, appEnv.GoogleProjectId())
 	default:
 		return localdb.New()
 	}
 }
 
-// initDBstructure initializes the data structure in NoSQL databases to create indexes after that
-func initDBstructure(ctx context.Context, snippetDb db.SnippetDB, env *environment.Environment) error {
+// initDBStructure initializes the data structure in NoSQL databases
+func initDBStructure(ctx context.Context, database db.Database, env *environment.Environment) error {
+	//init snippets
 	dummyStr := "dummy"
-	snip := &share.Snippet{
-		IdLength: env.ApplicationEnvs.FirestoreIdLength(),
-		Salt:     dummyStr,
-		Snippet: &share.SnippetDocument{
+	snip := &entity.Snippet{
+		IDInfo: entity.IDInfo{
+			IdLength: env.ApplicationEnvs.FirestoreIdLength(),
+			Salt:     env.ApplicationEnvs.PlaygroundSalt(),
+		},
+		Snippet: &entity.SnippetEntity{
 			OwnerId:  dummyStr,
 			PipeOpts: dummyStr,
-			Codes: []*share.CodeDocument{
+			Codes: []*entity.CodeEntity{
 				{
 					Name: dummyStr,
 					Code: dummyStr,
@@ -185,11 +188,46 @@ func initDBstructure(ctx context.Context, snippetDb db.SnippetDB, env *environme
 			},
 		},
 	}
-	id, err := snip.ID()
+	snipId, err := snip.ID()
 	if err != nil {
 		return err
 	}
-	return snippetDb.PutSnippet(ctx, id, snip.Snippet)
+	if err = database.PutSnippet(ctx, snipId, snip.Snippet); err != nil {
+		return err
+	}
+
+	//init schema versions
+	schema := &entity.Schema{
+		IDInfo: entity.IDInfo{
+			Salt:     env.ApplicationEnvs.PlaygroundSalt(),
+			IdLength: env.ApplicationEnvs.FirestoreIdLength(),
+		},
+		Schema: &entity.SchemaEntity{
+			Version: "0.0.1", //TODO should it get from env?
+			Descr:   "",      //TODO should it get from env?
+		},
+	}
+	schemaId, err := schema.ID()
+	if err != nil {
+		return err
+	}
+	if err = database.PutSchemaVersion(ctx, schemaId, schema.Schema); err != nil {
+		return err
+	}
+
+	//init sdks
+	var sdkEntities []*entity.SDKEntity
+	for _, sdk := range pb.Sdk_name {
+		sdkEntities = append(sdkEntities, &entity.SDKEntity{
+			Name:           sdk,
+			DefaultExample: "", //TODO should it get from env?
+		})
+	}
+	if err = database.PutSDKs(ctx, sdkEntities); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func main() {

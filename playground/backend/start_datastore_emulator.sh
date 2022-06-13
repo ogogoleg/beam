@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Launch datastore emulator
+# Launch db emulator
 current_dir="$(dirname "$0")"
 source "$current_dir/envs_and_functions.sh"
 
@@ -27,7 +27,7 @@ if [ -z "$PID" ]; then
     --project="${TEST_PROJECT_ID}" \
     --consistency=1 \
     --no-store-on-disk \
-    >/tmp/mock-datastore-logs &
+    >/tmp/mock-db-logs &
 else
   echo "There is an instance of Datastore emulator already running"
 fi

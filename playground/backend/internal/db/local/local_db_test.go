@@ -16,7 +16,7 @@
 package local_db
 
 import (
-	"beam.apache.org/playground/backend/internal/share"
+	db "beam.apache.org/playground/backend/internal/db/entity"
 	"context"
 	"testing"
 	"time"
@@ -38,7 +38,7 @@ func TestLocalDB_PutSnippet(t *testing.T) {
 	type args struct {
 		ctx  context.Context
 		id   string
-		snip *share.SnippetDocument
+		snip *db.SnippetEntity
 	}
 	tests := []struct {
 		name    string
@@ -50,12 +50,12 @@ func TestLocalDB_PutSnippet(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				id:  "MOCK_ID",
-				snip: &share.SnippetDocument{
-					Sdk:      1,
+				snip: &db.SnippetEntity{
+					Sdk:      "SDK_GO",
 					PipeOpts: "MOCK_OPTIONS",
-					Origin:   share.PLAYGROUND,
+					Origin:   db.PLAYGROUND,
 					OwnerId:  "",
-					Codes: []*share.CodeDocument{{
+					Codes: []*db.CodeEntity{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
@@ -101,13 +101,13 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 		{
 			name: "GetSnippet() in the usual case",
 			prepare: func() {
-				_ = localDb.PutSnippet(ctx, "MOCK_ID", &share.SnippetDocument{
-					Sdk:      1,
+				_ = localDb.PutSnippet(ctx, "MOCK_ID", &db.SnippetEntity{
+					Sdk:      "SDK_GO",
 					PipeOpts: "MOCK_OPTIONS",
 					Created:  nowDate,
-					Origin:   share.PLAYGROUND,
+					Origin:   db.PLAYGROUND,
 					OwnerId:  "",
-					Codes: []*share.CodeDocument{{
+					Codes: []*db.CodeEntity{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
@@ -130,10 +130,10 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 			}
 
 			if err == nil {
-				if snip.Sdk != 1 ||
+				if snip.Sdk != "SDK_GO" ||
 					snip.Codes[0].Code != "MOCK_CODE" ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Origin != share.PLAYGROUND ||
+					snip.Origin != db.PLAYGROUND ||
 					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}

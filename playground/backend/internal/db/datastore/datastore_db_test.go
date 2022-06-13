@@ -187,7 +187,9 @@ func TestNew(t *testing.T) {
 }
 
 func cleanData(t *testing.T) {
-	if err := datastoreDb.client.Delete(ctx, datastore.NameKey(snippetKind, "MOCK_ID", nil)); err != nil {
+	key := datastore.NameKey(snippetKind, "MOCK_ID", nil)
+	key.Namespace = "Playground"
+	if err := datastoreDb.client.Delete(ctx, key); err != nil {
 		t.Error("Error during data cleaning after the test")
 	}
 }

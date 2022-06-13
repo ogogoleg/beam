@@ -33,4 +33,4 @@ else
 fi
 
 echo "waiting for datastore emulator to start..."
-sleep 2
+sleep 1

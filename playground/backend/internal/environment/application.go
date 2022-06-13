@@ -16,7 +16,6 @@
 package environment
 
 import (
-	"beam.apache.org/playground/backend/internal/db"
 	"fmt"
 	"time"
 )
@@ -53,6 +52,20 @@ type CacheEnvs struct {
 
 	// keyExpirationTime is expiration time for cache keys
 	keyExpirationTime time.Duration
+}
+
+// Database represents data type that needed to use specific database
+type Database string
+
+// DatastoreDB represents value indicates database as datastore
+// LocalDB represents value indicates database for local usage or testing
+const (
+	DatastoreDB Database = "datastore"
+	LocalDB     Database = "local"
+)
+
+func (db Database) String() string {
+	return string(db)
 }
 
 // CacheType returns cache type
@@ -104,13 +117,13 @@ type ApplicationEnvs struct {
 	// bucketName is a name of the GCS's bucket with examples
 	bucketName string
 
-	// snippetDB is a database type to store code snippets
-	snippetDB db.Database
+	// dbType is a database type
+	dbType Database
 
 	// playgroundSalt is a salt to generate hash
 	playgroundSalt string
 
-	// maxSnippetSize is snippet size limit
+	// maxSnippetSize is entity size limit
 	maxSnippetSize int
 
 	// firestoreIdLength is a datastore ID length
@@ -125,7 +138,7 @@ func NewApplicationEnvs(
 	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, firestoreEmulatorHost string,
 	cacheEnvs *CacheEnvs,
 	pipelineExecuteTimeout time.Duration,
-	snippetDBType db.Database,
+	dbType Database,
 	maxSnippetSize, firestoreIdLength int,
 ) *ApplicationEnvs {
 	return &ApplicationEnvs{
@@ -136,7 +149,7 @@ func NewApplicationEnvs(
 		projectId:              projectId,
 		pipelinesFolder:        pipelinesFolder,
 		bucketName:             bucketName,
-		snippetDB:              snippetDBType,
+		dbType:                 dbType,
 		playgroundSalt:         playgroundSalt,
 		maxSnippetSize:         maxSnippetSize,
 		firestoreIdLength:      firestoreIdLength,
@@ -179,9 +192,9 @@ func (ae *ApplicationEnvs) BucketName() string {
 	return ae.bucketName
 }
 
-// SnippetDB returns database type for code snippets
-func (ae *ApplicationEnvs) SnippetDB() db.Database {
-	return ae.snippetDB
+// DbType returns database type
+func (ae *ApplicationEnvs) DbType() Database {
+	return ae.dbType
 }
 
 // PlaygroundSalt returns playground salt for hash generation
@@ -189,7 +202,7 @@ func (ae *ApplicationEnvs) PlaygroundSalt() string {
 	return ae.playgroundSalt
 }
 
-// MaxSnippetSize returns snippet size limit
+// MaxSnippetSize returns entity size limit
 func (ae *ApplicationEnvs) MaxSnippetSize() int {
 	return ae.maxSnippetSize
 }

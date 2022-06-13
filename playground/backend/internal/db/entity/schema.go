@@ -13,40 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package entity
 
 import (
-	"beam.apache.org/playground/backend/internal/logger"
-	"github.com/google/uuid"
-	"io/ioutil"
-	"regexp"
-	"strings"
-	"unicode"
+	"beam.apache.org/playground/backend/internal/utils"
+	"fmt"
 )
 
-func ReduceWhiteSpacesToSinge(s string) string {
-	re := regexp.MustCompile(`\s+`)
-	return re.ReplaceAllString(s, " ")
+type SchemaEntity struct {
+	Version string `datastore:"version"`
+	Descr   string `datastore:"descr"`
 }
 
-//ReadFile reads from file and returns string.
-func ReadFile(pipelineId uuid.UUID, path string) (string, error) {
-	content, err := ioutil.ReadFile(path)
+type Schema struct {
+	IDInfo
+	Schema *SchemaEntity
+}
+
+// ID generates id according to content of the entity
+func (s *Schema) ID() (string, error) {
+	content := fmt.Sprintf("%s%s", s.Schema.Version, s.Schema.Descr)
+	id, err := utils.ID(s.Salt, content, s.IdLength)
 	if err != nil {
-		logger.Errorf("%s: ReadFile(): error during reading from a file: %s", pipelineId, err.Error())
 		return "", err
 	}
-	return string(content), nil
-}
-
-//SpaceStringsBuilder returns data without spaces.
-func SpaceStringsBuilder(str string) string {
-	var b strings.Builder
-	b.Grow(len(str))
-	for _, ch := range str {
-		if !unicode.IsSpace(ch) {
-			b.WriteRune(ch)
-		}
-	}
-	return b.String()
+	return id, nil
 }

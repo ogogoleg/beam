@@ -20,11 +20,11 @@ import (
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/code_processing"
 	"beam.apache.org/playground/backend/internal/db"
+	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/logger"
 	"beam.apache.org/playground/backend/internal/setup_tools/life_cycle"
-	"beam.apache.org/playground/backend/internal/share"
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"github.com/google/uuid"
@@ -36,7 +36,7 @@ import (
 type playgroundController struct {
 	env          *environment.Environment
 	cacheService cache.Cache
-	snippetDB    db.SnippetDB
+	db           db.Database
 
 	pb.UnimplementedPlaygroundServiceServer
 }
@@ -360,28 +360,31 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 	}
 
 	nowDate := time.Now()
-	snippet := share.Snippet{
-		Salt:     controller.env.ApplicationEnvs.PlaygroundSalt(),
-		IdLength: controller.env.ApplicationEnvs.FirestoreIdLength(),
-		Snippet: &share.SnippetDocument{
-			OwnerId:  "", // will be used in Tour of Beam project
-			Sdk:      info.Sdk,
+	snippet := entity.Snippet{
+		IDInfo: entity.IDInfo{
+			Salt:     controller.env.ApplicationEnvs.PlaygroundSalt(),
+			IdLength: controller.env.ApplicationEnvs.FirestoreIdLength(),
+		},
+		Snippet: &entity.SnippetEntity{
+			SchVer:   "0.0.1", //TODO should it get from cache?
+			OwnerId:  "",      // will be used in Tour of Beam project
+			Sdk:      info.Sdk.String(),
 			PipeOpts: info.PipelineOptions,
 			Created:  nowDate,
 			LVisited: nowDate,
-			Origin:   share.PLAYGROUND, // will be used in Tour of Beam project also later. If the owner ID is empty, then the origin is Playground, otherwise it's Tour of Beam
+			Origin:   entity.PLAYGROUND, // will be used in Tour of Beam project also later. If the owner ID is empty, then the origin is Playground, otherwise it's Tour of Beam
 		},
 	}
 
 	for _, code := range info.Codes {
 		if code.Code == "" {
-			logger.Error("SaveCode(): snippet is empty")
+			logger.Error("SaveCode(): entity is empty")
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet must have some code")
 		}
 
 		maxSnippetSize := controller.env.ApplicationEnvs.MaxSnippetSize()
 		if len(code.Code) > maxSnippetSize {
-			logger.Errorf("SaveCode(): snippet is too large. Max snippet size: %d", maxSnippetSize)
+			logger.Errorf("SaveCode(): entity is too large. Max entity size: %d", maxSnippetSize)
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet size is more than %d", maxSnippetSize)
 		}
 
@@ -392,7 +395,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			isMain = utils.IsCodeMain(code.Code, info.Sdk)
 		}
 
-		snippet.Snippet.Codes = append(snippet.Snippet.Codes, &share.CodeDocument{
+		snippet.Snippet.Codes = append(snippet.Snippet.Codes, &entity.CodeEntity{
 			Name:     utils.GetCodeName(code.Name, info.Sdk),
 			Code:     code.Code,
 			CntxLine: 1, // it is necessary for examples from playground
@@ -406,25 +409,25 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 		return nil, errors.InternalError(errorTitle, "Failed to generate ID")
 	}
 
-	if err := controller.snippetDB.PutSnippet(ctx, id, snippet.Snippet); err != nil {
-		logger.Errorf("SaveCode(): PutSnippet(): error during snippet saving: %s", err.Error())
-		return nil, errors.InternalError(errorTitle, "Failed to save a code snippet")
+	if err := controller.db.PutSnippet(ctx, id, snippet.Snippet); err != nil {
+		logger.Errorf("SaveCode(): PutSnippet(): error during entity saving: %s", err.Error())
+		return nil, errors.InternalError(errorTitle, "Failed to save a code entity")
 	}
 
 	response := pb.SaveCodeResponse{Id: id}
 	return &response, nil
 }
 
-// GetCode returns the code snippet
+// GetCode returns the code entity
 func (controller *playgroundController) GetCode(ctx context.Context, info *pb.GetCodeRequest) (*pb.GetCodeResponse, error) {
-	snippet, err := controller.snippetDB.GetSnippet(ctx, info.GetId())
+	snippet, err := controller.db.GetSnippet(ctx, info.GetId())
 	if err != nil {
 		logger.Errorf("GetCode(): GetCode(): error during getting code: %s", err.Error())
 		return nil, errors.InternalError("Error during getting code", "Failed to retrieve the code")
 	}
 
 	response := pb.GetCodeResponse{
-		Sdk:             snippet.Sdk,
+		Sdk:             pb.Sdk(pb.Sdk_value[snippet.Sdk]),
 		PipelineOptions: snippet.PipeOpts,
 	}
 	for _, code := range snippet.Codes {

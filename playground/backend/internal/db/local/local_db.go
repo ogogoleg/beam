@@ -16,7 +16,7 @@
 package local_db
 
 import (
-	"beam.apache.org/playground/backend/internal/share"
+	"beam.apache.org/playground/backend/internal/db/entity"
 	"context"
 	"fmt"
 	"sync"
@@ -33,23 +33,41 @@ func New() (*LocalDB, error) {
 	return ls, nil
 }
 
-// PutSnippet puts the snippet to local database
-func (f *LocalDB) PutSnippet(_ context.Context, id string, snip *share.SnippetDocument) error {
-	f.Lock()
-	defer f.Unlock()
-	f.items[id] = snip
+// PutSnippet puts the entity to the local map
+func (l *LocalDB) PutSnippet(_ context.Context, id string, snip *entity.SnippetEntity) error {
+	l.Lock()
+	defer l.Unlock()
+	l.items[id] = snip
 	return nil
 }
 
-// GetSnippet returns the code snippet
-func (f *LocalDB) GetSnippet(_ context.Context, id string) (*share.SnippetDocument, error) {
-	f.RLock()
-	value, found := f.items[id]
+// GetSnippet returns the code entity
+func (l *LocalDB) GetSnippet(_ context.Context, id string) (*entity.SnippetEntity, error) {
+	l.RLock()
+	value, found := l.items[id]
 	if !found {
-		f.RUnlock()
+		l.RUnlock()
 		return nil, fmt.Errorf("value with id: %s not found", id)
 	}
-	f.RUnlock()
-	snippet, _ := value.(*share.SnippetDocument)
+	l.RUnlock()
+	snippet, _ := value.(*entity.SnippetEntity)
 	return snippet, nil
+}
+
+// PutSchemaVersion puts the schema entity to the local map
+func (l *LocalDB) PutSchemaVersion(_ context.Context, id string, schema *entity.SchemaEntity) error {
+	l.Lock()
+	defer l.Unlock()
+	l.items[id] = schema
+	return nil
+}
+
+// PutSDKs puts the SDK entities to the local map
+func (l *LocalDB) PutSDKs(_ context.Context, sdks []*entity.SDKEntity) error {
+	l.Lock()
+	defer l.Unlock()
+	for _, sdk := range sdks {
+		l.items[sdk.Name] = sdk
+	}
+	return nil
 }

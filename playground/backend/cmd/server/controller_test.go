@@ -19,9 +19,9 @@ import (
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
 	"beam.apache.org/playground/backend/internal/db"
+	"beam.apache.org/playground/backend/internal/db/entity"
 	localdb "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/environment"
-	"beam.apache.org/playground/backend/internal/share"
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"fmt"
@@ -50,7 +50,7 @@ const (
 
 var lis *bufconn.Listener
 var cacheService cache.Cache
-var snippetDb db.SnippetDB
+var snippetDb db.Database
 var opt goleak.Option
 
 func TestMain(m *testing.M) {
@@ -85,7 +85,7 @@ func setup() *grpc.Server {
 	// setup cache
 	cacheService = local.New(context.Background())
 
-	// setup snippet storage
+	// setup entity storage
 	snippetDb, err = localdb.New()
 	if err != nil {
 		panic(err)
@@ -117,7 +117,7 @@ func setup() *grpc.Server {
 	pb.RegisterPlaygroundServiceServer(s, &playgroundController{
 		env:          environment.NewEnvironment(*networkEnv, *sdkEnv, *appEnv),
 		cacheService: cacheService,
-		snippetDB:    snippetDb,
+		db:           snippetDb,
 	})
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -750,10 +750,10 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		// Test case with calling SaveCode method with empty snippet.
+		// Test case with calling SaveCode method with empty entity.
 		// As a result, want to receive an error.
 		{
-			name: "SaveCode with empty snippet",
+			name: "SaveCode with empty entity",
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
@@ -763,10 +763,10 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		// Test case with calling SaveCode method with a simple snippet.
+		// Test case with calling SaveCode method with a simple entity.
 		// As a result, want to receive a generated ID.
 		{
-			name: "SaveCode with a simple snippet",
+			name: "SaveCode with a simple entity",
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
@@ -776,10 +776,10 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		// Test case with calling SaveCode method with too large snippet.
+		// Test case with calling SaveCode method with too large entity.
 		// As a result, want to receive an error.
 		{
-			name: "SaveCode with too large snippet",
+			name: "SaveCode with too large entity",
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
@@ -826,7 +826,7 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 		// Test case with calling GetCode method with ID that is not in the database.
 		// As a result, want to receive an error.
 		{
-			name: "GetCode when the snippet not found",
+			name: "GetCode when the entity not found",
 			args: args{
 				ctx:  ctx,
 				info: &pb.GetCodeRequest{Id: "MOCK_ID"},
@@ -835,7 +835,7 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 			wantErr: true,
 		},
 		// Test case with calling GetCode method with a correct ID.
-		// As a result, want to receive a code snippet.
+		// As a result, want to receive a code entity.
 		{
 			name: "GetCode with correct ID",
 			args: args{
@@ -843,13 +843,13 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 				info: &pb.GetCodeRequest{Id: "MOCK_ID"},
 			},
 			prepare: func() {
-				_ = snippetDb.PutSnippet(ctx, "MOCK_ID", &share.SnippetDocument{
+				_ = snippetDb.PutSnippet(ctx, "MOCK_ID", &entity.SnippetEntity{
 					OwnerId:  "",
-					Sdk:      1,
+					Sdk:      "SDK_JAVA",
 					PipeOpts: "MOCK_OPTIONS",
 					Created:  nowDate,
-					Origin:   share.PLAYGROUND,
-					Codes: []*share.CodeDocument{{
+					Origin:   entity.PLAYGROUND,
+					Codes: []*entity.CodeEntity{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},

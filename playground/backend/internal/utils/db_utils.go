@@ -16,37 +16,26 @@
 package utils
 
 import (
+	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/logger"
-	"github.com/google/uuid"
-	"io/ioutil"
-	"regexp"
-	"strings"
-	"unicode"
+	"crypto/sha256"
+	"encoding/base64"
+	"io"
 )
 
-func ReduceWhiteSpacesToSinge(s string) string {
-	re := regexp.MustCompile(`\s+`)
-	return re.ReplaceAllString(s, " ")
-}
-
-//ReadFile reads from file and returns string.
-func ReadFile(pipelineId uuid.UUID, path string) (string, error) {
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		logger.Errorf("%s: ReadFile(): error during reading from a file: %s", pipelineId, err.Error())
-		return "", err
+func ID(salt, content string, length int) (string, error) {
+	hash := sha256.New()
+	if _, err := io.WriteString(hash, salt); err != nil {
+		logger.Errorf("ID(): error during ID generation: %s", err.Error())
+		return "", errors.InternalError("Error during ID generation", "Error writing ID and salt")
 	}
-	return string(content), nil
-}
-
-//SpaceStringsBuilder returns data without spaces.
-func SpaceStringsBuilder(str string) string {
-	var b strings.Builder
-	b.Grow(len(str))
-	for _, ch := range str {
-		if !unicode.IsSpace(ch) {
-			b.WriteRune(ch)
-		}
+	hash.Write([]byte(content))
+	sum := hash.Sum(nil)
+	b := make([]byte, base64.URLEncoding.EncodedLen(len(sum)))
+	base64.URLEncoding.Encode(b, sum)
+	hashLen := length
+	for hashLen <= len(b) && b[hashLen-1] == '_' {
+		hashLen++
 	}
-	return b.String()
+	return string(b)[:hashLen], nil
 }

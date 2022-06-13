@@ -13,26 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package db
+package entity
 
-import (
-	"beam.apache.org/playground/backend/internal/db/entity"
-	"context"
-)
-
-type Database interface {
-	Snippet
-	Catalogue
-}
-
-type Snippet interface {
-	PutSnippet(ctx context.Context, id string, snip *entity.SnippetEntity) error
-
-	GetSnippet(ctx context.Context, id string) (*entity.SnippetEntity, error)
-}
-
-type Catalogue interface {
-	PutSchemaVersion(ctx context.Context, id string, schema *entity.SchemaEntity) error
-
-	PutSDKs(ctx context.Context, sdks []*entity.SDKEntity) error
+type IDInfo struct {
+	Salt     string
+	IdLength int
 }

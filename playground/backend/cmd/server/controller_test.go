@@ -735,6 +735,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
+		wantId  string
 		wantErr bool
 	}{
 		// Test case with calling SaveCode method with incorrect sdk.
@@ -775,6 +776,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 				},
 			},
 			wantErr: false,
+			wantId:  "JB_91bJgr5g",
 		},
 		// Test case with calling SaveCode method with too large entity.
 		// As a result, want to receive an error.
@@ -798,7 +800,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 				t.Errorf("PlaygroundController_SaveCode() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err == nil {
-				if len(got.Id) != 11 {
+				if len(got.Id) != 11 || got.Id != tt.wantId {
 					t.Errorf("PlaygroundController_SaveCode() generated ID length is not 11")
 				}
 			}

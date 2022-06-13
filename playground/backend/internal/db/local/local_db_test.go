@@ -16,7 +16,8 @@
 package local_db
 
 import (
-	db "beam.apache.org/playground/backend/internal/db/entity"
+	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/db/entity"
 	"context"
 	"testing"
 	"time"
@@ -38,7 +39,7 @@ func TestLocalDB_PutSnippet(t *testing.T) {
 	type args struct {
 		ctx  context.Context
 		id   string
-		snip *db.SnippetEntity
+		snip *entity.SnippetEntity
 	}
 	tests := []struct {
 		name    string
@@ -50,12 +51,12 @@ func TestLocalDB_PutSnippet(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				id:  "MOCK_ID",
-				snip: &db.SnippetEntity{
+				snip: &entity.SnippetEntity{
 					Sdk:      "SDK_GO",
 					PipeOpts: "MOCK_OPTIONS",
-					Origin:   db.PLAYGROUND,
+					Origin:   entity.PLAYGROUND,
 					OwnerId:  "",
-					Codes: []*db.CodeEntity{{
+					Codes: []*entity.CodeEntity{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
@@ -101,13 +102,13 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 		{
 			name: "GetSnippet() in the usual case",
 			prepare: func() {
-				_ = localDb.PutSnippet(ctx, "MOCK_ID", &db.SnippetEntity{
+				_ = localDb.PutSnippet(ctx, "MOCK_ID", &entity.SnippetEntity{
 					Sdk:      "SDK_GO",
 					PipeOpts: "MOCK_OPTIONS",
 					Created:  nowDate,
-					Origin:   db.PLAYGROUND,
+					Origin:   entity.PLAYGROUND,
 					OwnerId:  "",
-					Codes: []*db.CodeEntity{{
+					Codes: []*entity.CodeEntity{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
 					}},
@@ -133,10 +134,99 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 				if snip.Sdk != "SDK_GO" ||
 					snip.Codes[0].Code != "MOCK_CODE" ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Origin != db.PLAYGROUND ||
+					snip.Origin != entity.PLAYGROUND ||
 					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
+			}
+		})
+	}
+
+	delete(localDb.items, "MOCK_ID")
+}
+
+func TestLocalDB_PutSDKs(t *testing.T) {
+	type args struct {
+		ctx  context.Context
+		sdks []*entity.SDKEntity
+	}
+	sdks := getSDKs()
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "PutSDKs() in the usual case",
+			args: args{
+				ctx:  ctx,
+				sdks: sdks,
+			},
+			wantErr: false,
+		},
+		{
+			name: "PutSDKs() when input data is nil",
+			args: args{
+				ctx:  ctx,
+				sdks: nil,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := localDb.PutSDKs(tt.args.ctx, tt.args.sdks)
+			if err != nil {
+				t.Error("PutSDKs() method failed")
+			}
+		})
+	}
+
+	for _, sdk := range sdks {
+		delete(localDb.items, sdk.Name)
+	}
+}
+
+func TestLocalDB_PutSchemaVersion(t *testing.T) {
+	type args struct {
+		ctx    context.Context
+		id     string
+		schema *entity.SchemaEntity
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "PutSchemaVersion() in the usual case",
+			args: args{
+				ctx: ctx,
+				id:  "MOCK_ID",
+				schema: &entity.SchemaEntity{
+					Version: "MOCK_VERSION",
+					Descr:   "MOCK_DESCRIPTION",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "PutSchemaVersion() when input data is nil",
+			args: args{
+				ctx:    ctx,
+				id:     "MOCK_ID",
+				schema: nil,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := localDb.PutSchemaVersion(tt.args.ctx, tt.args.id, tt.args.schema)
+			if err != nil {
+				t.Error("PutSchemaVersion() method failed")
 			}
 		})
 	}
@@ -161,4 +251,15 @@ func TestNew(t *testing.T) {
 			}
 		})
 	}
+}
+
+func getSDKs() []*entity.SDKEntity {
+	var sdkEntities []*entity.SDKEntity
+	for _, sdk := range pb.Sdk_name {
+		sdkEntities = append(sdkEntities, &entity.SDKEntity{
+			Name:           sdk,
+			DefaultExample: "MOCK_EXAMPLE",
+		})
+	}
+	return sdkEntities
 }

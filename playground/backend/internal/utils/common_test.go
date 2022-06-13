@@ -126,3 +126,36 @@ func TestReadFile(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveSpaces(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{
+			name:  "Remove spaces when spaces on the sides",
+			input: "  MOCK_CODE ",
+			want:  "MOCK_CODE",
+		},
+		{
+			name:  "Remove spaces when new lines on the sides",
+			input: "\r\rMOCK_CODE\r",
+			want:  "MOCK_CODE",
+		},
+		{
+			name:  "Remove spaces when spaces in the middle",
+			input: "MOCK_CODE   MOCK_CODE MOCK_CODE",
+			want:  "MOCK_CODEMOCK_CODEMOCK_CODE",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := RemoveSpaces(tt.input)
+			if result != tt.want {
+				t.Errorf("RemoveSpaces() result = %v, want %v", result, tt.want)
+			}
+		})
+	}
+}

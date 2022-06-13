@@ -61,14 +61,14 @@ type Snippet struct {
 func (s *Snippet) ID() (string, error) {
 	var codes []string
 	for _, v := range s.Snippet.Codes {
-		codes = append(codes, utils.SpaceStringsBuilder(v.Code)+utils.SpaceStringsBuilder(v.Name))
+		codes = append(codes, utils.RemoveSpaces(v.Code)+utils.RemoveSpaces(v.Name))
 	}
 	sort.Strings(codes)
 	var content string
 	for i, v := range codes {
 		content += v
 		if i == len(codes)-1 {
-			content += fmt.Sprintf("%v%s", s.Snippet.Sdk, utils.SpaceStringsBuilder(s.Snippet.PipeOpts))
+			content += fmt.Sprintf("%v%s", s.Snippet.Sdk, utils.RemoveSpaces(s.Snippet.PipeOpts))
 		}
 	}
 	id, err := utils.ID(s.Salt, content, s.IdLength)
@@ -80,7 +80,7 @@ func (s *Snippet) ID() (string, error) {
 
 // ID generates id according to content of a code and its name
 func (c *CodeEntity) ID(snip *Snippet) (string, error) {
-	content := fmt.Sprintf("%s%s", utils.SpaceStringsBuilder(c.Code), utils.SpaceStringsBuilder(c.Name))
+	content := fmt.Sprintf("%s%s", utils.RemoveSpaces(c.Code), utils.RemoveSpaces(c.Name))
 	id, err := utils.ID(snip.Salt, content, snip.IdLength)
 	if err != nil {
 		return "", err

@@ -16,6 +16,7 @@
 package datastore
 
 import (
+	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"cloud.google.com/go/datastore"
 	"context"
@@ -95,7 +96,7 @@ func TestDatastore_PutSnippet(t *testing.T) {
 		})
 	}
 
-	cleanData(t)
+	cleanData(t, snippetKind, "MOCK_ID")
 }
 
 func TestDatastore_GetSnippet(t *testing.T) {
@@ -156,7 +157,96 @@ func TestDatastore_GetSnippet(t *testing.T) {
 		})
 	}
 
-	cleanData(t)
+	cleanData(t, snippetKind, "MOCK_ID")
+}
+
+func TestDatastore_PutSDKs(t *testing.T) {
+	type args struct {
+		ctx  context.Context
+		sdks []*entity.SDKEntity
+	}
+	sdks := getSDKs()
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "PutSDKs() in the usual case",
+			args: args{
+				ctx:  ctx,
+				sdks: sdks,
+			},
+			wantErr: false,
+		},
+		{
+			name: "PutSDKs() when input data is nil",
+			args: args{
+				ctx:  ctx,
+				sdks: nil,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := datastoreDb.PutSDKs(tt.args.ctx, tt.args.sdks)
+			if err != nil {
+				t.Error("PutSDKs() method failed")
+			}
+		})
+	}
+
+	for _, sdk := range sdks {
+		cleanData(t, sdkKind, sdk.Name)
+	}
+}
+
+func TestDatastore_PutSchemaVersion(t *testing.T) {
+	type args struct {
+		ctx    context.Context
+		id     string
+		schema *entity.SchemaEntity
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "PutSchemaVersion() in the usual case",
+			args: args{
+				ctx: ctx,
+				id:  "MOCK_ID",
+				schema: &entity.SchemaEntity{
+					Version: "MOCK_VERSION",
+					Descr:   "MOCK_DESCRIPTION",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "PutSchemaVersion() when input data is nil",
+			args: args{
+				ctx:    ctx,
+				id:     "MOCK_ID",
+				schema: nil,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := datastoreDb.PutSchemaVersion(tt.args.ctx, tt.args.id, tt.args.schema)
+			if err != nil {
+				t.Error("PutSchemaVersion() method failed")
+			}
+		})
+	}
+
+	cleanData(t, schemaKind, "MOCK_ID")
 }
 
 func TestNew(t *testing.T) {
@@ -186,10 +276,21 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func cleanData(t *testing.T) {
-	key := datastore.NameKey(snippetKind, "MOCK_ID", nil)
+func cleanData(t *testing.T, kind, id string) {
+	key := datastore.NameKey(kind, id, nil)
 	key.Namespace = "Playground"
 	if err := datastoreDb.client.Delete(ctx, key); err != nil {
 		t.Error("Error during data cleaning after the test")
 	}
+}
+
+func getSDKs() []*entity.SDKEntity {
+	var sdkEntities []*entity.SDKEntity
+	for _, sdk := range pb.Sdk_name {
+		sdkEntities = append(sdkEntities, &entity.SDKEntity{
+			Name:           sdk,
+			DefaultExample: "MOCK_EXAMPLE",
+		})
+	}
+	return sdkEntities
 }

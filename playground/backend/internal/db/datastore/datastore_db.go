@@ -45,6 +45,10 @@ func New(ctx context.Context, projectId string) (*Datastore, error) {
 
 // PutSnippet puts the snippet entity to datastore
 func (d *Datastore) PutSnippet(ctx context.Context, id string, snip *entity.SnippetEntity) error {
+	if snip == nil {
+		logger.Errorf("Datastore: PutSnippet(): snippet is nil")
+		return nil
+	}
 	key := getNameKey(snippetKind, id)
 	if _, err := d.client.Put(ctx, key, snip); err != nil {
 		logger.Errorf("Datastore: PutSnippet(): error during entity saving, err: %s\n", err.Error())
@@ -72,6 +76,10 @@ func (d *Datastore) GetSnippet(ctx context.Context, id string) (*entity.SnippetE
 
 // PutSchemaVersion puts the schema entity to datastore
 func (d *Datastore) PutSchemaVersion(ctx context.Context, id string, schema *entity.SchemaEntity) error {
+	if schema == nil {
+		logger.Errorf("Datastore: PutSchemaVersion(): schema version is nil")
+		return nil
+	}
 	key := getNameKey(schemaKind, id)
 	if _, err := d.client.Put(ctx, key, schema); err != nil {
 		logger.Errorf("Datastore: PutSchemaVersion(): error during entity saving, err: %s\n", err.Error())
@@ -82,6 +90,10 @@ func (d *Datastore) PutSchemaVersion(ctx context.Context, id string, schema *ent
 
 // PutSDKs puts the SDK entity to datastore
 func (d *Datastore) PutSDKs(ctx context.Context, sdks []*entity.SDKEntity) error {
+	if sdks == nil || len(sdks) == 0 {
+		logger.Errorf("Datastore: PutSDKs(): sdks are empty")
+		return nil
+	}
 	var keys []*datastore.Key
 	for _, sdk := range sdks {
 		keys = append(keys, getNameKey(sdkKind, sdk.Name))

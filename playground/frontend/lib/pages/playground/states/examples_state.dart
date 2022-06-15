@@ -36,7 +36,6 @@ class ExampleState with ChangeNotifier {
   ExampleModel? defaultExample;
   bool isSelectorOpened = false;
   Map<SDK, ExampleModel>? sharedFilesMap;
-  String? link;
 
   ExampleState(this._exampleRepository);
 
@@ -102,24 +101,16 @@ class ExampleState with ChangeNotifier {
     notifyListeners();
   }
 
-  setDefaultShareLink(String path) {
-    setShareLink('${Uri.base.toString()}?$kExampleParam=$path');
-  }
-
-  setShareLink(String path) {
-    link = path;
-    notifyListeners();
-  }
-
   getShareLink(
     List<SharedFile> codes,
     SDK sdk,
     String pipelineOptions,
   ) async {
+    // await Future.delayed(const Duration(seconds: 3));
+    // String id = 'sharedExample';
     String id = await _exampleRepository
         .saveCode(SaveCodeRequestWrapper(codes, sdk, pipelineOptions));
-    setShareLink('${Uri.base}?shared=$id');
-    notifyListeners();
+    return '${Uri.base}?shared=$id';
   }
 
   Future<ExampleModel> loadExampleInfo(ExampleModel example, SDK sdk) async {

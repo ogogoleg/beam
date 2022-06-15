@@ -17,12 +17,10 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:playground/config/theme.dart';
-import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
-import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_link_field.dart';
 import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
@@ -62,21 +60,6 @@ class _ShareDropdownBodyState extends State<ShareDropdownBody> {
                   setState(() {
                     isPressed = true;
                   });
-                  exampleState.setShareLink('');
-                  if (playgroundState.isExampleChanged) {
-                    exampleState.getShareLink(
-                      [SharedFile(playgroundState.source, true, '')],
-                      playgroundState.sdk,
-                      playgroundState.pipelineOptions,
-                    );
-                  } else {
-                    exampleState.setDefaultShareLink(
-                      playgroundState.selectedExample!.path,
-                    );
-                  }
-                  await Clipboard.setData(ClipboardData(
-                    text: exampleState.link,
-                  ));
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -92,25 +75,11 @@ class _ShareDropdownBodyState extends State<ShareDropdownBody> {
                     padding: const EdgeInsets.symmetric(vertical: kLgSpacing),
                     margin: const EdgeInsets.symmetric(horizontal: kMdSpacing),
                     child: Center(
-                      child: isPressed
-                          ? SelectableText(
-                              exampleState.link ?? '',
-                              maxLines: 1,
-                              style: TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                fontSize: kLabelFontSize,
-                                fontWeight: kNormalWeight,
-                                color: ThemeColors.of(context).primary,
-                              ),
-                            )
-                          : Text(
-                              appLocale.showAndCopyLink,
-                              style: TextStyle(
-                                fontSize: kLabelFontSize,
-                                fontWeight: kBoldWeight,
-                                color: ThemeColors.of(context).primary,
-                              ),
-                            ),
+                      child: ShareLinkField(
+                        isPressed: isPressed,
+                        playgroundState: playgroundState,
+                        exampleState: exampleState,
+                      ),
                     ),
                   ),
                 ),

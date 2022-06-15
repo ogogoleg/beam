@@ -363,7 +363,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 	snippet := entity.Snippet{
 		IDInfo: entity.IDInfo{
 			Salt:     controller.env.ApplicationEnvs.PlaygroundSalt(),
-			IdLength: controller.env.ApplicationEnvs.FirestoreIdLength(),
+			IdLength: controller.env.ApplicationEnvs.IdLength(),
 		},
 		Snippet: &entity.SnippetEntity{
 			SchVer:   "0.0.1", //TODO should it get from cache?

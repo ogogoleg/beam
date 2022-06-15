@@ -173,7 +173,7 @@ func initDBStructure(ctx context.Context, database db.Database, env *environment
 	//init snippets
 	dummyStr := "dummy"
 	idInfo := entity.IDInfo{
-		IdLength: env.ApplicationEnvs.FirestoreIdLength(),
+		IdLength: env.ApplicationEnvs.IdLength(),
 		Salt:     env.ApplicationEnvs.PlaygroundSalt(),
 	}
 	snip := &entity.Snippet{

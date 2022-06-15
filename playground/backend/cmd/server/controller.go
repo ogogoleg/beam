@@ -395,7 +395,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			isMain = utils.IsCodeMain(code.Code, info.Sdk)
 		}
 
-		snippet.Snippet.Codes = append(snippet.Snippet.Codes, &entity.CodeEntity{
+		snippet.Codes = append(snippet.Codes, &entity.CodeEntity{
 			Name:     utils.GetCodeName(code.Name, info.Sdk),
 			Code:     code.Code,
 			CntxLine: 1, // it is necessary for examples from playground
@@ -409,7 +409,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 		return nil, errors.InternalError(errorTitle, "Failed to generate ID")
 	}
 
-	if err := controller.db.PutSnippet(ctx, id, snippet.Snippet); err != nil {
+	if err := controller.db.PutSnippet(ctx, id, &snippet); err != nil {
 		logger.Errorf("SaveCode(): PutSnippet(): error during entity saving: %s", err.Error())
 		return nil, errors.InternalError(errorTitle, "Failed to save a code entity")
 	}
@@ -420,23 +420,27 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 
 // GetCode returns the code entity
 func (controller *playgroundController) GetCode(ctx context.Context, info *pb.GetCodeRequest) (*pb.GetCodeResponse, error) {
+	errorTitle := "Error during getting code"
 	snippet, err := controller.db.GetSnippet(ctx, info.GetId())
 	if err != nil {
-		logger.Errorf("GetCode(): GetCode(): error during getting code: %s", err.Error())
-		return nil, errors.InternalError("Error during getting code", "Failed to retrieve the code")
+		logger.Errorf("GetCode(): GetSnippet(): error during getting snippet: %s", err.Error())
+		return nil, errors.InternalError(errorTitle, "Failed to retrieve the snippet")
 	}
-
 	response := pb.GetCodeResponse{
 		Sdk:             pb.Sdk(pb.Sdk_value[snippet.Sdk]),
 		PipelineOptions: snippet.PipeOpts,
 	}
-	for _, code := range snippet.Codes {
+	codes, err := controller.db.GetCodes(ctx, info.GetId())
+	if err != nil {
+		logger.Errorf("GetCode(): GetCodes(): error during getting codes: %s", err.Error())
+		return nil, errors.InternalError(errorTitle, "Failed to retrieve the codes")
+	}
+	for _, code := range codes {
 		response.Codes = append(response.Codes, &pb.CodeFullInfo{
 			Name:   code.Name,
 			Code:   code.Code,
 			IsMain: code.IsMain,
 		})
 	}
-
 	return &response, nil
 }

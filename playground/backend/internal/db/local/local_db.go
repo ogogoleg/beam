@@ -34,7 +34,7 @@ func New() (*LocalDB, error) {
 }
 
 // PutSnippet puts the entity to the local map
-func (l *LocalDB) PutSnippet(_ context.Context, id string, snip *entity.SnippetEntity) error {
+func (l *LocalDB) PutSnippet(_ context.Context, id string, snip *entity.Snippet) error {
 	l.Lock()
 	defer l.Unlock()
 	l.items[id] = snip
@@ -50,8 +50,8 @@ func (l *LocalDB) GetSnippet(_ context.Context, id string) (*entity.SnippetEntit
 		return nil, fmt.Errorf("value with id: %s not found", id)
 	}
 	l.RUnlock()
-	snippet, _ := value.(*entity.SnippetEntity)
-	return snippet, nil
+	snippet, _ := value.(*entity.Snippet)
+	return snippet.Snippet, nil
 }
 
 // PutSchemaVersion puts the schema entity to the local map
@@ -70,4 +70,17 @@ func (l *LocalDB) PutSDKs(_ context.Context, sdks []*entity.SDKEntity) error {
 		l.items[sdk.Name] = sdk
 	}
 	return nil
+}
+
+//GetCodes returns the code entities by parent identifier
+func (l *LocalDB) GetCodes(_ context.Context, parentId string) ([]*entity.CodeEntity, error) {
+	l.RLock()
+	value, found := l.items[parentId]
+	if !found {
+		l.RUnlock()
+		return nil, fmt.Errorf("value with id: %s not found", parentId)
+	}
+	l.RUnlock()
+	snippet, _ := value.(*entity.Snippet)
+	return snippet.Codes, nil
 }

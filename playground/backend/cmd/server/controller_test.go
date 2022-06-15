@@ -845,17 +845,21 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 				info: &pb.GetCodeRequest{Id: "MOCK_ID"},
 			},
 			prepare: func() {
-				_ = snippetDb.PutSnippet(ctx, "MOCK_ID", &entity.SnippetEntity{
-					OwnerId:  "",
-					Sdk:      "SDK_JAVA",
-					PipeOpts: "MOCK_OPTIONS",
-					Created:  nowDate,
-					Origin:   entity.PLAYGROUND,
-					Codes: []*entity.CodeEntity{{
-						Code:   "MOCK_CODE",
-						IsMain: false,
-					}},
-				})
+				_ = snippetDb.PutSnippet(ctx, "MOCK_ID",
+					&entity.Snippet{
+						Snippet: &entity.SnippetEntity{
+							OwnerId:  "",
+							Sdk:      "SDK_JAVA",
+							PipeOpts: "MOCK_OPTIONS",
+							Created:  nowDate,
+							Origin:   entity.PLAYGROUND,
+						},
+						Codes: []*entity.CodeEntity{{
+							Code:   "MOCK_CODE",
+							IsMain: false,
+						}},
+					},
+				)
 			},
 			wantErr: false,
 		},

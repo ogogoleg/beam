@@ -66,7 +66,7 @@ func TestDatastore_PutSnippet(t *testing.T) {
 	type args struct {
 		ctx  context.Context
 		id   string
-		snip *entity.SnippetEntity
+		snip *entity.Snippet
 	}
 	tests := []struct {
 		name    string
@@ -75,9 +75,17 @@ func TestDatastore_PutSnippet(t *testing.T) {
 	}{
 		{
 			name: "PutSnippet() in the usual case",
-			args: args{ctx: ctx, id: "MOCK_ID", snip: &entity.SnippetEntity{
-				Sdk:      "SDK_GO",
-				PipeOpts: "MOCK_OPTIONS",
+			args: args{ctx: ctx, id: "MOCK_ID", snip: &entity.Snippet{
+				IDInfo: entity.IDInfo{
+					Salt:     "MOCK_SALT",
+					IdLength: 11,
+				},
+				Snippet: &entity.SnippetEntity{
+					Sdk:      "SDK_GO",
+					PipeOpts: "MOCK_OPTIONS",
+					Origin:   entity.PLAYGROUND,
+					OwnerId:  "",
+				},
 				Codes: []*entity.CodeEntity{{
 					Code:   "MOCK_CODE",
 					IsMain: false,
@@ -120,12 +128,18 @@ func TestDatastore_GetSnippet(t *testing.T) {
 		{
 			name: "GetSnippet() in the usual case",
 			prepare: func() {
-				_ = datastoreDb.PutSnippet(ctx, "MOCK_ID", &entity.SnippetEntity{
-					Sdk:      "SDK_GO",
-					PipeOpts: "MOCK_OPTIONS",
-					Created:  nowDate,
-					Origin:   entity.PLAYGROUND,
-					OwnerId:  "",
+				_ = datastoreDb.PutSnippet(ctx, "MOCK_ID", &entity.Snippet{
+					IDInfo: entity.IDInfo{
+						Salt:     "MOCK_SALT",
+						IdLength: 11,
+					},
+					Snippet: &entity.SnippetEntity{
+						Sdk:      "SDK_GO",
+						PipeOpts: "MOCK_OPTIONS",
+						Created:  nowDate,
+						Origin:   entity.PLAYGROUND,
+						OwnerId:  "",
+					},
 					Codes: []*entity.CodeEntity{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
@@ -147,7 +161,6 @@ func TestDatastore_GetSnippet(t *testing.T) {
 
 			if err == nil {
 				if snip.Sdk != "SDK_GO" ||
-					snip.Codes[0].Code != "MOCK_CODE" ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
 					snip.Origin != entity.PLAYGROUND ||
 					snip.OwnerId != "" {

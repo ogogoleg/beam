@@ -30,12 +30,12 @@ func TestSnippet_ID(t *testing.T) {
 				Snippet: &SnippetEntity{
 					Sdk:      "SDK_GO",
 					PipeOpts: "MOCK_OPTIONS",
-					Codes: []*CodeEntity{{
-						Name:   "MOCK_NAME",
-						Code:   "MOCK_CODE",
-						IsMain: false,
-					}},
 				},
+				Codes: []*CodeEntity{{
+					Name:   "MOCK_NAME",
+					Code:   "MOCK_CODE",
+					IsMain: false,
+				}},
 				IDInfo: IDInfo{
 					IdLength: 11,
 					Salt:     "MOCK_SALT",
@@ -85,12 +85,12 @@ func TestCode_ID(t *testing.T) {
 				Snippet: &SnippetEntity{
 					Sdk:      "SDK_GO",
 					PipeOpts: "MOCK_OPTIONS",
-					Codes:    []*CodeEntity{code},
 				},
 				IDInfo: IDInfo{
 					Salt:     "MOCK_SALT",
 					IdLength: 11,
 				},
+				Codes: []*CodeEntity{code},
 			},
 			code:    code,
 			want:    "XSnhl0HoUOd",

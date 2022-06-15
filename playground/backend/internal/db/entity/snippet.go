@@ -41,26 +41,26 @@ type CodeEntity struct {
 }
 
 type SnippetEntity struct {
-	OwnerId    string        `datastore:"ownerId"`
-	Sdk        string        `datastore:"sdk"`
-	PipeOpts   string        `datastore:"pipeOpts"`
-	Created    time.Time     `datastore:"created"`
-	LVisited   time.Time     `datastore:"lVisited"`
-	Origin     Origin        `datastore:"origin"`
-	VisitCount int           `datastore:"visitCount"`
-	Codes      []*CodeEntity `datastore:"codes"`
-	SchVer     string        `datastore:"schVer"`
+	OwnerId    string    `datastore:"ownerId"`
+	Sdk        string    `datastore:"sdk"`
+	PipeOpts   string    `datastore:"pipeOpts"`
+	Created    time.Time `datastore:"created"`
+	LVisited   time.Time `datastore:"lVisited"`
+	Origin     Origin    `datastore:"origin"`
+	VisitCount int       `datastore:"visitCount"`
+	SchVer     string    `datastore:"schVer"`
 }
 
 type Snippet struct {
 	IDInfo
 	Snippet *SnippetEntity
+	Codes   []*CodeEntity
 }
 
 // ID generates id according to content of the entity
 func (s *Snippet) ID() (string, error) {
 	var codes []string
-	for _, v := range s.Snippet.Codes {
+	for _, v := range s.Codes {
 		codes = append(codes, utils.RemoveSpaces(v.Code)+utils.RemoveSpaces(v.Name))
 	}
 	sort.Strings(codes)

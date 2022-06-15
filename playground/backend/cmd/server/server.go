@@ -172,19 +172,20 @@ func setupDB(ctx context.Context, appEnv environment.ApplicationEnvs) (db.Databa
 func initDBStructure(ctx context.Context, database db.Database, env *environment.Environment) error {
 	//init snippets
 	dummyStr := "dummy"
+	idInfo := entity.IDInfo{
+		IdLength: env.ApplicationEnvs.FirestoreIdLength(),
+		Salt:     env.ApplicationEnvs.PlaygroundSalt(),
+	}
 	snip := &entity.Snippet{
-		IDInfo: entity.IDInfo{
-			IdLength: env.ApplicationEnvs.FirestoreIdLength(),
-			Salt:     env.ApplicationEnvs.PlaygroundSalt(),
-		},
+		IDInfo: idInfo,
 		Snippet: &entity.SnippetEntity{
 			OwnerId:  dummyStr,
 			PipeOpts: dummyStr,
-			Codes: []*entity.CodeEntity{
-				{
-					Name: dummyStr,
-					Code: dummyStr,
-				},
+		},
+		Codes: []*entity.CodeEntity{
+			{
+				Name: dummyStr,
+				Code: dummyStr,
 			},
 		},
 	}
@@ -192,16 +193,13 @@ func initDBStructure(ctx context.Context, database db.Database, env *environment
 	if err != nil {
 		return err
 	}
-	if err = database.PutSnippet(ctx, snipId, snip.Snippet); err != nil {
+	if err = database.PutSnippet(ctx, snipId, snip); err != nil {
 		return err
 	}
 
 	//init schema versions
 	schema := &entity.Schema{
-		IDInfo: entity.IDInfo{
-			Salt:     env.ApplicationEnvs.PlaygroundSalt(),
-			IdLength: env.ApplicationEnvs.FirestoreIdLength(),
-		},
+		IDInfo: idInfo,
 		Schema: &entity.SchemaEntity{
 			Version: "0.0.1", //TODO should it get from env?
 			Descr:   "",      //TODO should it get from env?

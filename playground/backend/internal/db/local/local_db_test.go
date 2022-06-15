@@ -238,6 +238,69 @@ func TestLocalDB_PutSchemaVersion(t *testing.T) {
 	delete(localDb.items, "MOCK_ID")
 }
 
+func TestLocalDB_GetCodes(t *testing.T) {
+	type args struct {
+		ctx      context.Context
+		parentId string
+	}
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "GetCodes() with parentId that is no in the database",
+			prepare: func() {},
+			args:    args{ctx: ctx, parentId: "MOCK_ID"},
+			wantErr: true,
+		},
+		{
+			name: "GetCodes() in the usual case",
+			prepare: func() {
+				_ = localDb.PutSnippet(ctx, "MOCK_ID", &entity.Snippet{
+					IDInfo: entity.IDInfo{
+						Salt:     "MOCK_SALT",
+						IdLength: 11,
+					},
+					Snippet: &entity.SnippetEntity{
+						Sdk:      "SDK_GO",
+						PipeOpts: "MOCK_OPTIONS",
+						Origin:   entity.PLAYGROUND,
+						OwnerId:  "",
+					},
+					Codes: []*entity.CodeEntity{{
+						Code:   "MOCK_CODE",
+						IsMain: false,
+					}},
+				})
+			},
+			args:    args{ctx: ctx, parentId: "MOCK_ID"},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.prepare()
+			codes, err := localDb.GetCodes(tt.args.ctx, tt.args.parentId)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetCodes() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err == nil {
+				if len(codes) != 1 ||
+					codes[0].Code != "MOCK_CODE" ||
+					codes[0].IsMain != false {
+					t.Error("GetCodes() unexpected result")
+				}
+			}
+		})
+	}
+
+	delete(localDb.items, "MOCK_ID")
+}
+
 func TestNew(t *testing.T) {
 	tests := []struct {
 		name    string

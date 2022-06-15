@@ -262,6 +262,68 @@ func TestDatastore_PutSchemaVersion(t *testing.T) {
 	cleanData(t, schemaKind, "MOCK_ID")
 }
 
+func TestDatastore_GetCodes(t *testing.T) {
+	type args struct {
+		ctx      context.Context
+		parentId string
+	}
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "GetCodes() with parentId that is no in the database",
+			prepare: func() {},
+			args:    args{ctx: ctx, parentId: "MOCK_ID"},
+			wantErr: false,
+		},
+		{
+			name: "GetCodes() in the usual case",
+			prepare: func() {
+				_ = datastoreDb.PutSnippet(ctx, "MOCK_ID", &entity.Snippet{
+					IDInfo: entity.IDInfo{
+						Salt:     "MOCK_SALT",
+						IdLength: 11,
+					},
+					Snippet: &entity.SnippetEntity{
+						Sdk:      "SDK_GO",
+						PipeOpts: "MOCK_OPTIONS",
+						Origin:   entity.PLAYGROUND,
+						OwnerId:  "",
+					},
+					Codes: []*entity.CodeEntity{{
+						Code:   "MOCK_CODE",
+						IsMain: false,
+					}},
+				})
+			},
+			args:    args{ctx: ctx, parentId: "MOCK_ID"},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.prepare()
+			codes, err := datastoreDb.GetCodes(tt.args.ctx, tt.args.parentId)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetCodes() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if len(codes) != 1 ||
+				codes[0].Code != "MOCK_CODE" ||
+				codes[0].IsMain != false {
+				t.Error("GetCodes() unexpected result")
+			}
+		})
+	}
+
+	cleanData(t, codeKind, "ig43m5rUQo_l")
+	cleanData(t, snippetKind, "MOCK_ID")
+}
+
 func TestNew(t *testing.T) {
 	type args struct {
 		ctx       context.Context

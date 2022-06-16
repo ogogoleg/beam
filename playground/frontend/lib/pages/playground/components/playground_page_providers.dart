@@ -25,6 +25,7 @@ import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_client/grpc_example_client.dart';
 import 'package:playground/modules/examples/repositories/example_repository.dart';
 import 'package:playground/modules/output/models/output_placement_state.dart';
+import 'package:playground/modules/sdk/components/sdk_selector.dart';
 import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/feedback_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
@@ -65,7 +66,8 @@ class PlaygroundPageProviders extends StatelessWidget {
                 selectedExample: null,
               );
               final example = _getExample(exampleState, newPlayground);
-              if (example != null) {
+              if (example != null &&
+                  Uri.base.queryParameters[kIsShared] == null) {
                 exampleState
                     .loadExampleInfo(
                       example,
@@ -103,7 +105,16 @@ class PlaygroundPageProviders extends StatelessWidget {
 
     if (shared?.isNotEmpty ?? false) {
       exampleState.getSharedExample(shared!);
+      if (exampleState.sharedFilesMap == null) {
+        return ExampleModel(
+          name: kEmptyExampleName,
+          path: '',
+          description: '',
+          type: ExampleType.example,
+        );
+      }
       playground.setSdk(exampleState.sharedFilesMap!.keys.first);
+      playground.setExample(exampleState.sharedFilesMap!.values.first);
       return exampleState.sharedFilesMap!.values.first;
     }
 

@@ -19,6 +19,7 @@ import (
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
 	"beam.apache.org/playground/backend/internal/db"
+	datastoreDb "beam.apache.org/playground/backend/internal/db/datastore"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	localdb "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/environment"
@@ -776,7 +777,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 				},
 			},
 			wantErr: false,
-			wantId:  "JB_91bJgr5g",
+			wantId:  "obxGH-aLdgj",
 		},
 		// Test case with calling SaveCode method with too large entity.
 		// As a result, want to receive an error.
@@ -849,7 +850,7 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 					&entity.Snippet{
 						Snippet: &entity.SnippetEntity{
 							OwnerId:  "",
-							Sdk:      "SDK_JAVA",
+							Sdk:      utils.GetNameKey(datastoreDb.SdkKind, "SDK_JAVA", datastoreDb.Namespace, nil),
 							PipeOpts: "MOCK_OPTIONS",
 							Created:  nowDate,
 							Origin:   entity.PLAYGROUND,

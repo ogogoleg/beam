@@ -84,3 +84,16 @@ func (l *LocalDB) GetCodes(_ context.Context, parentId string) ([]*entity.CodeEn
 	snippet, _ := value.(*entity.Snippet)
 	return snippet.Codes, nil
 }
+
+//GetSDK returns the sdk entity by an identifier
+func (l *LocalDB) GetSDK(_ context.Context, id string) (*entity.SDKEntity, error) {
+	l.RLock()
+	value, found := l.items[id]
+	if !found {
+		l.RUnlock()
+		return nil, fmt.Errorf("value with id: %s not found", id)
+	}
+	l.RUnlock()
+	sdk, _ := value.(*entity.SDKEntity)
+	return sdk, nil
+}

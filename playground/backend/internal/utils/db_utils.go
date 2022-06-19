@@ -18,6 +18,7 @@ package utils
 import (
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/logger"
+	"cloud.google.com/go/datastore"
 	"crypto/sha256"
 	"encoding/base64"
 	"io"
@@ -26,8 +27,8 @@ import (
 func ID(salt, content string, length int) (string, error) {
 	hash := sha256.New()
 	if _, err := io.WriteString(hash, salt); err != nil {
-		logger.Errorf("ID(): error during ID generation: %s", err.Error())
-		return "", errors.InternalError("Error during ID generation", "Error writing ID and salt")
+		logger.Errorf("ID(): error during K generation: %s", err.Error())
+		return "", errors.InternalError("Error during K generation", "Error writing K and salt")
 	}
 	hash.Write([]byte(content))
 	sum := hash.Sum(nil)
@@ -38,4 +39,14 @@ func ID(salt, content string, length int) (string, error) {
 		hashLen++
 	}
 	return string(b)[:hashLen], nil
+}
+
+// GetNameKey returns the datastore key
+func GetNameKey(kind, id, namespace string, parentId *datastore.Key) *datastore.Key {
+	key := datastore.NameKey(kind, id, nil)
+	if parentId != nil {
+		key.Parent = parentId
+	}
+	key.Namespace = namespace
+	return key
 }

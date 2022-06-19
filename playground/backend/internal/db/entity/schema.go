@@ -15,27 +15,6 @@
 
 package entity
 
-import (
-	"beam.apache.org/playground/backend/internal/utils"
-	"fmt"
-)
-
 type SchemaEntity struct {
-	Version string `datastore:"version"`
-	Descr   string `datastore:"descr"`
-}
-
-type Schema struct {
-	IDInfo
-	Schema *SchemaEntity
-}
-
-// ID generates id according to content of the entity
-func (s *Schema) ID() (string, error) {
-	content := fmt.Sprintf("%s%s", s.Schema.Version, s.Schema.Descr)
-	id, err := utils.ID(s.Salt, content, s.IdLength)
-	if err != nil {
-		return "", err
-	}
-	return id, nil
+	Descr string `datastore:"descr"`
 }

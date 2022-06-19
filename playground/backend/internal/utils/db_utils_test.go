@@ -30,7 +30,7 @@ func TestID(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "ID generation in the usual case",
+			name: "K generation in the usual case",
 			args: args{
 				salt:    "MOCK_SALT",
 				content: "MOCK_CONTENT",

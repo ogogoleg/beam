@@ -20,6 +20,7 @@ import (
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/code_processing"
 	"beam.apache.org/playground/backend/internal/db"
+	datastoreDb "beam.apache.org/playground/backend/internal/db/datastore"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/errors"
@@ -366,13 +367,13 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			IdLength: controller.env.ApplicationEnvs.IdLength(),
 		},
 		Snippet: &entity.SnippetEntity{
-			SchVer:   "0.0.1", //TODO should it get from cache?
-			OwnerId:  "",      // will be used in Tour of Beam project
-			Sdk:      info.Sdk.String(),
+			SchVer:   utils.GetNameKey(datastoreDb.SchemaKind, controller.env.ApplicationEnvs.SchemaVersion(), datastoreDb.Namespace, nil),
+			OwnerId:  "", // will be used in Tour of Beam project
+			Sdk:      utils.GetNameKey(datastoreDb.SdkKind, info.Sdk.String(), datastoreDb.Namespace, nil),
 			PipeOpts: info.PipelineOptions,
 			Created:  nowDate,
 			LVisited: nowDate,
-			Origin:   entity.PLAYGROUND, // will be used in Tour of Beam project also later. If the owner ID is empty, then the origin is Playground, otherwise it's Tour of Beam
+			Origin:   entity.PLAYGROUND, // will be used in Tour of Beam project also later. If the owner is empty, then the origin is Playground, otherwise it's Tour of Beam
 		},
 	}
 
@@ -426,8 +427,9 @@ func (controller *playgroundController) GetCode(ctx context.Context, info *pb.Ge
 		logger.Errorf("GetCode(): GetSnippet(): error during getting snippet: %s", err.Error())
 		return nil, errors.InternalError(errorTitle, "Failed to retrieve the snippet")
 	}
+
 	response := pb.GetCodeResponse{
-		Sdk:             pb.Sdk(pb.Sdk_value[snippet.Sdk]),
+		Sdk:             pb.Sdk(pb.Sdk_value[snippet.Sdk.Name]),
 		PipelineOptions: snippet.PipeOpts,
 	}
 	codes, err := controller.db.GetCodes(ctx, info.GetId())

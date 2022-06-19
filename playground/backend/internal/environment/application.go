@@ -131,6 +131,9 @@ type ApplicationEnvs struct {
 
 	// datastoreEmulatorHost is the address of datastore emulator
 	datastoreEmulatorHost string
+
+	// schemaVersion is the database schema version
+	schemaVersion string
 }
 
 // NewApplicationEnvs constructor for ApplicationEnvs
@@ -215,4 +218,14 @@ func (ae *ApplicationEnvs) IdLength() int {
 // DatastoreEmulatorHost returns the address of datastore emulator
 func (ae *ApplicationEnvs) DatastoreEmulatorHost() string {
 	return ae.datastoreEmulatorHost
+}
+
+// SchemaVersion returns the database schema version
+func (ae *ApplicationEnvs) SchemaVersion() string {
+	return ae.schemaVersion
+}
+
+// SetSchemaVersion sets the database schema version
+func (ae *ApplicationEnvs) SetSchemaVersion(schemaVersion string) {
+	ae.schemaVersion = schemaVersion
 }

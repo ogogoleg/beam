@@ -20,8 +20,6 @@ import (
 	"github.com/google/uuid"
 	"io/ioutil"
 	"regexp"
-	"strings"
-	"unicode"
 )
 
 func ReduceWhiteSpacesToSinge(s string) string {
@@ -37,16 +35,4 @@ func ReadFile(pipelineId uuid.UUID, path string) (string, error) {
 		return "", err
 	}
 	return string(content), nil
-}
-
-//RemoveSpaces returns data without spaces.
-func RemoveSpaces(str string) string {
-	var b strings.Builder
-	b.Grow(len(str))
-	for _, ch := range str {
-		if !unicode.IsSpace(ch) {
-			b.WriteRune(ch)
-		}
-	}
-	return b.String()
 }

@@ -17,16 +17,17 @@ package entity
 
 import (
 	"beam.apache.org/playground/backend/internal/utils"
+	"cloud.google.com/go/datastore"
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 )
 
 type Origin int32
 
 const (
-	TOUR_OF_BEAM Origin = 0 //will be used in Tour of Beam project
-	PLAYGROUND   Origin = 1
+	PLAYGROUND Origin = 0
 )
 
 func (s Origin) Value() int32 {
@@ -41,14 +42,14 @@ type CodeEntity struct {
 }
 
 type SnippetEntity struct {
-	OwnerId    string    `datastore:"ownerId"`
-	Sdk        string    `datastore:"sdk"`
-	PipeOpts   string    `datastore:"pipeOpts"`
-	Created    time.Time `datastore:"created"`
-	LVisited   time.Time `datastore:"lVisited"`
-	Origin     Origin    `datastore:"origin"`
-	VisitCount int       `datastore:"visitCount"`
-	SchVer     string    `datastore:"schVer"`
+	OwnerId    string         `datastore:"ownerId"`
+	Sdk        *datastore.Key `datastore:"sdk"`
+	PipeOpts   string         `datastore:"pipeOpts"`
+	Created    time.Time      `datastore:"created"`
+	LVisited   time.Time      `datastore:"lVisited"`
+	Origin     Origin         `datastore:"origin"`
+	VisitCount int            `datastore:"visitCount"`
+	SchVer     *datastore.Key `datastore:"schVer"`
 }
 
 type Snippet struct {
@@ -61,14 +62,14 @@ type Snippet struct {
 func (s *Snippet) ID() (string, error) {
 	var codes []string
 	for _, v := range s.Codes {
-		codes = append(codes, utils.RemoveSpaces(v.Code)+utils.RemoveSpaces(v.Name))
+		codes = append(codes, strings.TrimSpace(v.Code)+strings.TrimSpace(v.Name))
 	}
 	sort.Strings(codes)
 	var content string
 	for i, v := range codes {
 		content += v
 		if i == len(codes)-1 {
-			content += fmt.Sprintf("%v%s", s.Snippet.Sdk, utils.RemoveSpaces(s.Snippet.PipeOpts))
+			content += fmt.Sprintf("%v%s", s.Snippet.Sdk, strings.TrimSpace(s.Snippet.PipeOpts))
 		}
 	}
 	id, err := utils.ID(s.Salt, content, s.IdLength)
@@ -80,7 +81,7 @@ func (s *Snippet) ID() (string, error) {
 
 // ID generates id according to content of a code and its name
 func (c *CodeEntity) ID(snip *Snippet) (string, error) {
-	content := fmt.Sprintf("%s%s", utils.RemoveSpaces(c.Code), utils.RemoveSpaces(c.Name))
+	content := fmt.Sprintf("%s%s", strings.TrimSpace(c.Code), strings.TrimSpace(c.Name))
 	id, err := utils.ID(snip.Salt, content, snip.IdLength)
 	if err != nil {
 		return "", err

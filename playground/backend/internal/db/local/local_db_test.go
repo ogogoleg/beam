@@ -18,6 +18,7 @@ package local_db
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/db/entity"
+	"beam.apache.org/playground/backend/internal/utils"
 	"context"
 	"testing"
 	"time"
@@ -53,7 +54,7 @@ func TestLocalDB_PutSnippet(t *testing.T) {
 				id:  "MOCK_ID",
 				snip: &entity.Snippet{
 					Snippet: &entity.SnippetEntity{
-						Sdk:      "SDK_GO",
+						Sdk:      utils.GetNameKey("MOCK_KIND", "SDK_GO", "MOCK_NAMESPACE", nil),
 						PipeOpts: "MOCK_OPTIONS",
 						Origin:   entity.PLAYGROUND,
 						OwnerId:  "",
@@ -93,7 +94,7 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "GetSnippet() when ID is not in the database",
+			name:    "GetSnippet() when K is not in the database",
 			prepare: func() {},
 			args: args{
 				ctx: ctx,
@@ -106,7 +107,7 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 			prepare: func() {
 				_ = localDb.PutSnippet(ctx, "MOCK_ID", &entity.Snippet{
 					Snippet: &entity.SnippetEntity{
-						Sdk:      "SDK_GO",
+						Sdk:      utils.GetNameKey("MOCK_KIND", "SDK_GO", "MOCK_NAMESPACE", nil),
 						PipeOpts: "MOCK_OPTIONS",
 						Created:  nowDate,
 						Origin:   entity.PLAYGROUND,
@@ -135,7 +136,7 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 			}
 
 			if err == nil {
-				if snip.Sdk != "SDK_GO" ||
+				if snip.Sdk.Name != "SDK_GO" ||
 					//snip.Codes[0].Code != "MOCK_CODE" ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
 					snip.Origin != entity.PLAYGROUND ||
@@ -206,12 +207,9 @@ func TestLocalDB_PutSchemaVersion(t *testing.T) {
 		{
 			name: "PutSchemaVersion() in the usual case",
 			args: args{
-				ctx: ctx,
-				id:  "MOCK_ID",
-				schema: &entity.SchemaEntity{
-					Version: "MOCK_VERSION",
-					Descr:   "MOCK_DESCRIPTION",
-				},
+				ctx:    ctx,
+				id:     "MOCK_ID",
+				schema: &entity.SchemaEntity{Descr: "MOCK_DESCRIPTION"},
 			},
 			wantErr: false,
 		},
@@ -264,7 +262,7 @@ func TestLocalDB_GetCodes(t *testing.T) {
 						IdLength: 11,
 					},
 					Snippet: &entity.SnippetEntity{
-						Sdk:      "SDK_GO",
+						Sdk:      utils.GetNameKey("MOCK_KIND", "SDK_GO", "MOCK_NAMESPACE", nil),
 						PipeOpts: "MOCK_OPTIONS",
 						Origin:   entity.PLAYGROUND,
 						OwnerId:  "",

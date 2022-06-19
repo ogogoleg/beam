@@ -24,6 +24,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-redis/redismock/v8 v8.0.6
 	github.com/google/uuid v1.3.0
+	github.com/hashicorp/go.net v0.0.1
 	github.com/improbable-eng/grpc-web v0.14.1
 	github.com/rs/cors v1.8.0
 	go.uber.org/goleak v1.1.12

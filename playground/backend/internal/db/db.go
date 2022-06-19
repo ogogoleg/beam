@@ -37,4 +37,6 @@ type Catalogue interface {
 	PutSchemaVersion(ctx context.Context, id string, schema *entity.SchemaEntity) error
 
 	PutSDKs(ctx context.Context, sdks []*entity.SDKEntity) error
+
+	GetSDK(ctx context.Context, id string) (*entity.SDKEntity, error)
 }

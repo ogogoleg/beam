@@ -72,6 +72,8 @@ const (
 	defaultIdLength               = 11
 	datastoreEmulatorHostKey      = "DATASTORE_EMULATOR_HOST"
 	defaultDatastoreEmulatorHost  = "localhost:8082"
+	originKey                     = "ORIGIN"
+	defaultOrigin                 = "PG_USER"
 )
 
 // Environment operates with environment structures: NetworkEnvs, BeamEnvs, ApplicationEnvs
@@ -119,6 +121,7 @@ func GetApplicationEnvsFromOsEnvs() (*ApplicationEnvs, error) {
 	maxSnippetSize := getEnvAsInt(maxSnippetSizeKey, defaultMaxSnippetSize)
 	idLength := getEnvAsInt(idLengthKey, defaultIdLength)
 	datastoreEmulatorHost := getEnv(datastoreEmulatorHostKey, defaultDatastoreEmulatorHost)
+	origin := getEnv(originKey, defaultOrigin)
 
 	if value, present := os.LookupEnv(cacheKeyExpirationTimeKey); present {
 		if converted, err := time.ParseDuration(value); err == nil {
@@ -136,7 +139,7 @@ func GetApplicationEnvsFromOsEnvs() (*ApplicationEnvs, error) {
 	}
 
 	if value, present := os.LookupEnv(workingDirKey); present {
-		return NewApplicationEnvs(value, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, datastoreEmulatorHost, NewCacheEnvs(cacheType, cacheAddress, cacheExpirationTime), pipelineExecuteTimeout, DBType, maxSnippetSize, idLength), nil
+		return NewApplicationEnvs(value, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, datastoreEmulatorHost, origin, NewCacheEnvs(cacheType, cacheAddress, cacheExpirationTime), pipelineExecuteTimeout, DBType, maxSnippetSize, idLength), nil
 	}
 	return nil, errors.New("APP_WORK_DIR env should be provided with os.env")
 }

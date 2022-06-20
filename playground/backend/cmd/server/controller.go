@@ -373,7 +373,7 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 			PipeOpts: info.PipelineOptions,
 			Created:  nowDate,
 			LVisited: nowDate,
-			Origin:   entity.PLAYGROUND, // will be used in Tour of Beam project also later. If the owner is empty, then the origin is Playground, otherwise it's Tour of Beam
+			Origin:   entity.Origin(entity.OriginValue[controller.env.ApplicationEnvs.Origin()]),
 		},
 	}
 

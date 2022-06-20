@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	version     = "0.0.1"
-	description = "Data initialization: code snippet, schema versions, SDK"
+	versionV1     = "0.0.1"
+	descriptionV1 = "Data initialization: code snippet, schema versions, SDK"
 )
 
 type InitialStructure struct {
@@ -58,8 +58,8 @@ func (is *InitialStructure) InitiateData(args *schema.DBArgs) error {
 	}
 
 	//init schema versions
-	schemaEntity := &entity.SchemaEntity{Descr: description}
-	if err = args.Db.PutSchemaVersion(args.Ctx, version, schemaEntity); err != nil {
+	schemaEntity := &entity.SchemaEntity{Descr: descriptionV1}
+	if err = args.Db.PutSchemaVersion(args.Ctx, versionV1, schemaEntity); err != nil {
 		return err
 	}
 
@@ -79,9 +79,9 @@ func (is *InitialStructure) InitiateData(args *schema.DBArgs) error {
 }
 
 func (is *InitialStructure) GetVersion() string {
-	return version
+	return versionV1
 }
 
 func (is *InitialStructure) GetDescription() string {
-	return description
+	return descriptionV1
 }

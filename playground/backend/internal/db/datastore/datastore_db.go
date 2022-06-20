@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	Namespace = "Playground" //TODO should it get from env?
+	Namespace = "Playground"
 
 	SnippetKind = "pg_snippets"
 	SchemaKind  = "pg_schema_versions"

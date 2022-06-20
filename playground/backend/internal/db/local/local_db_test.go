@@ -56,7 +56,7 @@ func TestLocalDB_PutSnippet(t *testing.T) {
 					Snippet: &entity.SnippetEntity{
 						Sdk:      utils.GetNameKey("MOCK_KIND", "SDK_GO", "MOCK_NAMESPACE", nil),
 						PipeOpts: "MOCK_OPTIONS",
-						Origin:   entity.PLAYGROUND,
+						Origin:   entity.PG_USER,
 						OwnerId:  "",
 					},
 					Codes: []*entity.CodeEntity{{
@@ -110,7 +110,7 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 						Sdk:      utils.GetNameKey("MOCK_KIND", "SDK_GO", "MOCK_NAMESPACE", nil),
 						PipeOpts: "MOCK_OPTIONS",
 						Created:  nowDate,
-						Origin:   entity.PLAYGROUND,
+						Origin:   entity.PG_USER,
 						OwnerId:  "",
 					},
 					Codes: []*entity.CodeEntity{{
@@ -139,7 +139,7 @@ func TestLocalDB_GetSnippet(t *testing.T) {
 				if snip.Sdk.Name != "SDK_GO" ||
 					//snip.Codes[0].Code != "MOCK_CODE" ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Origin != entity.PLAYGROUND ||
+					snip.Origin != entity.PG_USER ||
 					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
@@ -264,7 +264,7 @@ func TestLocalDB_GetCodes(t *testing.T) {
 					Snippet: &entity.SnippetEntity{
 						Sdk:      utils.GetNameKey("MOCK_KIND", "SDK_GO", "MOCK_NAMESPACE", nil),
 						PipeOpts: "MOCK_OPTIONS",
-						Origin:   entity.PLAYGROUND,
+						Origin:   entity.PG_USER,
 						OwnerId:  "",
 					},
 					Codes: []*entity.CodeEntity{{

@@ -853,7 +853,7 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 							Sdk:      utils.GetNameKey(datastoreDb.SdkKind, "SDK_JAVA", datastoreDb.Namespace, nil),
 							PipeOpts: "MOCK_OPTIONS",
 							Created:  nowDate,
-							Origin:   entity.PLAYGROUND,
+							Origin:   entity.PG_USER,
 						},
 						Codes: []*entity.CodeEntity{{
 							Code:   "MOCK_CODE",

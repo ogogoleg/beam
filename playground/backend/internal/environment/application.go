@@ -134,11 +134,14 @@ type ApplicationEnvs struct {
 
 	// schemaVersion is the database schema version
 	schemaVersion string
+
+	// origin is a backend source
+	origin string
 }
 
 // NewApplicationEnvs constructor for ApplicationEnvs
 func NewApplicationEnvs(
-	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, datastoreEmulatorHost string,
+	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, datastoreEmulatorHost, origin string,
 	cacheEnvs *CacheEnvs,
 	pipelineExecuteTimeout time.Duration,
 	dbType Database,
@@ -157,6 +160,7 @@ func NewApplicationEnvs(
 		maxSnippetSize:         maxSnippetSize,
 		idLength:               firestoreIdLength,
 		datastoreEmulatorHost:  datastoreEmulatorHost,
+		origin:                 origin,
 	}
 }
 
@@ -223,6 +227,11 @@ func (ae *ApplicationEnvs) DatastoreEmulatorHost() string {
 // SchemaVersion returns the database schema version
 func (ae *ApplicationEnvs) SchemaVersion() string {
 	return ae.schemaVersion
+}
+
+// Origin returns backend source
+func (ae *ApplicationEnvs) Origin() string {
+	return ae.origin
 }
 
 // SetSchemaVersion sets the database schema version

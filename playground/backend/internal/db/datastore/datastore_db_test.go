@@ -84,7 +84,7 @@ func TestDatastore_PutSnippet(t *testing.T) {
 				Snippet: &entity.SnippetEntity{
 					Sdk:      utils.GetNameKey(SdkKind, "SDK_GO", Namespace, nil),
 					PipeOpts: "MOCK_OPTIONS",
-					Origin:   entity.PLAYGROUND,
+					Origin:   entity.PG_USER,
 					OwnerId:  "",
 				},
 				Codes: []*entity.CodeEntity{{
@@ -138,7 +138,7 @@ func TestDatastore_GetSnippet(t *testing.T) {
 						Sdk:      utils.GetNameKey(SdkKind, "SDK_GO", Namespace, nil),
 						PipeOpts: "MOCK_OPTIONS",
 						Created:  nowDate,
-						Origin:   entity.PLAYGROUND,
+						Origin:   entity.PG_USER,
 						OwnerId:  "",
 					},
 					Codes: []*entity.CodeEntity{{
@@ -163,7 +163,7 @@ func TestDatastore_GetSnippet(t *testing.T) {
 			if err == nil {
 				if snip.Sdk.Name != "SDK_GO" ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Origin != entity.PLAYGROUND ||
+					snip.Origin != entity.PG_USER ||
 					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
@@ -288,7 +288,7 @@ func TestDatastore_GetCodes(t *testing.T) {
 					Snippet: &entity.SnippetEntity{
 						Sdk:      utils.GetNameKey(SdkKind, "SDK_GO", Namespace, nil),
 						PipeOpts: "MOCK_OPTIONS",
-						Origin:   entity.PLAYGROUND,
+						Origin:   entity.PG_USER,
 						OwnerId:  "",
 					},
 					Codes: []*entity.CodeEntity{{

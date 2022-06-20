@@ -25,7 +25,7 @@ import (
 	"beam.apache.org/playground/backend/internal/db/datastore"
 	localdb "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/db/schema"
-	migration "beam.apache.org/playground/backend/internal/db/schema/0.0.1"
+	"beam.apache.org/playground/backend/internal/db/schema/migration"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
 	"beam.apache.org/playground/backend/internal/utils"

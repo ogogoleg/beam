@@ -27,7 +27,14 @@ import (
 type Origin int32
 
 const (
-	PLAYGROUND Origin = 0
+	PG_USER      Origin = 0
+	PG_EXAMPLES  Origin = 1
+	TOUR_OF_BEAM Origin = 2
+)
+
+// OriginValue value maps for Origin.
+var (
+	OriginValue = map[string]int32{"PG_USER": 0, "PG_EXAMPLES": 1, "TOUR_OF_BEAM": 2}
 )
 
 func (s Origin) Value() int32 {

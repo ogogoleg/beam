@@ -137,11 +137,14 @@ type ApplicationEnvs struct {
 
 	// origin is a backend source
 	origin string
+
+	// sdkConfigPath is a sdk configuration file
+	sdkConfigPath string
 }
 
 // NewApplicationEnvs constructor for ApplicationEnvs
 func NewApplicationEnvs(
-	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, datastoreEmulatorHost, origin string,
+	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, datastoreEmulatorHost, origin, sdkConfigPath string,
 	cacheEnvs *CacheEnvs,
 	pipelineExecuteTimeout time.Duration,
 	dbType Database,
@@ -161,6 +164,7 @@ func NewApplicationEnvs(
 		idLength:               firestoreIdLength,
 		datastoreEmulatorHost:  datastoreEmulatorHost,
 		origin:                 origin,
+		sdkConfigPath:          sdkConfigPath,
 	}
 }
 
@@ -232,6 +236,11 @@ func (ae *ApplicationEnvs) SchemaVersion() string {
 // Origin returns backend source
 func (ae *ApplicationEnvs) Origin() string {
 	return ae.origin
+}
+
+// SdkConfigPath returns sdk configuration file
+func (ae *ApplicationEnvs) SdkConfigPath() string {
+	return ae.sdkConfigPath
 }
 
 // SetSchemaVersion sets the database schema version

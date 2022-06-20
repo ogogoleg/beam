@@ -19,6 +19,8 @@ import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/db/schema"
+	"gopkg.in/yaml.v3"
+	"io/ioutil"
 )
 
 const (
@@ -65,10 +67,18 @@ func (is *InitialStructure) InitiateData(args *schema.DBArgs) error {
 
 	//init sdks
 	var sdkEntities []*entity.SDKEntity
+	sdkConfig, err := readSDKConfiguration(args.AppEnv.SdkConfigPath())
+	if err != nil {
+		return err
+	}
 	for _, sdk := range pb.Sdk_name {
+		if sdk == pb.Sdk_SDK_UNSPECIFIED.String() {
+			continue
+		}
+		defaultExample := getDefaultExample(sdkConfig, sdk)
 		sdkEntities = append(sdkEntities, &entity.SDKEntity{
 			Name:           sdk,
-			DefaultExample: "",
+			DefaultExample: defaultExample,
 		})
 	}
 	if err = args.Db.PutSDKs(args.Ctx, sdkEntities); err != nil {
@@ -76,6 +86,46 @@ func (is *InitialStructure) InitiateData(args *schema.DBArgs) error {
 	}
 
 	return nil
+}
+
+type SdkConfig struct {
+	Sdks struct {
+		Go     *SdkProperties `yaml:"SDK_GO"`
+		Java   *SdkProperties `yaml:"SDK_JAVA"`
+		Python *SdkProperties `yaml:"SDK_PYTHON"`
+		Scio   *SdkProperties `yaml:"SDK_SCIO"`
+	}
+}
+
+type SdkProperties struct {
+	DefaultExample string `yaml:"default-example"`
+}
+
+func readSDKConfiguration(filename string) (*SdkConfig, error) {
+	buf, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	result := new(SdkConfig)
+	if err = yaml.Unmarshal(buf, result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func getDefaultExample(config *SdkConfig, sdk string) string {
+	switch sdk {
+	case pb.Sdk_SDK_JAVA.String():
+		return config.Sdks.Java.DefaultExample
+	case pb.Sdk_SDK_GO.String():
+		return config.Sdks.Go.DefaultExample
+	case pb.Sdk_SDK_PYTHON.String():
+		return config.Sdks.Python.DefaultExample
+	case pb.Sdk_SDK_SCIO.String():
+		return config.Sdks.Scio.DefaultExample
+	default:
+		return ""
+	}
 }
 
 func (is *InitialStructure) GetVersion() string {

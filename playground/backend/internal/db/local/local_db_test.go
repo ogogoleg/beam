@@ -299,6 +299,49 @@ func TestLocalDB_GetCodes(t *testing.T) {
 	delete(localDb.items, "MOCK_ID")
 }
 
+func TestDatastore_GetSDK(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		id  string
+	}
+	sdks := getSDKs()
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "GetSDK() in the usual case",
+			prepare: func() {
+				_ = localDb.PutSDKs(ctx, sdks)
+			},
+			args:    args{ctx: ctx, id: "SDK_GO"},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.prepare()
+			sdkEntity, err := localDb.GetSDK(tt.args.ctx, tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetSDK() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err == nil {
+				if sdkEntity.DefaultExample != "MOCK_EXAMPLE" {
+					t.Error("GetSDK() unexpected result")
+				}
+			}
+		})
+	}
+
+	for _, sdk := range sdks {
+		delete(localDb.items, sdk.Name)
+	}
+}
+
 func TestNew(t *testing.T) {
 	tests := []struct {
 		name    string

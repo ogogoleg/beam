@@ -850,7 +850,7 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 					&entity.Snippet{
 						Snippet: &entity.SnippetEntity{
 							OwnerId:  "",
-							Sdk:      utils.GetNameKey(datastoreDb.SdkKind, "SDK_JAVA", datastoreDb.Namespace, nil),
+							Sdk:      utils.GetNameKey(datastoreDb.SdkKind, pb.Sdk_SDK_JAVA.String(), datastoreDb.Namespace, nil),
 							PipeOpts: "MOCK_OPTIONS",
 							Created:  nowDate,
 							Origin:   entity.PG_USER,

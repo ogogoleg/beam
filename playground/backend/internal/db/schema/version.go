@@ -46,6 +46,7 @@ func (dv *DBSchema) InitiateData() (string, error) {
 	for _, ver := range dv.versions {
 		if err := ver.InitiateData(dv.args); err != nil {
 			logger.Errorf("DBSchema: InitiateData() error during the data initialization, err: %s", err.Error())
+			return "", err
 		}
 		versions = append(versions, ver.GetVersion())
 	}

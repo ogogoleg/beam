@@ -322,6 +322,49 @@ func TestDatastore_GetCodes(t *testing.T) {
 	cleanData(t, SnippetKind, "MOCK_ID")
 }
 
+func TestDatastore_GetSDK(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		id  string
+	}
+	sdks := getSDKs()
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "GetSDK() in the usual case",
+			prepare: func() {
+				_ = datastoreDb.PutSDKs(ctx, sdks)
+			},
+			args:    args{ctx: ctx, id: "SDK_GO"},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.prepare()
+			sdkEntity, err := datastoreDb.GetSDK(tt.args.ctx, tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetSDK() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err == nil {
+				if sdkEntity.DefaultExample != "MOCK_EXAMPLE" {
+					t.Error("GetSDK() unexpected result")
+				}
+			}
+		})
+	}
+
+	for _, sdk := range sdks {
+		cleanData(t, SdkKind, sdk.Name)
+	}
+}
+
 func TestNew(t *testing.T) {
 	type args struct {
 		ctx       context.Context

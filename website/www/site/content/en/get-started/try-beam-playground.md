@@ -1,5 +1,6 @@
 ---
 title: "Try Beam Playground (Beta)"
+layout: "playground_template"
 ---
 <!--
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +26,7 @@ You can try the available Apache Beam examples at
 
 ## Beam Playground WordCount Example
 
-{{< playground "true" "SDK_JAVA/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MinimalWordCount" "" "700px">}}
+{{< playground "true" "SDK_JAVA/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MinimalWordCount" "" "700px" "playgroundIframe">}}
 
 ## How To Add New Examples
 

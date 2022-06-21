@@ -351,8 +351,8 @@ func (controller *playgroundController) GetDefaultPrecompiledObject(ctx context.
 	return &response, nil
 }
 
-// SaveCode returns the generated ID
-func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.SaveCodeRequest) (*pb.SaveCodeResponse, error) {
+// SaveSnippet returns the generated ID
+func (controller *playgroundController) SaveSnippet(ctx context.Context, info *pb.SaveSnippetRequest) (*pb.SaveSnippetResponse, error) {
 	errorTitle := "Error during saving code"
 	switch info.Sdk {
 	case pb.Sdk_SDK_UNSPECIFIED:
@@ -377,28 +377,28 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 		},
 	}
 
-	for _, code := range info.Codes {
-		if code.Code == "" {
+	for _, code := range info.Files {
+		if code.Content == "" {
 			logger.Error("SaveCode(): entity is empty")
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet must have some code")
 		}
 
 		maxSnippetSize := controller.env.ApplicationEnvs.MaxSnippetSize()
-		if len(code.Code) > maxSnippetSize {
+		if len(code.Content) > maxSnippetSize {
 			logger.Errorf("SaveCode(): entity is too large. Max entity size: %d", maxSnippetSize)
 			return nil, errors.InvalidArgumentError(errorTitle, "Snippet size is more than %d", maxSnippetSize)
 		}
 
 		var isMain bool
-		if len(info.Codes) == 1 {
+		if len(info.Files) == 1 {
 			isMain = true
 		} else {
-			isMain = utils.IsCodeMain(code.Code, info.Sdk)
+			isMain = utils.IsCodeMain(code.Content, info.Sdk)
 		}
 
 		snippet.Codes = append(snippet.Codes, &entity.CodeEntity{
 			Name:     utils.GetCodeName(code.Name, info.Sdk),
-			Code:     code.Code,
+			Code:     code.Content,
 			CntxLine: 1, // it is necessary for examples from playground
 			IsMain:   isMain,
 		})
@@ -415,12 +415,12 @@ func (controller *playgroundController) SaveCode(ctx context.Context, info *pb.S
 		return nil, errors.InternalError(errorTitle, "Failed to save a code entity")
 	}
 
-	response := pb.SaveCodeResponse{Id: id}
+	response := pb.SaveSnippetResponse{Id: id}
 	return &response, nil
 }
 
-// GetCode returns the code entity
-func (controller *playgroundController) GetCode(ctx context.Context, info *pb.GetCodeRequest) (*pb.GetCodeResponse, error) {
+// GetSnippet returns the code entity
+func (controller *playgroundController) GetSnippet(ctx context.Context, info *pb.GetSnippetRequest) (*pb.GetSnippetResponse, error) {
 	errorTitle := "Error during getting code"
 	snippet, err := controller.db.GetSnippet(ctx, info.GetId())
 	if err != nil {
@@ -428,7 +428,7 @@ func (controller *playgroundController) GetCode(ctx context.Context, info *pb.Ge
 		return nil, errors.InternalError(errorTitle, "Failed to retrieve the snippet")
 	}
 
-	response := pb.GetCodeResponse{
+	response := pb.GetSnippetResponse{
 		Sdk:             pb.Sdk(pb.Sdk_value[snippet.Sdk.Name]),
 		PipelineOptions: snippet.PipeOpts,
 	}
@@ -438,10 +438,10 @@ func (controller *playgroundController) GetCode(ctx context.Context, info *pb.Ge
 		return nil, errors.InternalError(errorTitle, "Failed to retrieve the codes")
 	}
 	for _, code := range codes {
-		response.Codes = append(response.Codes, &pb.CodeFile{
-			Name:   code.Name,
-			Code:   code.Code,
-			IsMain: code.IsMain,
+		response.Files = append(response.Files, &pb.SnippetFile{
+			Name:    code.Name,
+			Content: code.Code,
+			IsMain:  code.IsMain,
 		})
 	}
 	return &response, nil

@@ -249,40 +249,34 @@ message GetDefaultPrecompiledObjectResponse {
   PrecompiledObject precompiled_object = 1;
 }
 
-// SavingCodeFile represents the code content to save.
-message SavingCodeFile {
+// SnippetFile represents the snippet file content and its name to save.
+message SnippetFile {
   string name = 1;
-  string code = 2;
+  string content = 2;
+  bool is_main = 3;
 }
 
-// SaveCodeRequest represents a code text and options of SDK which executes the code.
-message SaveCodeRequest {
-  repeated SavingCodeFile codes = 1;
+// SaveSnippetRequest represents a snippet content and options of SDK which executes the snippet.
+message SaveSnippetRequest {
+  repeated SnippetFile files = 1;
   Sdk sdk = 2;
   // The pipeline options as they would be passed to the program (e.g. "--option1 value1 --option2 value2")
   string pipeline_options = 3;
 }
 
-// SaveCodeResponse contains information of the generated ID.
-message SaveCodeResponse {
+// SaveSnippetResponse contains information of the generated ID.
+message SaveSnippetResponse {
   string id = 1;
 }
 
-// GetCodeRequest represents the generated ID.
-message GetCodeRequest {
+// GetSnippetRequest represents the generated ID.
+message GetSnippetRequest {
   string id = 1;
 }
 
-// CodeFile represents the code content after saving.
-message CodeFile {
-  string name = 1;
-  string code = 2;
-  bool is_main = 3;
-}
-
-// GetCodeResponse contains information of a code text and options of SDK which executes the code.
-message GetCodeResponse {
-  repeated CodeFile codes = 1;
+// GetSnippetResponse contains information of a snippet content and options of SDK which executes the snippet.
+message GetSnippetResponse {
+  repeated SnippetFile files = 1;
   Sdk sdk = 2;
   // The pipeline options as they would be passed to the program (e.g. "--option1 value1 --option2 value2")
   string pipeline_options = 3;
@@ -341,9 +335,9 @@ service PlaygroundService {
   // Get the default precompile object for the sdk.
   rpc GetDefaultPrecompiledObject(GetDefaultPrecompiledObjectRequest) returns (GetDefaultPrecompiledObjectResponse);
 
-  // Save the code required for the sharing.
-  rpc SaveCode(SaveCodeRequest) returns (SaveCodeResponse);
+  // Save the snippet required for the sharing.
+  rpc SaveSnippet(SaveSnippetRequest) returns (SaveSnippetResponse);
 
-  // Get the code of playground.
-  rpc GetCode(GetCodeRequest) returns (GetCodeResponse);
+  // Get the snippet of playground.
+  rpc GetSnippet(GetSnippetRequest) returns (GetSnippetResponse);
 }

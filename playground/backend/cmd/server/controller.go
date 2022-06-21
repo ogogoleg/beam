@@ -438,7 +438,7 @@ func (controller *playgroundController) GetCode(ctx context.Context, info *pb.Ge
 		return nil, errors.InternalError(errorTitle, "Failed to retrieve the codes")
 	}
 	for _, code := range codes {
-		response.Codes = append(response.Codes, &pb.CodeFullInfo{
+		response.Codes = append(response.Codes, &pb.CodeFile{
 			Name:   code.Name,
 			Code:   code.Code,
 			IsMain: code.IsMain,

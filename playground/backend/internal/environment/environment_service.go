@@ -67,7 +67,7 @@ const (
 	playgroundSaltKey             = "PLAYGROUND_SALT"
 	defaultPlaygroundSalt         = "Beam playground salt\n"
 	maxSnippetSizeKey             = "MAX_SNIPPET_SIZE"
-	defaultMaxSnippetSize         = 64 * 1024 //65536
+	defaultMaxSnippetSize         = 1000000 //1 MB
 	idLengthKey                   = "ID_LENGTH"
 	defaultIdLength               = 11
 	datastoreEmulatorHostKey      = "DATASTORE_EMULATOR_HOST"

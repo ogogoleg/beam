@@ -249,15 +249,15 @@ message GetDefaultPrecompiledObjectResponse {
   PrecompiledObject precompiled_object = 1;
 }
 
-// CodeInfo represents the code content to save.
-message CodeInfo {
+// SavingCodeFile represents the code content to save.
+message SavingCodeFile {
   string name = 1;
   string code = 2;
 }
 
 // SaveCodeRequest represents a code text and options of SDK which executes the code.
 message SaveCodeRequest {
-  repeated CodeInfo codes = 1;
+  repeated SavingCodeFile codes = 1;
   Sdk sdk = 2;
   // The pipeline options as they would be passed to the program (e.g. "--option1 value1 --option2 value2")
   string pipeline_options = 3;
@@ -273,8 +273,8 @@ message GetCodeRequest {
   string id = 1;
 }
 
-// CodeFullInfo represents the code content after saving.
-message CodeFullInfo {
+// CodeFile represents the code content after saving.
+message CodeFile {
   string name = 1;
   string code = 2;
   bool is_main = 3;
@@ -282,7 +282,7 @@ message CodeFullInfo {
 
 // GetCodeResponse contains information of a code text and options of SDK which executes the code.
 message GetCodeResponse {
-  repeated CodeFullInfo codes = 1;
+  repeated CodeFile codes = 1;
   Sdk sdk = 2;
   // The pipeline options as they would be passed to the program (e.g. "--option1 value1 --option2 value2")
   string pipeline_options = 3;

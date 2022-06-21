@@ -746,7 +746,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
+					Codes: []*pb.SavingCodeFile{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
 					Sdk:   pb.Sdk_SDK_UNSPECIFIED,
 				},
 			},
@@ -759,7 +759,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: ""}},
+					Codes: []*pb.SavingCodeFile{{Name: "MOCK_NAME", Code: ""}},
 					Sdk:   pb.Sdk_SDK_JAVA,
 				},
 			},
@@ -772,7 +772,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
+					Codes: []*pb.SavingCodeFile{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
 					Sdk:   pb.Sdk_SDK_GO,
 				},
 			},
@@ -786,7 +786,7 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 			args: args{
 				ctx: ctx,
 				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: utils.RandomString(65537)}},
+					Codes: []*pb.SavingCodeFile{{Name: "MOCK_NAME", Code: utils.RandomString(1000001)}},
 					Sdk:   pb.Sdk_SDK_JAVA,
 				},
 			},

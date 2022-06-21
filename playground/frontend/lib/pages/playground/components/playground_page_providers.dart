@@ -67,7 +67,7 @@ class PlaygroundPageProviders extends StatelessWidget {
               );
               final example = _getExample(exampleState, newPlayground);
               if (example != null &&
-                  Uri.base.queryParameters[kIsShared] == null) {
+                  Uri.base.queryParameters[kSnippetId] == null) {
                 exampleState
                     .loadExampleInfo(
                       example,
@@ -97,14 +97,14 @@ class PlaygroundPageProviders extends StatelessWidget {
     PlaygroundState playground,
   ) {
     final examplePath = Uri.base.queryParameters[kExampleParam];
-    final shared = Uri.base.queryParameters[kIsShared];
+    final snippetId = Uri.base.queryParameters[kSnippetId];
 
     if (exampleState.defaultExamplesMap.isEmpty) {
       exampleState.loadDefaultExamples();
     }
 
-    if (shared?.isNotEmpty ?? false) {
-      exampleState.getSharedExample(shared!);
+    if (snippetId?.isNotEmpty ?? false) {
+      exampleState.getSharedExample(snippetId!);
       if (exampleState.sharedFilesMap == null) {
         return ExampleModel(
           name: kEmptyExampleName,

@@ -242,5 +242,9 @@
   "showAndCopyLink": "Show and copy code link",
   "@showAndCopyLink": {
     "description": "Description for the copy link button"
+  },
+  "loadingLink": "Loading link, please wait...",
+  "@loadingLink": {
+    "description": "Text that appears when you load link to your code sample"
   }
 }

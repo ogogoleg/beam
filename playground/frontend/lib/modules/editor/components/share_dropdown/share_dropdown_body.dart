@@ -17,27 +17,31 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:playground/config/theme.dart';
+import 'package:playground/constants/font_weight.dart';
+import 'package:playground/constants/params.dart';
 import 'package:playground/constants/sizes.dart';
+import 'package:playground/modules/editor/components/share_dropdown/link_text_field.dart';
 import 'package:playground/modules/editor/components/share_dropdown/share_link_field.dart';
 import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
 
-class ShareDropdownBody extends StatefulWidget {
-  final Function close;
+const kLoadingIndicatorSize = 20.0;
 
-  const ShareDropdownBody({
-    Key? key,
-    required this.close,
-  }) : super(key: key);
+class ShareDropdownBody extends StatefulWidget {
+  final VoidCallback close;
+
+  const ShareDropdownBody({super.key, required this.close});
 
   @override
   State<ShareDropdownBody> createState() => _ShareDropdownBodyState();
 }
 
 class _ShareDropdownBodyState extends State<ShareDropdownBody> {
+  final TextEditingController textEditingController = TextEditingController();
   bool isPressed = false;
 
   @override
@@ -51,43 +55,104 @@ class _ShareDropdownBodyState extends State<ShareDropdownBody> {
           horizontal: kXlSpacing,
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text(isPressed ? appLocale.linkCopied : appLocale.clickForLink),
-              GestureDetector(
-                onTap: () async {
-                  setState(() {
-                    isPressed = true;
-                  });
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isPressed
-                        ? ThemeColors.of(context).greyColor
-                        : ThemeColors.of(context).primaryBackground,
-                    border: Border.all(
-                      color: ThemeColors.of(context).primary,
-                    ),
-                    borderRadius: BorderRadius.circular(kSmBorderRadius),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: kLgSpacing),
-                    margin: const EdgeInsets.symmetric(horizontal: kMdSpacing),
-                    child: Center(
+          child: isPressed
+              ? FutureBuilder(
+                  builder: (context, snapshot) {
+                    return _buildButton(playgroundState, snapshot, appLocale);
+                  },
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(appLocale.clickForLink),
+                    GestureDetector(
+                      onTap: () async {
+                        setState(() {
+                          isPressed = true;
+                        });
+                      },
                       child: ShareLinkField(
                         isPressed: isPressed,
-                        playgroundState: playgroundState,
-                        exampleState: exampleState,
+                        child: Text(
+                          appLocale.showAndCopyLink,
+                          style: TextStyle(
+                            fontSize: kLabelFontSize,
+                            fontWeight: kBoldWeight,
+                            color: ThemeColors.of(context).primary,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
+  }
+
+  Widget _buildButton(
+    PlaygroundState playgroundState,
+    AsyncSnapshot snapshot,
+    AppLocalizations appLocale,
+  ) {
+    if (playgroundState.isExampleChanged) {
+      if (snapshot.hasData) {
+        setAndCopyLinkText(snapshot.data.toString());
+
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text(appLocale.linkCopied),
+            ShareLinkField(
+              isPressed: isPressed,
+              child: LinkTextField(
+                textEditingController: textEditingController,
+              ),
+            ),
+          ],
+        );
+      } else {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text(appLocale.loadingLink),
+            ShareLinkField(
+              isPressed: isPressed,
+              child: SizedBox(
+                height: kLoadingIndicatorSize,
+                width: kLoadingIndicatorSize,
+                child: CircularProgressIndicator(
+                  color: ThemeColors.of(context).primary,
+                ),
+              ),
+            ),
+          ],
+        );
+      }
+    } else {
+      setAndCopyLinkText(
+        '${Uri.base.toString().split('?')[0]}?$kExampleParam=${playgroundState.selectedExample!.path}',
+      );
+
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text(appLocale.linkCopied),
+          ShareLinkField(
+            isPressed: isPressed,
+            child: LinkTextField(
+              textEditingController: textEditingController,
+            ),
+          ),
+        ],
+      );
+    }
+  }
+
+  void setAndCopyLinkText(String link) async {
+    textEditingController.text = link;
+    await Clipboard.setData(ClipboardData(
+      text: textEditingController.text,
+    ));
   }
 }

@@ -110,7 +110,7 @@ class ExampleState with ChangeNotifier {
     // String id = 'sharedExample';
     String id = await _exampleRepository
         .saveCode(SaveCodeRequestWrapper(codes, sdk, pipelineOptions));
-    return '${Uri.base}?shared=$id';
+    return '${Uri.base.toString().split('?')[0]}?shared=$id';
   }
 
   Future<ExampleModel> loadExampleInfo(ExampleModel example, SDK sdk) async {

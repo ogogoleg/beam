@@ -18,36 +18,28 @@
 
 import 'package:flutter/material.dart';
 import 'package:playground/config/theme.dart';
+import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
 
-class ShareLinkField extends StatelessWidget {
-  final bool isPressed;
-  final Widget child;
+class LinkTextField extends StatelessWidget {
+  final TextEditingController textEditingController;
 
-  const ShareLinkField({
-    super.key,
-    required this.isPressed,
-    required this.child,
-  });
+  const LinkTextField({super.key, required this.textEditingController});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isPressed
-            ? ThemeColors.of(context).greyColor
-            : ThemeColors.of(context).primaryBackground,
-        border: Border.all(
-          color: ThemeColors.of(context).primary,
-        ),
-        borderRadius: BorderRadius.circular(kSmBorderRadius),
+    return TextFormField(
+      controller: textEditingController,
+      decoration: const InputDecoration(
+        contentPadding: EdgeInsets.symmetric(vertical: kSmSpacing),
+        border: InputBorder.none,
+        isCollapsed: true,
       ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: kLgSpacing),
-        margin: const EdgeInsets.symmetric(horizontal: kMdSpacing),
-        child: Center(
-          child: child,
-        ),
+      readOnly: true,
+      style: TextStyle(
+        fontSize: kLabelFontSize,
+        fontWeight: kNormalWeight,
+        color: ThemeColors.of(context).primary,
       ),
     );
   }

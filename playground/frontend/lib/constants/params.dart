@@ -21,6 +21,6 @@ const kIsEditable = 'enabled';
 const kSourceCode = 'code';
 const kContextLine = 'line';
 const kIsEmbedded = 'embedded';
-const kIsShared = 'shared';
+const kSnippetId = 'snippetId';
 
 const kQuickStartCategoryName = 'quick start';

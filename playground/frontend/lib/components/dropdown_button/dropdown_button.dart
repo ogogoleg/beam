@@ -19,12 +19,11 @@
 import 'package:flutter/material.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/sizes.dart';
-import 'package:playground/modules/examples/models/selector_size_model.dart';
+import 'package:playground/utils/dropdown_utils.dart';
 
 const int kAnimationDurationInMilliseconds = 80;
 const Offset kAnimationBeginOffset = Offset(0.0, -0.02);
 const Offset kAnimationEndOffset = Offset(0.0, 0.0);
-const double kAdditionalDyAlignment = 50.0;
 
 enum DropdownAlignment {
   left,
@@ -36,24 +35,24 @@ class AppDropdownButton extends StatefulWidget {
   final Function createDropdown;
   final double height;
   final double width;
-  final Icon? leadingIcon;
+  final Widget? leading;
   final Color? buttonColor;
   final bool withArrowDown;
   final DropdownAlignment dropdownAlign;
   final Color? dropdownBackgroundColor;
 
   const AppDropdownButton({
-    Key? key,
+    super.key,
     required this.buttonText,
     required this.createDropdown,
     required this.height,
     required this.width,
-    this.leadingIcon,
+    this.leading,
     this.buttonColor,
     this.dropdownBackgroundColor,
     this.withArrowDown = true,
     this.dropdownAlign = DropdownAlignment.left,
-  }) : super(key: key);
+  });
 
   @override
   _AppDropdownButtonState createState() => _AppDropdownButtonState();
@@ -103,10 +102,12 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: kMdSpacing),
-                child: widget.leadingIcon ?? const SizedBox(),
-              ),
+              widget.leading != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(right: kMdSpacing),
+                      child: widget.leading,
+                    )
+                  : const SizedBox(),
               widget.buttonText,
               widget.withArrowDown
                   ? const Icon(Icons.keyboard_arrow_down)
@@ -119,8 +120,10 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
   }
 
   OverlayEntry createDropdown() {
-    SelectorPositionModel posModel = findSelectorPositionData(
-      widget.dropdownAlign,
+    Offset dropdownOffset = findDropdownOffset(
+      alignment: widget.dropdownAlign,
+      selectorKey: selectorKey,
+      widgetWidth: widget.width,
     );
 
     return OverlayEntry(
@@ -138,8 +141,8 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
               ),
             ),
             Positioned(
-              left: posModel.xAlignment,
-              top: posModel.yAlignment + kAdditionalDyAlignment,
+              left: dropdownOffset.dx,
+              top: dropdownOffset.dy,
               child: SlideTransition(
                 position: offsetAnimation,
                 child: Material(
@@ -162,28 +165,6 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
         );
       },
     );
-  }
-
-  SelectorPositionModel findSelectorPositionData(DropdownAlignment alignment) {
-    RenderBox? rBox =
-        selectorKey.currentContext?.findRenderObject() as RenderBox;
-    double xAlignment = rBox.localToGlobal(Offset.zero).dx;
-    double yAlignment = rBox.localToGlobal(Offset.zero).dy;
-
-    switch (alignment) {
-      case DropdownAlignment.left:
-        SelectorPositionModel positionModel = SelectorPositionModel(
-          xAlignment: xAlignment,
-          yAlignment: yAlignment,
-        );
-        return positionModel;
-      case DropdownAlignment.right:
-        SelectorPositionModel positionModel = SelectorPositionModel(
-          xAlignment: xAlignment - (widget.width - rBox.size.width),
-          yAlignment: yAlignment,
-        );
-        return positionModel;
-    }
   }
 
   void _close() {

@@ -25,10 +25,10 @@ import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/examples/components/examples_components.dart';
 import 'package:playground/modules/examples/components/outside_click_handler.dart';
 import 'package:playground/modules/examples/models/popover_state.dart';
-import 'package:playground/modules/examples/models/selector_size_model.dart';
 import 'package:playground/pages/playground/states/example_selector_state.dart';
 import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
+import 'package:playground/utils/dropdown_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -122,7 +122,7 @@ class _ExampleSelectorState extends State<ExampleSelector>
   }
 
   OverlayEntry createExamplesDropdown() {
-    SelectorPositionModel posModel = findSelectorPositionData();
+    Offset dropdownOffset = findDropdownOffset(selectorKey: selectorKey);
 
     return OverlayEntry(
       builder: (context) {
@@ -136,7 +136,8 @@ class _ExampleSelectorState extends State<ExampleSelector>
                     onTap: () {
                       closeDropdown(exampleState);
                       // handle description dialogs
-                      Navigator.of(context, rootNavigator: true).popUntil((route) {
+                      Navigator.of(context, rootNavigator: true)
+                          .popUntil((route) {
                         return route.isFirst;
                       });
                     },
@@ -148,8 +149,8 @@ class _ExampleSelectorState extends State<ExampleSelector>
                       exampleState.getCategories(playgroundState.sdk)!,
                     ),
                     builder: (context, _) => Positioned(
-                      left: posModel.xAlignment,
-                      top: posModel.yAlignment + kAdditionalDyAlignment,
+                      left: dropdownOffset.dx,
+                      top: dropdownOffset.dy,
                       child: SlideTransition(
                         position: offsetAnimation,
                         child: Material(
@@ -159,12 +160,14 @@ class _ExampleSelectorState extends State<ExampleSelector>
                             width: kLgContainerWidth,
                             decoration: BoxDecoration(
                               color: Theme.of(context).backgroundColor,
-                              borderRadius: BorderRadius.circular(kMdBorderRadius),
+                              borderRadius:
+                                  BorderRadius.circular(kMdBorderRadius),
                             ),
                             child: exampleState.sdkCategories == null ||
                                     playgroundState.selectedExample == null
                                 ? const LoadingIndicator(size: kContainerHeight)
-                                : _buildDropdownContent(context, playgroundState),
+                                : _buildDropdownContent(
+                                    context, playgroundState),
                           ),
                         ),
                       ),
@@ -173,7 +176,7 @@ class _ExampleSelectorState extends State<ExampleSelector>
                 ],
               ),
             );
-          }
+          },
         );
       },
     );
@@ -217,16 +220,6 @@ class _ExampleSelectorState extends State<ExampleSelector>
         )
       ],
     );
-  }
-
-  SelectorPositionModel findSelectorPositionData() {
-    RenderBox? rBox =
-        selectorKey.currentContext?.findRenderObject() as RenderBox;
-    SelectorPositionModel positionModel = SelectorPositionModel(
-      xAlignment: rBox.localToGlobal(Offset.zero).dx,
-      yAlignment: rBox.localToGlobal(Offset.zero).dy,
-    );
-    return positionModel;
   }
 
   void closeDropdown(ExampleState exampleState) {

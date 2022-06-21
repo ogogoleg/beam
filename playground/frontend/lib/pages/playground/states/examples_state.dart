@@ -21,11 +21,11 @@ import 'package:playground/constants/params.dart';
 import 'package:playground/modules/examples/models/category_model.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_repository.dart';
-import 'package:playground/modules/examples/repositories/models/get_code_request.dart';
-import 'package:playground/modules/examples/repositories/models/get_code_response.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_request.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
-import 'package:playground/modules/examples/repositories/models/save_code_request.dart';
+import 'package:playground/modules/examples/repositories/models/save_snippet_request.dart';
 import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
@@ -84,33 +84,31 @@ class ExampleState with ChangeNotifier {
     );
   }
 
-  getSharedExample(String id) async {
-    GetCodeResponse result = await _exampleRepository.getCode(
-      GetCodeRequestWrapper(id),
+  Future<void> getSharedExample(String id) async {
+    GetSnippetResponse result = await _exampleRepository.getSnippet(
+      GetSnippetRequestWrapper(id),
     );
     sharedFilesMap = {
       result.sdk: ExampleModel(
-        name: result.codes.first.name,
+        name: result.files.first.name,
         path: '',
         description: '',
         type: ExampleType.example,
-        source: result.codes.first.code,
+        source: result.files.first.code,
         pipelineOptions: result.pipelineOptions,
       ),
     };
     notifyListeners();
   }
 
-  getShareLink(
-    List<SharedFile> codes,
+  Future<String> getShareLink(
+    List<SharedFile> files,
     SDK sdk,
     String pipelineOptions,
   ) async {
-    // await Future.delayed(const Duration(seconds: 3));
-    // String id = 'sharedExample';
     String id = await _exampleRepository
-        .saveCode(SaveCodeRequestWrapper(codes, sdk, pipelineOptions));
-    return '${Uri.base.toString().split('?')[0]}?shared=$id';
+        .saveSnippet(SaveSnippetRequestWrapper(files, sdk, pipelineOptions));
+    return '${Uri.base.toString().split('?')[0]}?snippetId=$id';
   }
 
   Future<ExampleModel> loadExampleInfo(ExampleModel example, SDK sdk) async {

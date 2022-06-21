@@ -19,10 +19,10 @@
 import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
-class SaveCodeRequestWrapper {
-  final List<SharedFile> codes;
+class SaveSnippetRequestWrapper {
+  final List<SharedFile> files;
   final SDK sdk;
   final String pipelineOptions;
 
-  SaveCodeRequestWrapper(this.codes, this.sdk, this.pipelineOptions);
+  SaveSnippetRequestWrapper(this.files, this.sdk, this.pipelineOptions);
 }

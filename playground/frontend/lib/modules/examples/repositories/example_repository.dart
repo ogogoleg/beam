@@ -19,11 +19,11 @@
 import 'package:playground/modules/examples/models/category_model.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_client/example_client.dart';
-import 'package:playground/modules/examples/repositories/models/get_code_request.dart';
-import 'package:playground/modules/examples/repositories/models/get_code_response.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_request.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
-import 'package:playground/modules/examples/repositories/models/save_code_request.dart';
+import 'package:playground/modules/examples/repositories/models/save_snippet_request.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
 class ExampleRepository {
@@ -82,17 +82,17 @@ class ExampleRepository {
     return result.example;
   }
 
-  Future<GetCodeResponse> getCode(
-    GetCodeRequestWrapper request,
+  Future<GetSnippetResponse> getSnippet(
+    GetSnippetRequestWrapper request,
   ) async {
-    final result = await _client.getCode(request);
+    final result = await _client.getSnippet(request);
     return result;
   }
 
-  Future<String> saveCode(
-    SaveCodeRequestWrapper request,
+  Future<String> saveSnippet(
+    SaveSnippetRequestWrapper request,
   ) async {
-    final result = await _client.saveCode(request);
+    final result = await _client.saveSnippet(request);
     return result.id;
   }
 }

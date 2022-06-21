@@ -25,6 +25,7 @@ import 'package:playground/constants/params.dart';
 import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/editor/components/share_dropdown/link_text_field.dart';
 import 'package:playground/modules/editor/components/share_dropdown/share_link_field.dart';
+import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
 import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
@@ -57,6 +58,11 @@ class _ShareDropdownBodyState extends State<ShareDropdownBody> {
         child: Center(
           child: isPressed
               ? FutureBuilder(
+                  future: exampleState.getShareLink(
+                    [SharedFile(playgroundState.source, true, '')],
+                    playgroundState.sdk,
+                    playgroundState.pipelineOptions,
+                  ),
                   builder: (context, snapshot) {
                     return _buildButton(playgroundState, snapshot, appLocale);
                   },

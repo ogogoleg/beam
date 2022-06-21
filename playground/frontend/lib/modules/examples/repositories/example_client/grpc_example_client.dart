@@ -24,15 +24,15 @@ import 'package:playground/modules/editor/repository/code_repository/code_client
 import 'package:playground/modules/examples/models/category_model.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_client/example_client.dart';
-import 'package:playground/modules/examples/repositories/models/get_code_request.dart';
-import 'package:playground/modules/examples/repositories/models/get_code_response.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_request.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_code_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_response.dart';
-import 'package:playground/modules/examples/repositories/models/save_code_request.dart';
-import 'package:playground/modules/examples/repositories/models/save_code_response.dart';
+import 'package:playground/modules/examples/repositories/models/save_snippet_request.dart';
+import 'package:playground/modules/examples/repositories/models/save_snippet_response.dart';
 import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 import 'package:playground/utils/replace_incorrect_symbols.dart';
@@ -142,13 +142,13 @@ class GrpcExampleClient implements ExampleClient {
   }
 
   @override
-  Future<GetCodeResponse> getCode(
-    GetCodeRequestWrapper request,
+  Future<GetSnippetResponse> getSnippet(
+    GetSnippetRequestWrapper request,
   ) {
     return _runSafely(
-      () => _defaultClient.getCode(_getCodeRequestToGrpcRequest(request)).then(
-            (response) => GetCodeResponse(
-              _convertToSharedFileList(response.codes),
+      () => _defaultClient.getSnippet(_getSnippetRequestToGrpcRequest(request)).then(
+            (response) => GetSnippetResponse(
+              _convertToSharedFileList(response.files),
               _getAppSdk(response.sdk),
               response.pipelineOptions,
             ),
@@ -157,12 +157,12 @@ class GrpcExampleClient implements ExampleClient {
   }
 
   @override
-  Future<SaveCodeResponse> saveCode(
-    SaveCodeRequestWrapper request,
+  Future<SaveSnippetResponse> saveSnippet(
+    SaveSnippetRequestWrapper request,
   ) {
     return _runSafely(
-      () => _defaultClient.saveCode(_saveCodeRequestToGrpcRequest(request)).then(
-            (response) => SaveCodeResponse(response.id),
+      () => _defaultClient.saveSnippet(_saveSnippetRequestToGrpcRequest(request)).then(
+            (response) => SaveSnippetResponse(response.id),
           ),
     );
   }
@@ -217,19 +217,19 @@ class GrpcExampleClient implements ExampleClient {
     return grpc.GetPrecompiledObjectGraphRequest()..cloudPath = request.path;
   }
 
-  grpc.GetCodeRequest _getCodeRequestToGrpcRequest(
-    GetCodeRequestWrapper request,
+  grpc.GetSnippetRequest _getSnippetRequestToGrpcRequest(
+    GetSnippetRequestWrapper request,
   ) {
-    return grpc.GetCodeRequest()..id = request.id;
+    return grpc.GetSnippetRequest()..id = request.id;
   }
 
-  grpc.SaveCodeRequest _saveCodeRequestToGrpcRequest(
-    SaveCodeRequestWrapper request,
+  grpc.SaveSnippetRequest _saveSnippetRequestToGrpcRequest(
+    SaveSnippetRequestWrapper request,
   ) {
-    return grpc.SaveCodeRequest()
+    return grpc.SaveSnippetRequest()
       ..sdk = _getGrpcSdk(request.sdk)
       ..pipelineOptions = request.pipelineOptions
-      ..codes.addAll(_convertToCodeInfoList(request.codes));
+      ..files.addAll(_convertToSnippetFileList(request.files));
   }
 
   grpc.Sdk _getGrpcSdk(SDK sdk) {
@@ -313,13 +313,13 @@ class GrpcExampleClient implements ExampleClient {
   }
 
   List<SharedFile> _convertToSharedFileList(
-    List<grpc.CodeFullInfo> codesList,
+    List<grpc.SnippetFile> snippetFileList,
   ) {
     List<SharedFile> sharedFilesList = [];
 
-    for (grpc.CodeFullInfo item in codesList) {
+    for (grpc.SnippetFile item in snippetFileList) {
       sharedFilesList.add(SharedFile(
-        item.code,
+        item.content,
         item.isMain,
         item.name,
       ));
@@ -328,19 +328,20 @@ class GrpcExampleClient implements ExampleClient {
     return sharedFilesList;
   }
 
-  List<grpc.CodeInfo> _convertToCodeInfoList(
+  List<grpc.SnippetFile> _convertToSnippetFileList(
     List<SharedFile> sharedFilesList,
   ) {
-    List<grpc.CodeInfo> codesList = [];
+    List<grpc.SnippetFile> snippetFileList = [];
 
     for (SharedFile item in sharedFilesList) {
-      codesList.add(
-        grpc.CodeInfo()
+      snippetFileList.add(
+        grpc.SnippetFile()
           ..name = item.name
-          ..code = item.code,
+          ..isMain = true
+          ..content = item.code,
       );
     }
 
-    return codesList;
+    return snippetFileList;
   }
 }

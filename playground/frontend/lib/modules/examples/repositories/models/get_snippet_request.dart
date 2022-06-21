@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-class SaveCodeResponse {
+class GetSnippetRequestWrapper {
   final String id;
 
-  const SaveCodeResponse(this.id);
+  GetSnippetRequestWrapper(this.id);
 }

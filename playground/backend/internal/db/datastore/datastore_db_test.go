@@ -16,7 +16,9 @@
 package datastore
 
 import (
+	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/db/entity"
+	"beam.apache.org/playground/backend/internal/utils"
 	"cloud.google.com/go/datastore"
 	"context"
 	"os"
@@ -65,7 +67,7 @@ func TestDatastore_PutSnippet(t *testing.T) {
 	type args struct {
 		ctx  context.Context
 		id   string
-		snip *entity.SnippetEntity
+		snip *entity.Snippet
 	}
 	tests := []struct {
 		name    string
@@ -74,9 +76,17 @@ func TestDatastore_PutSnippet(t *testing.T) {
 	}{
 		{
 			name: "PutSnippet() in the usual case",
-			args: args{ctx: ctx, id: "MOCK_ID", snip: &entity.SnippetEntity{
-				Sdk:      "SDK_GO",
-				PipeOpts: "MOCK_OPTIONS",
+			args: args{ctx: ctx, id: "MOCK_ID", snip: &entity.Snippet{
+				IDInfo: entity.IDInfo{
+					Salt:     "MOCK_SALT",
+					IdLength: 11,
+				},
+				Snippet: &entity.SnippetEntity{
+					Sdk:      utils.GetNameKey(SdkKind, "SDK_GO", Namespace, nil),
+					PipeOpts: "MOCK_OPTIONS",
+					Origin:   entity.PG_USER,
+					OwnerId:  "",
+				},
 				Codes: []*entity.CodeEntity{{
 					Code:   "MOCK_CODE",
 					IsMain: false,
@@ -95,7 +105,7 @@ func TestDatastore_PutSnippet(t *testing.T) {
 		})
 	}
 
-	cleanData(t)
+	cleanData(t, SnippetKind, "MOCK_ID")
 }
 
 func TestDatastore_GetSnippet(t *testing.T) {
@@ -119,12 +129,18 @@ func TestDatastore_GetSnippet(t *testing.T) {
 		{
 			name: "GetSnippet() in the usual case",
 			prepare: func() {
-				_ = datastoreDb.PutSnippet(ctx, "MOCK_ID", &entity.SnippetEntity{
-					Sdk:      "SDK_GO",
-					PipeOpts: "MOCK_OPTIONS",
-					Created:  nowDate,
-					Origin:   entity.PLAYGROUND,
-					OwnerId:  "",
+				_ = datastoreDb.PutSnippet(ctx, "MOCK_ID", &entity.Snippet{
+					IDInfo: entity.IDInfo{
+						Salt:     "MOCK_SALT",
+						IdLength: 11,
+					},
+					Snippet: &entity.SnippetEntity{
+						Sdk:      utils.GetNameKey(SdkKind, "SDK_GO", Namespace, nil),
+						PipeOpts: "MOCK_OPTIONS",
+						Created:  nowDate,
+						Origin:   entity.PG_USER,
+						OwnerId:  "",
+					},
 					Codes: []*entity.CodeEntity{{
 						Code:   "MOCK_CODE",
 						IsMain: false,
@@ -145,10 +161,9 @@ func TestDatastore_GetSnippet(t *testing.T) {
 			}
 
 			if err == nil {
-				if snip.Sdk != "SDK_GO" ||
-					snip.Codes[0].Code != "MOCK_CODE" ||
+				if snip.Sdk.Name != "SDK_GO" ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Origin != entity.PLAYGROUND ||
+					snip.Origin != entity.PG_USER ||
 					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
@@ -156,7 +171,198 @@ func TestDatastore_GetSnippet(t *testing.T) {
 		})
 	}
 
-	cleanData(t)
+	cleanData(t, SnippetKind, "MOCK_ID")
+}
+
+func TestDatastore_PutSDKs(t *testing.T) {
+	type args struct {
+		ctx  context.Context
+		sdks []*entity.SDKEntity
+	}
+	sdks := getSDKs()
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "PutSDKs() in the usual case",
+			args: args{
+				ctx:  ctx,
+				sdks: sdks,
+			},
+			wantErr: false,
+		},
+		{
+			name: "PutSDKs() when input data is nil",
+			args: args{
+				ctx:  ctx,
+				sdks: nil,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := datastoreDb.PutSDKs(tt.args.ctx, tt.args.sdks)
+			if err != nil {
+				t.Error("PutSDKs() method failed")
+			}
+		})
+	}
+
+	for _, sdk := range sdks {
+		cleanData(t, SdkKind, sdk.Name)
+	}
+}
+
+func TestDatastore_PutSchemaVersion(t *testing.T) {
+	type args struct {
+		ctx    context.Context
+		id     string
+		schema *entity.SchemaEntity
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "PutSchemaVersion() in the usual case",
+			args: args{
+				ctx:    ctx,
+				id:     "MOCK_ID",
+				schema: &entity.SchemaEntity{Descr: "MOCK_DESCRIPTION"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "PutSchemaVersion() when input data is nil",
+			args: args{
+				ctx:    ctx,
+				id:     "MOCK_ID",
+				schema: nil,
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := datastoreDb.PutSchemaVersion(tt.args.ctx, tt.args.id, tt.args.schema)
+			if err != nil {
+				t.Error("PutSchemaVersion() method failed")
+			}
+		})
+	}
+
+	cleanData(t, SchemaKind, "MOCK_ID")
+}
+
+func TestDatastore_GetCodes(t *testing.T) {
+	type args struct {
+		ctx      context.Context
+		parentId string
+	}
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "GetCodes() with parentId that is no in the database",
+			prepare: func() {},
+			args:    args{ctx: ctx, parentId: "MOCK_ID"},
+			wantErr: false,
+		},
+		{
+			name: "GetCodes() in the usual case",
+			prepare: func() {
+				_ = datastoreDb.PutSnippet(ctx, "MOCK_ID", &entity.Snippet{
+					IDInfo: entity.IDInfo{
+						Salt:     "MOCK_SALT",
+						IdLength: 11,
+					},
+					Snippet: &entity.SnippetEntity{
+						Sdk:      utils.GetNameKey(SdkKind, "SDK_GO", Namespace, nil),
+						PipeOpts: "MOCK_OPTIONS",
+						Origin:   entity.PG_USER,
+						OwnerId:  "",
+					},
+					Codes: []*entity.CodeEntity{{
+						Code:   "MOCK_CODE",
+						IsMain: false,
+					}},
+				})
+			},
+			args:    args{ctx: ctx, parentId: "MOCK_ID"},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.prepare()
+			codes, err := datastoreDb.GetCodes(tt.args.ctx, tt.args.parentId)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetCodes() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if len(codes) != 1 ||
+				codes[0].Code != "MOCK_CODE" ||
+				codes[0].IsMain != false {
+				t.Error("GetCodes() unexpected result")
+			}
+		})
+	}
+
+	cleanData(t, CodeKind, "ig43m5rUQo_l")
+	cleanData(t, SnippetKind, "MOCK_ID")
+}
+
+func TestDatastore_GetSDK(t *testing.T) {
+	type args struct {
+		ctx context.Context
+		id  string
+	}
+	sdks := getSDKs()
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "GetSDK() in the usual case",
+			prepare: func() {
+				_ = datastoreDb.PutSDKs(ctx, sdks)
+			},
+			args:    args{ctx: ctx, id: "SDK_GO"},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.prepare()
+			sdkEntity, err := datastoreDb.GetSDK(tt.args.ctx, tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetSDK() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err == nil {
+				if sdkEntity.DefaultExample != "MOCK_EXAMPLE" {
+					t.Error("GetSDK() unexpected result")
+				}
+			}
+		})
+	}
+
+	for _, sdk := range sdks {
+		cleanData(t, SdkKind, sdk.Name)
+	}
 }
 
 func TestNew(t *testing.T) {
@@ -186,10 +392,21 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func cleanData(t *testing.T) {
-	key := datastore.NameKey(snippetKind, "MOCK_ID", nil)
-	key.Namespace = "Playground"
+func cleanData(t *testing.T, kind, id string) {
+	key := datastore.NameKey(kind, id, nil)
+	key.Namespace = Namespace
 	if err := datastoreDb.client.Delete(ctx, key); err != nil {
 		t.Error("Error during data cleaning after the test")
 	}
+}
+
+func getSDKs() []*entity.SDKEntity {
+	var sdkEntities []*entity.SDKEntity
+	for _, sdk := range pb.Sdk_name {
+		sdkEntities = append(sdkEntities, &entity.SDKEntity{
+			Name:           sdk,
+			DefaultExample: "MOCK_EXAMPLE",
+		})
+	}
+	return sdkEntities
 }

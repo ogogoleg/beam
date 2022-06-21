@@ -15,6 +15,6 @@
 package entity
 
 type SDKEntity struct {
-	Name           string `datastore:"name"`
+	Name           string `datastore:"-"`
 	DefaultExample string `datastore:"defaultExample"`
 }

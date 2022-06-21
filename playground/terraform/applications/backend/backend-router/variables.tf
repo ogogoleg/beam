@@ -43,8 +43,8 @@ variable "cache_type" {
   default = "remote"
 }
 
-variable "snippet_db_type" {
-  default = "firestore"
+variable "db_type" {
+  default = "datastore"
 }
 
 variable "cache_address" {

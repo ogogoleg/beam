@@ -18,15 +18,20 @@ package datastore
 import (
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/utils"
 	"cloud.google.com/go/datastore"
 	"context"
+	"google.golang.org/api/iterator"
 	"time"
 )
 
 const (
-	snippetKind = "pg_snippets"
-	schemaKind  = "pg_schema_versions"
-	sdkKind     = "pg_sdks"
+	Namespace = "Playground"
+
+	SnippetKind = "pg_snippets"
+	SchemaKind  = "pg_schema_versions"
+	SdkKind     = "pg_sdks"
+	CodeKind    = "pg_codes"
 )
 
 type Datastore struct {
@@ -44,27 +49,47 @@ func New(ctx context.Context, projectId string) (*Datastore, error) {
 }
 
 // PutSnippet puts the snippet entity to datastore
-func (d *Datastore) PutSnippet(ctx context.Context, id string, snip *entity.SnippetEntity) error {
-	key := getNameKey(snippetKind, id)
-	if _, err := d.client.Put(ctx, key, snip); err != nil {
-		logger.Errorf("Datastore: PutSnippet(): error during entity saving, err: %s\n", err.Error())
+func (d *Datastore) PutSnippet(ctx context.Context, id string, snip *entity.Snippet) error {
+	if snip == nil {
+		logger.Errorf("Datastore: PutSnippet(): snippet is nil")
+		return nil
+	}
+	key := utils.GetNameKey(SnippetKind, id, Namespace, nil)
+	if _, err := d.client.Put(ctx, key, snip.Snippet); err != nil {
+		logger.Errorf("Datastore: PutSnippet(): error during the snippet entity saving, err: %s\n", err.Error())
 		return err
 	}
+
+	var keys []*datastore.Key
+	for _, code := range snip.Codes {
+		codeId, err := code.ID(snip)
+		if err != nil {
+			logger.Errorf("Datastore: PutSnippet(): error during the code K generation, err: %s\n", err.Error())
+			return err
+		}
+		keys = append(keys, utils.GetNameKey(CodeKind, codeId, Namespace, key))
+	}
+
+	if _, err := d.client.PutMulti(ctx, keys, snip.Codes); err != nil {
+		logger.Errorf("Datastore: PutSnippet(): error during the code entity saving, err: %s\n", err.Error())
+		return err
+	}
+
 	return nil
 }
 
 // GetSnippet returns the snippet entity by identifier
 func (d *Datastore) GetSnippet(ctx context.Context, id string) (*entity.SnippetEntity, error) {
-	key := getNameKey(snippetKind, id)
+	key := utils.GetNameKey(SnippetKind, id, Namespace, nil)
 	snip := new(entity.SnippetEntity)
 	if err := d.client.Get(ctx, key, snip); err != nil {
-		logger.Errorf("Datastore: GetSnippet(): error during data getting, err: %s\n", err.Error())
+		logger.Errorf("Datastore: GetSnippet(): error during snippet getting, err: %s\n", err.Error())
 		return nil, err
 	}
 	snip.LVisited = time.Now()
 	snip.VisitCount += 1
-	if err := d.PutSnippet(ctx, id, snip); err != nil {
-		logger.Errorf("Datastore: GetSnippet(): error during data setting, err: %s\n", err.Error())
+	if _, err := d.client.Put(ctx, key, snip); err != nil {
+		logger.Errorf("Datastore: GetSnippet(): error during snippet setting, err: %s\n", err.Error())
 		return nil, err
 	}
 	return snip, nil
@@ -72,7 +97,11 @@ func (d *Datastore) GetSnippet(ctx context.Context, id string) (*entity.SnippetE
 
 // PutSchemaVersion puts the schema entity to datastore
 func (d *Datastore) PutSchemaVersion(ctx context.Context, id string, schema *entity.SchemaEntity) error {
-	key := getNameKey(schemaKind, id)
+	if schema == nil {
+		logger.Errorf("Datastore: PutSchemaVersion(): schema version is nil")
+		return nil
+	}
+	key := utils.GetNameKey(SchemaKind, id, Namespace, nil)
 	if _, err := d.client.Put(ctx, key, schema); err != nil {
 		logger.Errorf("Datastore: PutSchemaVersion(): error during entity saving, err: %s\n", err.Error())
 		return err
@@ -82,9 +111,13 @@ func (d *Datastore) PutSchemaVersion(ctx context.Context, id string, schema *ent
 
 // PutSDKs puts the SDK entity to datastore
 func (d *Datastore) PutSDKs(ctx context.Context, sdks []*entity.SDKEntity) error {
+	if sdks == nil || len(sdks) == 0 {
+		logger.Errorf("Datastore: PutSDKs(): sdks are empty")
+		return nil
+	}
 	var keys []*datastore.Key
 	for _, sdk := range sdks {
-		keys = append(keys, getNameKey(sdkKind, sdk.Name))
+		keys = append(keys, utils.GetNameKey(SdkKind, sdk.Name, Namespace, nil))
 	}
 	if _, err := d.client.PutMulti(ctx, keys, sdks); err != nil {
 		logger.Errorf("Datastore: PutSDK(): error during entity saving, err: %s\n", err.Error())
@@ -93,9 +126,33 @@ func (d *Datastore) PutSDKs(ctx context.Context, sdks []*entity.SDKEntity) error
 	return nil
 }
 
-// getNameKey returns the datastore key
-func getNameKey(kind, id string) *datastore.Key {
-	key := datastore.NameKey(kind, id, nil)
-	key.Namespace = "Playground" //TODO should it get from env?
-	return key
+//GetCodes returns the code entities by parent identifier
+func (d *Datastore) GetCodes(ctx context.Context, parentId string) ([]*entity.CodeEntity, error) {
+	snipId := utils.GetNameKey(SnippetKind, parentId, Namespace, nil)
+	query := datastore.NewQuery(CodeKind).Ancestor(snipId).Namespace(Namespace)
+	it := d.client.Run(ctx, query)
+	var codes []*entity.CodeEntity
+	for {
+		var code entity.CodeEntity
+		_, err := it.Next(&code)
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			logger.Errorf("Datastore: GetCodes(): error during code getting, err: %s\n", err.Error())
+		}
+		codes = append(codes, &code)
+	}
+	return codes, nil
+}
+
+//GetSDK returns the sdk entity by an identifier
+func (d *Datastore) GetSDK(ctx context.Context, id string) (*entity.SDKEntity, error) {
+	sdkId := utils.GetNameKey(SdkKind, id, Namespace, nil)
+	sdk := new(entity.SDKEntity)
+	if err := d.client.Get(ctx, sdkId, sdk); err != nil {
+		logger.Errorf("Datastore: GetSDK(): error during sdk getting, err: %s\n", err.Error())
+		return nil, err
+	}
+	return sdk, nil
 }

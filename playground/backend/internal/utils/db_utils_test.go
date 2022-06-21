@@ -13,49 +13,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package entity
+package utils
 
 import "testing"
 
-func TestSchema_ID(t *testing.T) {
+func TestID(t *testing.T) {
+	type args struct {
+		salt    string
+		content string
+		length  int
+	}
 	tests := []struct {
 		name    string
-		schema  *Schema
+		args    args
 		want    string
 		wantErr bool
 	}{
 		{
-			name: "Schema ID() in the usual case",
-			schema: &Schema{
-				IDInfo: IDInfo{
-					Salt:     "MOCK_SALT",
-					IdLength: 11,
-				},
-				Schema: &SchemaEntity{
-					Version: "MOCK_VERSION",
-					Descr:   "MOCK_DESCRIPTION",
-				},
+			name: "K generation in the usual case",
+			args: args{
+				salt:    "MOCK_SALT",
+				content: "MOCK_CONTENT",
+				length:  11,
 			},
-			want:    "C5At43gZ2Hy",
+			want:    "Zl_s-8seE6k",
 			wantErr: false,
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			id, err := tt.schema.ID()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ID() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if err == nil {
-				if len(id) != tt.schema.IdLength {
-					t.Error("The ID length is not 11")
-				}
-				if tt.want != id {
-					t.Error("ID is wrong")
-				}
-			}
-		})
+		result, err := ID(tt.args.salt, tt.args.content, tt.args.length)
+		if (err != nil) != tt.wantErr {
+			t.Errorf("ID() error = %v, wantErr %v", err, tt.wantErr)
+			return
+		}
+		if result != tt.want {
+			t.Errorf("ID() result = %v, want %v", result, tt.want)
+		}
 	}
 }

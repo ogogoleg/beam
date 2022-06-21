@@ -126,16 +126,25 @@ type ApplicationEnvs struct {
 	// maxSnippetSize is entity size limit
 	maxSnippetSize int
 
-	// firestoreIdLength is a datastore ID length
-	firestoreIdLength int
+	// idLength is a datastore ID length
+	idLength int
 
-	// firestoreEmulatorHost is the address of datastore emulator
-	firestoreEmulatorHost string
+	// datastoreEmulatorHost is the address of datastore emulator
+	datastoreEmulatorHost string
+
+	// schemaVersion is the database schema version
+	schemaVersion string
+
+	// origin is a backend source
+	origin string
+
+	// sdkConfigPath is a sdk configuration file
+	sdkConfigPath string
 }
 
 // NewApplicationEnvs constructor for ApplicationEnvs
 func NewApplicationEnvs(
-	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, firestoreEmulatorHost string,
+	workingDir, launchSite, projectId, pipelinesFolder, bucketName, playgroundSalt, datastoreEmulatorHost, origin, sdkConfigPath string,
 	cacheEnvs *CacheEnvs,
 	pipelineExecuteTimeout time.Duration,
 	dbType Database,
@@ -152,8 +161,10 @@ func NewApplicationEnvs(
 		dbType:                 dbType,
 		playgroundSalt:         playgroundSalt,
 		maxSnippetSize:         maxSnippetSize,
-		firestoreIdLength:      firestoreIdLength,
-		firestoreEmulatorHost:  firestoreEmulatorHost,
+		idLength:               firestoreIdLength,
+		datastoreEmulatorHost:  datastoreEmulatorHost,
+		origin:                 origin,
+		sdkConfigPath:          sdkConfigPath,
 	}
 }
 
@@ -207,12 +218,32 @@ func (ae *ApplicationEnvs) MaxSnippetSize() int {
 	return ae.maxSnippetSize
 }
 
-// FirestoreIdLength returns the datastore ID length
-func (ae *ApplicationEnvs) FirestoreIdLength() int {
-	return ae.firestoreIdLength
+// IdLength returns the datastore ID length
+func (ae *ApplicationEnvs) IdLength() int {
+	return ae.idLength
 }
 
-// FirestoreEmulatorHost returns the address of datastore emulator
-func (ae *ApplicationEnvs) FirestoreEmulatorHost() string {
-	return ae.firestoreEmulatorHost
+// DatastoreEmulatorHost returns the address of datastore emulator
+func (ae *ApplicationEnvs) DatastoreEmulatorHost() string {
+	return ae.datastoreEmulatorHost
+}
+
+// SchemaVersion returns the database schema version
+func (ae *ApplicationEnvs) SchemaVersion() string {
+	return ae.schemaVersion
+}
+
+// Origin returns backend source
+func (ae *ApplicationEnvs) Origin() string {
+	return ae.origin
+}
+
+// SdkConfigPath returns sdk configuration file
+func (ae *ApplicationEnvs) SdkConfigPath() string {
+	return ae.sdkConfigPath
+}
+
+// SetSchemaVersion sets the database schema version
+func (ae *ApplicationEnvs) SetSchemaVersion(schemaVersion string) {
+	ae.schemaVersion = schemaVersion
 }

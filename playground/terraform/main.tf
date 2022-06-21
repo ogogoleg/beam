@@ -54,7 +54,7 @@ module "applications" {
   backend_service_name  = var.backend_service_name
   frontend_service_name = var.frontend_service_name
   cache_type            = var.cache_type
-  snippet_db_type       = var.snippet_db_type
+  db_type       = var.db_type
 
   go_volume_size      = var.go_volume_size
   go_cpu              = var.go_cpu

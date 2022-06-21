@@ -23,8 +23,9 @@ import (
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/db/datastore"
-	"beam.apache.org/playground/backend/internal/db/entity"
 	localdb "beam.apache.org/playground/backend/internal/db/local"
+	"beam.apache.org/playground/backend/internal/db/schema"
+	"beam.apache.org/playground/backend/internal/db/schema/migration"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
 	"beam.apache.org/playground/backend/internal/utils"
@@ -57,7 +58,7 @@ func runServer() error {
 		return err
 	}
 
-	if err = initDBStructure(ctx, databaseClient, envService); err != nil {
+	if err = setupDBStructure(ctx, databaseClient, &envService.ApplicationEnvs); err != nil {
 		return err
 	}
 
@@ -168,65 +169,17 @@ func setupDB(ctx context.Context, appEnv environment.ApplicationEnvs) (db.Databa
 	}
 }
 
-// initDBStructure initializes the data structure in NoSQL databases
-func initDBStructure(ctx context.Context, database db.Database, env *environment.Environment) error {
-	//init snippets
-	dummyStr := "dummy"
-	snip := &entity.Snippet{
-		IDInfo: entity.IDInfo{
-			IdLength: env.ApplicationEnvs.FirestoreIdLength(),
-			Salt:     env.ApplicationEnvs.PlaygroundSalt(),
-		},
-		Snippet: &entity.SnippetEntity{
-			OwnerId:  dummyStr,
-			PipeOpts: dummyStr,
-			Codes: []*entity.CodeEntity{
-				{
-					Name: dummyStr,
-					Code: dummyStr,
-				},
-			},
-		},
+// setupDBStructure initializes the data structure
+func setupDBStructure(ctx context.Context, db db.Database, appEnv *environment.ApplicationEnvs) error {
+	versions := []schema.Version{
+		new(migration.InitialStructure),
 	}
-	snipId, err := snip.ID()
+	dbSchema := schema.New(ctx, db, appEnv, versions)
+	actualSchemaVersion, err := dbSchema.InitiateData()
 	if err != nil {
 		return err
 	}
-	if err = database.PutSnippet(ctx, snipId, snip.Snippet); err != nil {
-		return err
-	}
-
-	//init schema versions
-	schema := &entity.Schema{
-		IDInfo: entity.IDInfo{
-			Salt:     env.ApplicationEnvs.PlaygroundSalt(),
-			IdLength: env.ApplicationEnvs.FirestoreIdLength(),
-		},
-		Schema: &entity.SchemaEntity{
-			Version: "0.0.1", //TODO should it get from env?
-			Descr:   "",      //TODO should it get from env?
-		},
-	}
-	schemaId, err := schema.ID()
-	if err != nil {
-		return err
-	}
-	if err = database.PutSchemaVersion(ctx, schemaId, schema.Schema); err != nil {
-		return err
-	}
-
-	//init sdks
-	var sdkEntities []*entity.SDKEntity
-	for _, sdk := range pb.Sdk_name {
-		sdkEntities = append(sdkEntities, &entity.SDKEntity{
-			Name:           sdk,
-			DefaultExample: "", //TODO should it get from env?
-		})
-	}
-	if err = database.PutSDKs(ctx, sdkEntities); err != nil {
-		return err
-	}
-
+	appEnv.SetSchemaVersion(actualSchemaVersion)
 	return nil
 }
 

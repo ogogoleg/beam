@@ -46,6 +46,17 @@ class BatchDoFnNoReturnAnnotation(beam.DoFn):
     yield [element * 2 for element in batch]
 
 
+class BatchDoFnOverrideTypeInference(beam.DoFn):
+  def process_batch(self, batch, *args, **kwargs):
+    yield [element * 2 for element in batch]
+
+  def get_input_batch_type(self, input_element_type):
+    return List[input_element_type]
+
+  def get_output_batch_type(self, input_element_type):
+    return List[input_element_type]
+
+
 class EitherDoFn(beam.DoFn):
   def process(self, element: int, *args, **kwargs) -> Iterator[float]:
     yield element / 2
@@ -75,6 +86,7 @@ def get_test_class_name(cls, num, params_dict):
 @parameterized_class([
     {
         "dofn": ElementDoFn(),
+        "input_element_type": int,
         "expected_process_defined": True,
         "expected_process_batch_defined": False,
         "expected_input_batch_type": None,
@@ -82,6 +94,7 @@ def get_test_class_name(cls, num, params_dict):
     },
     {
         "dofn": BatchDoFn(),
+        "input_element_type": int,
         "expected_process_defined": False,
         "expected_process_batch_defined": True,
         "expected_input_batch_type": beam.typehints.List[int],
@@ -89,6 +102,15 @@ def get_test_class_name(cls, num, params_dict):
     },
     {
         "dofn": BatchDoFnNoReturnAnnotation(),
+        "input_element_type": int,
+        "expected_process_defined": False,
+        "expected_process_batch_defined": True,
+        "expected_input_batch_type": beam.typehints.List[int],
+        "expected_output_batch_type": beam.typehints.List[int]
+    },
+    {
+        "dofn": BatchDoFnOverrideTypeInference(),
+        "input_element_type": int,
         "expected_process_defined": False,
         "expected_process_batch_defined": True,
         "expected_input_batch_type": beam.typehints.List[int],
@@ -96,6 +118,7 @@ def get_test_class_name(cls, num, params_dict):
     },
     {
         "dofn": EitherDoFn(),
+        "input_element_type": int,
         "expected_process_defined": True,
         "expected_process_batch_defined": True,
         "expected_input_batch_type": beam.typehints.List[int],
@@ -103,6 +126,7 @@ def get_test_class_name(cls, num, params_dict):
     },
     {
         "dofn": ElementToBatchDoFn(),
+        "input_element_type": int,
         "expected_process_defined": True,
         "expected_process_batch_defined": False,
         "expected_input_batch_type": None,
@@ -110,6 +134,7 @@ def get_test_class_name(cls, num, params_dict):
     },
     {
         "dofn": BatchToElementDoFn(),
+        "input_element_type": int,
         "expected_process_defined": False,
         "expected_process_batch_defined": True,
         "expected_input_batch_type": beam.typehints.List[int],
@@ -119,24 +144,25 @@ def get_test_class_name(cls, num, params_dict):
                      class_name_func=get_test_class_name)
 class BatchDoFnParameterizedTest(unittest.TestCase):
   def test_process_defined(self):
-    self.assertEqual(self.dofn.process_defined, self.expected_process_defined)
+    self.assertEqual(self.dofn._process_defined, self.expected_process_defined)
 
   def test_process_batch_defined(self):
     self.assertEqual(
-        self.dofn.process_batch_defined, self.expected_process_batch_defined)
+        self.dofn._process_batch_defined, self.expected_process_batch_defined)
 
   def test_get_input_batch_type(self):
     self.assertEqual(
-        self.dofn.get_input_batch_type(), self.expected_input_batch_type)
+        self.dofn._get_input_batch_type_normalized(self.input_element_type),
+        self.expected_input_batch_type)
 
   def test_get_output_batch_type(self):
     self.assertEqual(
-        self.dofn.get_output_batch_type(beam.typehints.Any),
+        self.dofn._get_output_batch_type_normalized(self.input_element_type),
         self.expected_output_batch_type)
 
   def test_can_yield_batches(self):
     expected = self.expected_output_batch_type is not None
-    self.assertEqual(self.dofn.can_yield_batches, expected)
+    self.assertEqual(self.dofn._can_yield_batches, expected)
 
 
 class BatchDoFnNoInputAnnotation(beam.DoFn):
@@ -150,10 +176,10 @@ class BatchDoFnTest(unittest.TestCase):
     # checking this in parameterized test causes a circular reference issue
     dofn = beam.Map(lambda x: x * 2).dofn
 
-    self.assertTrue(dofn.process_defined)
-    self.assertFalse(dofn.process_batch_defined)
-    self.assertEqual(dofn.get_input_batch_type(), None)
-    self.assertEqual(dofn.get_output_batch_type(int), None)
+    self.assertTrue(dofn._process_defined)
+    self.assertFalse(dofn._process_batch_defined)
+    self.assertEqual(dofn._get_input_batch_type_normalized(int), None)
+    self.assertEqual(dofn._get_output_batch_type_normalized(int), None)
 
   def test_no_input_annotation_raises(self):
     p = beam.Pipeline()

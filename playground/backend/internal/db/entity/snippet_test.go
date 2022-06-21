@@ -15,7 +15,10 @@
 
 package entity
 
-import "testing"
+import (
+	"beam.apache.org/playground/backend/internal/utils"
+	"testing"
+)
 
 func TestSnippet_ID(t *testing.T) {
 	tests := []struct {
@@ -28,20 +31,20 @@ func TestSnippet_ID(t *testing.T) {
 			name: "Snippet ID() in the usual case",
 			snip: &Snippet{
 				Snippet: &SnippetEntity{
-					Sdk:      "SDK_GO",
+					Sdk:      utils.GetNameKey("pg_sdks", "SDK_GO", "Playground", nil),
 					PipeOpts: "MOCK_OPTIONS",
-					Codes: []*CodeEntity{{
-						Name:   "MOCK_NAME",
-						Code:   "MOCK_CODE",
-						IsMain: false,
-					}},
 				},
+				Codes: []*CodeEntity{{
+					Name:   "MOCK_NAME",
+					Code:   "MOCK_CODE",
+					IsMain: false,
+				}},
 				IDInfo: IDInfo{
 					IdLength: 11,
 					Salt:     "MOCK_SALT",
 				},
 			},
-			want:    "JBuYwNWTvAk",
+			want:    "nN5n1noWt2J",
 			wantErr: false,
 		},
 	}
@@ -83,14 +86,14 @@ func TestCode_ID(t *testing.T) {
 			name: "CodeEntity ID() in the usual case",
 			snip: &Snippet{
 				Snippet: &SnippetEntity{
-					Sdk:      "SDK_GO",
+					Sdk:      utils.GetNameKey("pg_sdks", "SDK_GO", "Playground", nil),
 					PipeOpts: "MOCK_OPTIONS",
-					Codes:    []*CodeEntity{code},
 				},
 				IDInfo: IDInfo{
 					Salt:     "MOCK_SALT",
 					IdLength: 11,
 				},
+				Codes: []*CodeEntity{code},
 			},
 			code:    code,
 			want:    "XSnhl0HoUOd",

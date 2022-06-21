@@ -53,13 +53,13 @@ resource "google_app_engine_flexible_app_version" "backend_app_go" {
   }
 
   network {
-    name = var.network_name
+    name       = var.network_name
     subnetwork = var.subnetwork_name
   }
 
   env_variables = {
     CACHE_TYPE        = var.cache_type
-    SNIPPET_DB_TYPE   = var.snippet_db_type
+    DB_TYPE           = var.db_type
     CACHE_ADDRESS     = "${var.cache_address}:6379"
     NUM_PARALLEL_JOBS = 30
     LAUNCH_SITE       = "app_engine"

@@ -73,16 +73,16 @@ module "gke" {
   source                = "./gke"
   project_id            = var.project_id
   service_account_email = module.setup.service_account_email
-  machine_type      = var.gke_machine_type
-  node_count        = var.gke_node_count
-  name              = var.gke_name
-  location          = var.gke_location
-  subnetwork        = module.network.playground_subnetwork_id
-  network           = module.network.playground_network_id
+  machine_type          = var.gke_machine_type
+  node_count            = var.gke_node_count
+  name                  = var.gke_name
+  location              = var.gke_location
+  subnetwork            = module.network.playground_subnetwork_id
+  network               = module.network.playground_network_id
 }
 
 module "firebase" {
-  source = "./firestore"
-  project_id            = var.project_id
+  source     = "./firestore"
+  project_id = var.project_id
   depends_on = [module.setup, module.artifact_registry, module.memorystore, module.network]
 }

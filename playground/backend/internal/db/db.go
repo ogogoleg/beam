@@ -26,13 +26,17 @@ type Database interface {
 }
 
 type Snippet interface {
-	PutSnippet(ctx context.Context, id string, snip *entity.SnippetEntity) error
+	PutSnippet(ctx context.Context, id string, snip *entity.Snippet) error
 
 	GetSnippet(ctx context.Context, id string) (*entity.SnippetEntity, error)
+
+	GetCodes(ctx context.Context, parentId string) ([]*entity.CodeEntity, error)
 }
 
 type Catalogue interface {
 	PutSchemaVersion(ctx context.Context, id string, schema *entity.SchemaEntity) error
 
 	PutSDKs(ctx context.Context, sdks []*entity.SDKEntity) error
+
+	GetSDK(ctx context.Context, id string) (*entity.SDKEntity, error)
 }

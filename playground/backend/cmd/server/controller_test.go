@@ -19,6 +19,7 @@ import (
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
 	"beam.apache.org/playground/backend/internal/db"
+	datastoreDb "beam.apache.org/playground/backend/internal/db/datastore"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	localdb "beam.apache.org/playground/backend/internal/db/local"
 	"beam.apache.org/playground/backend/internal/environment"
@@ -722,7 +723,7 @@ func TestPlaygroundController_Cancel(t *testing.T) {
 	}
 }
 
-func TestPlaygroundController_SaveCode(t *testing.T) {
+func TestPlaygroundController_SaveSnippet(t *testing.T) {
 	defer goleak.VerifyNone(t, opt)
 	ctx := context.Background()
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
@@ -730,60 +731,62 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 
 	type args struct {
 		ctx  context.Context
-		info *pb.SaveCodeRequest
+		info *pb.SaveSnippetRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
+		wantId  string
 		wantErr bool
 	}{
-		// Test case with calling SaveCode method with incorrect sdk.
+		// Test case with calling SaveSnippet method with incorrect sdk.
 		// As a result, want to receive an error.
 		{
-			name: "SaveCode with incorrect sdk",
+			name: "SaveSnippet with incorrect sdk",
 			args: args{
 				ctx: ctx,
-				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
+				info: &pb.SaveSnippetRequest{
+					Files: []*pb.SnippetFile{{Name: "MOCK_NAME", Content: "MOCK_CODE"}},
 					Sdk:   pb.Sdk_SDK_UNSPECIFIED,
 				},
 			},
 			wantErr: true,
 		},
-		// Test case with calling SaveCode method with empty entity.
+		// Test case with calling SaveSnippet method with empty entity.
 		// As a result, want to receive an error.
 		{
-			name: "SaveCode with empty entity",
+			name: "SaveSnippet with empty entity",
 			args: args{
 				ctx: ctx,
-				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: ""}},
+				info: &pb.SaveSnippetRequest{
+					Files: []*pb.SnippetFile{{Name: "MOCK_NAME", Content: ""}},
 					Sdk:   pb.Sdk_SDK_JAVA,
 				},
 			},
 			wantErr: true,
 		},
-		// Test case with calling SaveCode method with a simple entity.
+		// Test case with calling SaveSnippet method with a simple entity.
 		// As a result, want to receive a generated ID.
 		{
-			name: "SaveCode with a simple entity",
+			name: "SaveSnippet with a simple entity",
 			args: args{
 				ctx: ctx,
-				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: "MOCK_CODE"}},
+				info: &pb.SaveSnippetRequest{
+					Files: []*pb.SnippetFile{{Name: "MOCK_NAME", Content: "MOCK_CODE"}},
 					Sdk:   pb.Sdk_SDK_GO,
 				},
 			},
 			wantErr: false,
+			wantId:  "obxGH-aLdgj",
 		},
-		// Test case with calling SaveCode method with too large entity.
+		// Test case with calling SaveSnippet method with too large entity.
 		// As a result, want to receive an error.
 		{
-			name: "SaveCode with too large entity",
+			name: "SaveSnippet with too large entity",
 			args: args{
 				ctx: ctx,
-				info: &pb.SaveCodeRequest{
-					Codes: []*pb.CodeInfo{{Name: "MOCK_NAME", Code: utils.RandomString(65537)}},
+				info: &pb.SaveSnippetRequest{
+					Files: []*pb.SnippetFile{{Name: "MOCK_NAME", Content: utils.RandomString(1000001)}},
 					Sdk:   pb.Sdk_SDK_JAVA,
 				},
 			},
@@ -793,20 +796,20 @@ func TestPlaygroundController_SaveCode(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := client.SaveCode(ctx, tt.args.info)
+			got, err := client.SaveSnippet(ctx, tt.args.info)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("PlaygroundController_SaveCode() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("PlaygroundController_SaveSnippet() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err == nil {
-				if len(got.Id) != 11 {
-					t.Errorf("PlaygroundController_SaveCode() generated ID length is not 11")
+				if len(got.Id) != 11 || got.Id != tt.wantId {
+					t.Errorf("PlaygroundController_SaveSnippet() generated ID length is not 11")
 				}
 			}
 		})
 	}
 }
 
-func TestPlaygroundController_GetCode(t *testing.T) {
+func TestPlaygroundController_GetSnippet(t *testing.T) {
 	defer goleak.VerifyNone(t, opt)
 	ctx := context.Background()
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
@@ -815,7 +818,7 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 
 	type args struct {
 		ctx  context.Context
-		info *pb.GetCodeRequest
+		info *pb.GetSnippetRequest
 	}
 	tests := []struct {
 		name    string
@@ -823,37 +826,41 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 		prepare func()
 		wantErr bool
 	}{
-		// Test case with calling GetCode method with ID that is not in the database.
+		// Test case with calling GetSnippet method with ID that is not in the database.
 		// As a result, want to receive an error.
 		{
-			name: "GetCode when the entity not found",
+			name: "GetSnippet when the entity not found",
 			args: args{
 				ctx:  ctx,
-				info: &pb.GetCodeRequest{Id: "MOCK_ID"},
+				info: &pb.GetSnippetRequest{Id: "MOCK_ID"},
 			},
 			prepare: func() {},
 			wantErr: true,
 		},
-		// Test case with calling GetCode method with a correct ID.
+		// Test case with calling GetSnippet method with a correct ID.
 		// As a result, want to receive a code entity.
 		{
-			name: "GetCode with correct ID",
+			name: "GetSnippet with correct ID",
 			args: args{
 				ctx:  ctx,
-				info: &pb.GetCodeRequest{Id: "MOCK_ID"},
+				info: &pb.GetSnippetRequest{Id: "MOCK_ID"},
 			},
 			prepare: func() {
-				_ = snippetDb.PutSnippet(ctx, "MOCK_ID", &entity.SnippetEntity{
-					OwnerId:  "",
-					Sdk:      "SDK_JAVA",
-					PipeOpts: "MOCK_OPTIONS",
-					Created:  nowDate,
-					Origin:   entity.PLAYGROUND,
-					Codes: []*entity.CodeEntity{{
-						Code:   "MOCK_CODE",
-						IsMain: false,
-					}},
-				})
+				_ = snippetDb.PutSnippet(ctx, "MOCK_ID",
+					&entity.Snippet{
+						Snippet: &entity.SnippetEntity{
+							OwnerId:  "",
+							Sdk:      utils.GetNameKey(datastoreDb.SdkKind, pb.Sdk_SDK_JAVA.String(), datastoreDb.Namespace, nil),
+							PipeOpts: "MOCK_OPTIONS",
+							Created:  nowDate,
+							Origin:   entity.PG_USER,
+						},
+						Codes: []*entity.CodeEntity{{
+							Code:   "MOCK_CODE",
+							IsMain: false,
+						}},
+					},
+				)
 			},
 			wantErr: false,
 		},
@@ -862,13 +869,13 @@ func TestPlaygroundController_GetCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.prepare()
-			got, err := client.GetCode(ctx, tt.args.info)
+			got, err := client.GetSnippet(ctx, tt.args.info)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("PlaygroundController_GetCode() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("PlaygroundController_GetSnippet() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err == nil {
-				if got.Codes[0].Code != "MOCK_CODE" || got.Sdk != 1 || got.PipelineOptions != "MOCK_OPTIONS" {
-					t.Errorf("PlaygroundController_GetCode() unexpected response")
+				if got.Files[0].Content != "MOCK_CODE" || got.Sdk != 1 || got.PipelineOptions != "MOCK_OPTIONS" {
+					t.Errorf("PlaygroundController_GetSnippet() unexpected response")
 				}
 			}
 		})

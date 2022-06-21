@@ -40,47 +40,44 @@ task("tidy") {
   }
 }
 
-task("startDatastoreEmulator") {
-  doLast {
-    exec {
-      executable("sh")
-      args("start_datastore_emulator.sh")
+val startDatastoreEmulator by tasks.registering {
+    doFirst {
+        val process = ProcessBuilder()
+            .directory(projectDir)
+            .inheritIO()
+            .command("sh", "start_datastore_emulator.sh")
+            .start()
+            .waitFor()
+        if (process == 0) {
+            println("Datastore emulator started")
+        } else {
+            println("Failed to start datastore emulator")
+        }
     }
-  }
-  doLast {
-     exec {
-       executable("sh")
-       args("wait_datastore_running.sh")
-      }
-   }
 }
 
-task("stopDatastoreEmulator") {
-  doFirst {
-    exec {
-      executable("sh")
-      args("stop_datastore_emulator.sh")
+val stopDatastoreEmulator by tasks.registering {
+    doLast {
+        exec {
+            executable("sh")
+            args("stop_datastore_emulator.sh")
+        }
     }
-  }
 }
 
-task("test") {
-  group = "verification"
-  dependsOn(":playground:backend:startDatastoreEmulator")
-  description = "Test the backend"
-  doFirst {
-    exec {
-      executable("go")
-      args("test", "./...")
+val test by tasks.registering {
+    group = "verification"
+    description = "Test the backend"
+    doLast {
+        exec {
+            executable("go")
+            args("test", "./...")
+        }
     }
-  }
-  doLast {
-     exec {
-       executable("sh")
-       args("stop_datastore_emulator.sh")
-     }
-   }
 }
+
+test { dependsOn(startDatastoreEmulator) }
+test { finalizedBy(stopDatastoreEmulator) }
 
 task("benchmarkPrecompiledObjects") {
   group = "verification"

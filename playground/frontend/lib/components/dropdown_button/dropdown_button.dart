@@ -32,7 +32,7 @@ enum DropdownAlignment {
 
 class AppDropdownButton extends StatefulWidget {
   final Widget buttonText;
-  final Function createDropdown;
+  final Widget Function(void Function()) createDropdown;
   final double height;
   final double width;
   final Widget? leading;
@@ -55,7 +55,7 @@ class AppDropdownButton extends StatefulWidget {
   });
 
   @override
-  _AppDropdownButtonState createState() => _AppDropdownButtonState();
+  State<AppDropdownButton> createState() => _AppDropdownButtonState();
 }
 
 class _AppDropdownButtonState extends State<AppDropdownButton>

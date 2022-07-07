@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
+import 'package:akvelon_flutter_issue_106664_workaround/akvelon_flutter_issue_106664_workaround.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_issue_106664_workaround/flutter_issue_106664_workaround.dart';
 import 'package:intl/intl_browser.dart';
 import 'package:playground/configure_nonweb.dart'
 if (dart.library.html) 'package:playground/configure_web.dart';

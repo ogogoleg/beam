@@ -1,0 +1,12 @@
+version: "3.4"
+services:
+  app:
+    container_name: react_tour_poc
+    image: oborisevich/react_tour_poc:latest
+    ports:
+      - 3001:80
+  playground: 
+    container_name: playground_frontend
+    image: oborisevich/playground_frontend:latest
+    ports:
+      - 3002:8080

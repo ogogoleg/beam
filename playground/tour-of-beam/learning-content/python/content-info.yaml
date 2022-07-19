@@ -1,0 +1,8 @@
+name: Tour of Beam
+language: English
+programming_language: Python
+content:
+- introduction
+- basic-transforms
+- common-transforms
+- triggers

@@ -1,1 +1,1 @@
-Theory for unit + assignment
+Theory for unit

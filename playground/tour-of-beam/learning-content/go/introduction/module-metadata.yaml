@@ -1,4 +1,5 @@
 name: Introduction
+complexity: 1
 content:
 - introduction-concepts
 - hello-beam

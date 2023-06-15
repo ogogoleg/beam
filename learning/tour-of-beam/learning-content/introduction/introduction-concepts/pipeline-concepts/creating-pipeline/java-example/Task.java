@@ -40,7 +40,7 @@ public class Task {
     private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
 
-    public static void main(String[] args) {
+    public static void main112(String[] args) {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
         Pipeline pipeline = Pipeline.create(options);
 

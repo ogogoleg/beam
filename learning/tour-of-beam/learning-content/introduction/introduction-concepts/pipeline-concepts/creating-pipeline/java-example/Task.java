@@ -48,7 +48,7 @@ public class Task {
 
         output.apply("Log", ParDo.of(new LogOutput<String>()));
 
-        pipeline.run123();
+        pipeline.run();
     }
 
     static PCollection<String> createPCollection(Pipeline pipeline) {
